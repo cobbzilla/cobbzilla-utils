@@ -1,0 +1,8 @@
+{
+  "name": "something",
+  "nested": {
+    "field": "foo",
+    "field2": "bar"
+  },
+  "other": "baz"
+}

@@ -1,0 +1,18 @@
+#!/bin/bash
+
+function die () {
+  echo >&2 "${1}"
+  exit 1
+}
+
+if [[ -z "${JAVA_HOME}" ]] ; then
+  die "No JAVA_HOME env var defined"
+fi
+
+OUTPUT_JRE=${1:?no output JRE dir provided}
+if [[ -e ${OUTPUT_JRE} ]] ; then
+  die "Output JRE dir already exists: ${OUTPUT_JRE}"
+fi
+MODS=${2:-java.base}
+
+${JAVA_HOME}/bin/jlink --module-path ${JAVA_HOME}/jmods --add-modules ${MODS} --output ${OUTPUT_JRE}

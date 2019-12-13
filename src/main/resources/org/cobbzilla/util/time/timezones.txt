@@ -1,0 +1,67 @@
+ID|GMT offset|Java-TimeZone|Display Name|Linux Name
+0|GMT-12:00|Etc/GMT+12|International Date Line West
+1|GMT-11:00|Pacific/Samoa|Midway Island, Samoa
+2|GMT-10:00|HST|Hawaii|US/Hawaii
+3|GMT-9:00|AST|Alaska|US/Alaska
+4|GMT-8:00|PST|Pacific Time (US & Canada)|US/Pacific
+5|GMT-7:00|MST|Mountain Time (US & Canada)|US/Mountain
+6|GMT-7:00|MST|Chihuahua, La Paz, Mazatlan|America/Chihuahua
+7|GMT-7:00|US/Arizona|Arizona
+8|GMT-6:00|CST|Central Time (US & Canada)|US/Central
+9|GMT-6:00|CST|Guadalajara, Mexico City, Monterrey|America/Mexico_City
+10|GMT-6:00|Canada/Saskatchewan|Saskatchewan
+11|GMT-5:00|EST|Eastern Time (US & Canada)|US/Eastern
+12|GMT-5:00|America/Indianapolis|Indiana (East)|US/East-Indiana
+13|GMT-5:00|America/Bogota|Bogota, Lima, Quito
+14|GMT-4:00|Canada/Atlantic|Atlantic Time (Canada)
+15|GMT-4:00|America/Caracas|Caracas, La Paz
+16|GMT-4:00|America/Santiago|Santiago
+17|GMT-3:30|Canada/Newfoundland|Newfoundland
+18|GMT-3:00|BET|Brasilia|Brazil/East
+19|GMT-3:00|America/Buenos_Aires|Buenos Aires, Georgetown
+20|GMT-3:00|America/Godthab|Greenland
+21|GMT-2:00|Etc/GMT+2|Mid-Altantic
+22|GMT-1:00|Atlantic/Azores|Azores
+23|GMT-1:00|Atlantic/Cape_Verde|Cape Verde
+24|GMT|Africa/Casablanca|Casablanca, Monrovia
+25|GMT|GB|GMT: London, Dublin, Lisbon
+26|GMT+1:00|CET|Central European Time
+27|GMT+2:00|EET|Eastern European Time
+28|GMT+2:00|CAT|Harare, Pretoria|Africa/Harare
+29|GMT+2:00|Israel|Israel Standard Time
+30|GMT+3:00|Asia/Baghdad|Baghdad
+31|GMT+3:00|Asia/Kuwait|Arabia Standard Time
+32|GMT+3:00|Europe/Moscow|Moscow|Etc/GMT+4
+33|GMT+3:00|EAT|Eastern African Time|Africa/Nairobi
+34|GMT+3:30|Iran|Iran
+35|GMT+4:00|Asia/Dubai|Dubai, Muscat
+36|GMT+4:00|Asia/Baku|Baku, Tbilisi, Yerevan
+37|GMT+4:30|Asia/Kabul|Afganistan
+38|GMT+5:00|Asia/Yekaterinburg|Ekaterinburg
+39|GMT+5:00|Asia/Karachi|Islamabad, Karachi, Tashkent
+40|GMT+5:30|IST|India Standard Time|Asia/Kolkata
+41|GMT+5:45|Asia/Katmandu|Nepal
+42|GMT+6:00|Asia/Almaty|Almaty, Novosibirsk
+43|GMT+6:00|Asia/Dhaka|Astana, Dhaka|Etc/GMT+6
+44|GMT+6:00|Asia/Colombo|Sri Lanka
+45|GMT+6:30|Asia/Rangoon|Rangoon
+46|GMT+7:00|Asia/Bangkok|Bangkok, Hanoi, Jakarta
+47|GMT+7:00|Asia/Krasnoyarsk|Krasnoyarsk
+48|GMT+8:00|Asia/Hong_Kong|Beijing, Hong Kong, Chongquing|Hongkong
+49|GMT+8:00|Asia/Irkutsk|Irkutsk, Ulaan Bataar
+50|GMT+8:00|Asia/Kuala_Lumpur|Kuala Lumpur, Singapore
+51|GMT+8:00|Australia/Perth|Perth
+52|GMT+8:00|Asia/Taipei|Taipei|Etc/GMT+8
+53|GMT+9:00|JST|Tokyo, Osaka, Sapporo|Japan
+54|GMT+9:00|Asia/Yakutsk|Yakutsk
+55|GMT+9:30|Australia/Adelaide|Adelaide|Australia/South
+56|GMT+9:30|Australia/Darwin|Darwin||Australia/North
+57|GMT+10:00|Australia/Brisbane|Brisbane
+58|GMT+10:00|Australia/Canberra|Canberra, Melbourne, Sydney|Australia/Sydney
+59|GMT+10:00|Pacific/Guam|Guam, Port Moresby
+60|GMT+10:00|Australia/Hobart|Tasmania, Hobart|Australia/Tasmania
+61|GMT+10:00|Asia/Vladivostok|Vladivostok
+62|GMT+11:00|Asia/Magadan|Magadan, New Caledonia
+63|GMT+12:00|Pacific/Auckland|Auckland, Wellington|NZ
+64|GMT+12:00|Asia/Kamchatka|Kamchatka
+65|GMT+12:00|Pacific/Fiji|Fiji

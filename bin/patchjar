@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# patchjar - for quick patching jar files in a world of maven projects
+#
+# Usage: patchjar <jar-file> <destination> <dir> [<dir2> <dir3> ...]
+#
+# jar-file:      path to a jar file. you can use relative paths
+# destination:   a local path or user@host:path
+# dirs:          any directory with a maven pom.xml file
+#
+# Rationale: building uber-jars is time-consuming. Uber-jars are wonderful for
+# deployment, but can sometimes feel like the slow down iteration cycles.
+#
+# patchjar runs "mvn compile" in each maven directory, then directly updates
+# the jar via "jar uvf". Only the class files that changed are updated.
+#
+# Once all patches are applied, patchjar copies the jar file to the destination.
+#
+
+function die () {
+  echo >&2 "${1}"
+  exit 1
+}
+
+START_DIR=$(pwd)
+JAR="$(cd $(dirname ${1}) && pwd)/$(basename ${1})"
+DESTINATION="${2}"
+shift 2
+
+MAVEN="mvn -DskipTests=true -Dcheckstyle.skip=true"
+
+for dir in ${@} ; do
+  cd ${START_DIR} && cd $(cd ${dir} && pwd) \
+  && ${MAVEN} compile \
+  && cd target/classes \
+  && classes="$(find . -type f -mmin -3)" && if [ -z "${classes}" ] ; then classes="./*" ; fi \
+  && jar uvf ${JAR} ${classes} \
+  || die "Error building: ${dir}"
+done
+
+cd ${START_DIR}
+scp ${JAR} ${DESTINATION}

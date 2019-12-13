@@ -1,0 +1,63 @@
+#!/usr/bin/python
+
+import sys
+import json
+import re
+
+from optparse import OptionParser
+
+parser = OptionParser()
+parser.add_option("-i", "--infile", dest="infile",
+                  help="read JSON from here (stdin if omitted)", metavar="FILE")
+parser.add_option("-o", "--outfile", dest="outfile",
+                  help="write JSON to here (stdout if omitted)", metavar="FILE")
+parser.add_option("-p", "--path", dest="json_path",
+                  help="JSON path to read", metavar="path.to.data")
+parser.add_option("-v", "--value", dest="json_value",
+                  help="Value to write to the JSON path", metavar="value")
+
+(options, args) = parser.parse_args()
+
+if options.infile is None:
+    data = json.load(sys.stdin)
+else:
+    with open(options.infile) as infile:
+        data = json.load(infile)
+
+ref = data
+if options.json_value is None:
+    # READ mode
+    if options.json_path is not None:
+        for token in re.split('\.', options.json_path):
+            try:
+                ref = ref[token]
+            except KeyError:
+                # JSON path does not exist, we treat that as "empty"
+                ref = None
+                break
+    data = ref
+
+else:
+    # WRITE mode
+    if options.json_path is not None:
+        token_path = re.split('\.', options.json_path)
+        if len(token_path) == 0:
+            data = options.json_value
+        else:
+            for token in token_path[0:-1]:
+                try:
+                    ref = ref[token]
+                except KeyError:
+                    # JSON path does not exist, create it
+                    ref[token] = {}
+                    ref = ref[token]
+            ref[token_path[-1]] = options.json_value
+    else:
+        data = options.json_value
+
+if ref is not None:
+    if options.outfile is None:
+        print json.dumps(data, sys.stdout, indent=2)
+    else:
+        with open(options.outfile, 'w') as outfile:
+            outfile.write(json.dumps(data, indent=2))

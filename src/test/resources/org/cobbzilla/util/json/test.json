@@ -1,0 +1,20 @@
+{
+    "id": "test",
+    "thing": {
+        "field1": [ "item1", "item2", "item3" ],
+        "field2": {
+            "subfieldA": "foo",
+            "subB": "bar"
+        }
+    },
+    "another_thing": {
+        "field1": "baz",
+        "fieldZ": {
+            "nested": {
+                "deeper": {
+                    "quux": "blah"
+                }
+            }
+        }
+    }
+}

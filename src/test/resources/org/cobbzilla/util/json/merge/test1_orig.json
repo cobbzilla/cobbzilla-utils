@@ -1,0 +1,6 @@
+{
+  "name": "something",
+  "nested": {
+    "field": "foo"
+  }
+}
