@@ -28,6 +28,7 @@ public class TimeUtil {
     public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH = DateTimeFormat.forPattern("yyyy-MM-dd-HH");
     public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH_mm_ss = DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss");
     public static final DateTimeFormatter DATE_FORMAT_YYYYMMDDHHMMSS = DateTimeFormat.forPattern("yyyyMMddHHmmss");
+    public static final DateTimeFormatter DATE_FORMAT_YYYY_MM = DateTimeFormat.forPattern("yyyy-MM");
     public static final DateTimeFormatter DATE_FORMAT_HYPHEN_MMDDYYYY = DateTimeFormat.forPattern("MM-dd-yyyy");
     public static final DateTimeFormatter DATE_FORMAT_EEE_DD_MMM_YYYY_HH_MM_SS_ZZZ = DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss zzz");
     public static final DateTimeFormatter DATE_FORMAT_IF_MODIFIED_SINCE = DATE_FORMAT_EEE_DD_MMM_YYYY_HH_MM_SS_ZZZ;
