@@ -9,16 +9,15 @@ import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
-import java.util.concurrent.TimeUnit;
-
+import static java.util.concurrent.TimeUnit.*;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 
 public class TimeUtil {
 
-    public static final long DAY    = TimeUnit.DAYS.toMillis(1);
-    public static final long HOUR   = TimeUnit.HOURS.toMillis(1);
-    public static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
-    public static final long SECOND = TimeUnit.SECONDS.toMillis(1);
+    public static final long DAY    = DAYS.toMillis(1);
+    public static final long HOUR   = HOURS.toMillis(1);
+    public static final long MINUTE = MINUTES.toMillis(1);
+    public static final long SECOND = SECONDS.toMillis(1);
 
     public static final DateTimeFormatter DATE_FORMAT_MMDDYYYY = DateTimeFormat.forPattern("MM/dd/yyyy");
     public static final DateTimeFormatter DATE_FORMAT_MMMM_D_YYYY = DateTimeFormat.forPattern("MMMM d, yyyy");
@@ -116,10 +115,10 @@ public class TimeUtil {
         if (empty(duration)) return 0;
         final long val = Long.parseLong(duration.length() > 1 ? StringUtil.chopSuffix(duration) : duration);
         switch (duration.charAt(duration.length()-1)) {
-            case 's': return TimeUnit.SECONDS.toMillis(val);
-            case 'm': return TimeUnit.MINUTES.toMillis(val);
-            case 'h': return TimeUnit.HOURS.toMillis(val);
-            case 'd': return TimeUnit.DAYS.toMillis(val);
+            case 's': return SECONDS.toMillis(val);
+            case 'm': return MINUTES.toMillis(val);
+            case 'h': return HOURS.toMillis(val);
+            case 'd': return DAYS.toMillis(val);
             default: return val;
         }
     }
