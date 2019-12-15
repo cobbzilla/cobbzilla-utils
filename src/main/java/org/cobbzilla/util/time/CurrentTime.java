@@ -17,7 +17,7 @@ public class CurrentTime {
     public CurrentTime(DateTimeZone tz) {
         zone = tz.getID();
         now = new CurrentTimeValues(tz, ZillaRuntime.now());
-        realNow = ZillaRuntime.getSystemTimeOffset() == 0 ? null : new CurrentTimeValues(tz, ZillaRuntime.realNow());
+        realNow = ZillaRuntime.getSystemTimeOffset().get() == 0 ? null : new CurrentTimeValues(tz, ZillaRuntime.realNow());
     }
 
     @NoArgsConstructor

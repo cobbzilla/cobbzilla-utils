@@ -286,8 +286,9 @@ public class ZillaRuntime {
 
     public static String uuid() { return UUID.randomUUID().toString(); }
 
-    @Getter @Setter private static volatile long systemTimeOffset = 0;
-    public static long now() { return System.currentTimeMillis() + systemTimeOffset; }
+    @Getter @Setter private static AtomicLong systemTimeOffset = new AtomicLong(0L);
+    public static long incrementSystemTimeOffset(long t) { return systemTimeOffset.addAndGet(t); }
+    public static long now() { return System.currentTimeMillis() + systemTimeOffset.get(); }
     public static String hexnow() { return toHexString(now()); }
     public static String hexnow(long now) { return toHexString(now); }
     public static long realNow() { return System.currentTimeMillis(); }
