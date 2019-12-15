@@ -7,6 +7,8 @@ import org.cobbzilla.util.daemon.ZillaRuntime;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import static org.cobbzilla.util.daemon.ZillaRuntime.getSystemTimeOffset;
+
 @NoArgsConstructor
 public class CurrentTime {
 
@@ -17,7 +19,7 @@ public class CurrentTime {
     public CurrentTime(DateTimeZone tz) {
         zone = tz.getID();
         now = new CurrentTimeValues(tz, ZillaRuntime.now());
-        realNow = ZillaRuntime.getSystemTimeOffset().get() == 0 ? null : new CurrentTimeValues(tz, ZillaRuntime.realNow());
+        realNow = getSystemTimeOffset() == 0 ? null : new CurrentTimeValues(tz, ZillaRuntime.realNow());
     }
 
     @NoArgsConstructor
