@@ -1,16 +1,20 @@
 package org.cobbzilla.util.network;
 
 import com.sun.jna.Platform;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
+import static org.cobbzilla.util.http.HttpUtil.url2string;
 import static org.cobbzilla.util.string.ValidationRegexes.IPv4_PATTERN;
 
 @Slf4j
@@ -27,14 +31,23 @@ public class NetworkUtil {
         return false;
     }
 
+    private static final Map<String, Boolean> localhostCache = new ConcurrentHashMap<>();
+
     public static boolean isLocalHost(String host) {
+        return localhostCache.computeIfAbsent(host, NetworkUtil::determineLocalHost);
+    }
+
+    private static Boolean determineLocalHost(String host) {
         if (isLocalIpv4(host)) return true;
+        String hostAddress = null;
         try {
-            return isLocalIpv4(InetAddress.getByName(host).getHostAddress());
+            hostAddress = InetAddress.getByName(host).getHostAddress();
+            if (isLocalIpv4(hostAddress)) return true;
         } catch (Exception e) {
             log.warn("isLocalHost("+host+"): "+e);
-            return false;
         }
+        final String ex = getExternalIp();
+        return ex != null && ex.equals(hostAddress != null ? hostAddress : host);
     }
 
     public static boolean isPublicIpv4(String addr) {
@@ -127,6 +140,23 @@ public class NetworkUtil {
         }
     }
 
+    public static Set<String> configuredIpsAndExternalIp() {
+        final Set<String> ips = configuredIps();
+        final String externalIp = getExternalIp();
+        if (externalIp != null) ips.add(externalIp);
+        return ips;
+    }
+
+    @Getter(lazy=true) private static final String externalIp = initExternalIp();
+    private static String initExternalIp() {
+        try {
+            return url2string("http://checkip.amazonaws.com/").trim();
+        } catch (Exception e) {
+            log.warn("initExternalIp: returning null due to: "+e);
+            return null;
+        }
+    }
+
     public static String getFirstPublicIpv4() {
         try {
             final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -140,7 +170,7 @@ public class NetworkUtil {
                     }
                 }
             }
-            log.warn("getFirstPublicIpv4: no public IPv4 address found");
+            log.debug("getFirstPublicIpv4: no public IPv4 address found");
             return null;
 
         } catch (Exception e) {
