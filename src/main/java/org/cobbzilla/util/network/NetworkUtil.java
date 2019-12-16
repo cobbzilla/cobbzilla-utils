@@ -3,6 +3,7 @@ package org.cobbzilla.util.network;
 import com.sun.jna.Platform;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.cobbzilla.util.collection.ExpirationMap;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -10,7 +11,6 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
@@ -31,7 +31,7 @@ public class NetworkUtil {
         return false;
     }
 
-    private static final Map<String, Boolean> localhostCache = new ConcurrentHashMap<>();
+    private static final Map<String, Boolean> localhostCache = new ExpirationMap<>();
 
     public static boolean isLocalHost(String host) {
         return localhostCache.computeIfAbsent(host, NetworkUtil::determineLocalHost);
