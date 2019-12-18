@@ -101,7 +101,7 @@ public class LocaleUtil {
 
     @Getter(lazy=true) private static final Map<String, List<String>> defaultLocales = initDefaultLocales();
     private static Map<String, List<String>> initDefaultLocales() {
-        final Map<String, List<String>> defaults = new HashMap<>();
+        final Map<String, List<String>> defaults = new LinkedHashMap<>();
         final JsonNode node = json(stream2string(getPackagePath(LocaleUtil.class)+"/default_locales.json"), JsonNode.class);
         return buildDefaultsMap(defaults, node);
     }
