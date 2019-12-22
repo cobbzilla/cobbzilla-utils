@@ -15,10 +15,10 @@ public class Topology<T> {
     private final List<Node<T>> nodes = new ArrayList<>();
 
     public void addNode(T thing, Collection<T> refs) {
-        final Node<T> node = nodes.stream()
+        final Node<T> existingNode = nodes.stream()
                 .filter(n -> n.thing.equals(thing))
-                .findFirst()
-                .orElse(new Node<>(thing));
+                .findFirst().orElse(null);
+        final Node<T> node = existingNode != null ? existingNode : new Node<>(thing);
 
         // add refs as edges; skip self-references
         refs.stream().filter(ref -> !ref.equals(thing)).forEach(ref -> {
@@ -34,7 +34,7 @@ public class Topology<T> {
                 node.addEdge(newEdgeNode);
             }
         });
-        nodes.add(node);
+        if (existingNode == null) nodes.add(node);
     }
 
     static class Node<T> {
