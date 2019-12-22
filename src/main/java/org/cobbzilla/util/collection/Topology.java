@@ -89,8 +89,8 @@ public class Topology<T> {
                 // remove edge e from the graph
                 final Edge<T> e = it.next();
                 final Node<T> m = e.to;
-                it.remove();//Remove edge from n
-                m.inEdges.remove(e);//Remove edge from m
+                it.remove();  // Remove edge from n
+                m.inEdges.remove(e);  // Remove edge from m
 
                 // if m has no other incoming edges then insert m into S
                 if (m.inEdges.isEmpty()) S.add(m);
@@ -99,7 +99,7 @@ public class Topology<T> {
         // Check to see if all edges are removed
         for (Node<T> n : nodes) {
             if (!n.inEdges.isEmpty()) {
-                return die("Cycle present, topological sort not possible");
+                return die("Cycle present, topological sort not possible: "+n.thing.toString()+" <- ["+n.inEdges.stream().map(e->e.from.thing.toString()).collect(Collectors.joining(", "))+"]");
             }
         }
         return L.stream().map(n -> n.thing).collect(Collectors.toList());
