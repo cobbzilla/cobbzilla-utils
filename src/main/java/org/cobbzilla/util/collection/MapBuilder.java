@@ -63,7 +63,7 @@ public class MapBuilder {
 
     /** Usage: Map<K,V> myMap = MapBuilder.build(key, value); */
     public static <K,V> Map<K, V> build(K key, V value) {
-        Map<K,V> map = new HashMap<>();
+        final Map<K,V> map = new HashMap<>();
         map.put(key, value);
         return map;
     }
