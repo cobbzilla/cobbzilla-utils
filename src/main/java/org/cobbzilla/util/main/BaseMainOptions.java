@@ -7,6 +7,7 @@ import org.kohsuke.args4j.Option;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 
@@ -69,11 +70,11 @@ public class BaseMainOptions {
         }
     }
 
-    public static String keyValue(String v, String desc) {
+    public String keyValue(String v, String desc) {
         if (empty(v)) return v;
         if (!v.startsWith("@")) return v;
         final String varOrFile = v.substring(1);
-        final String envVal = System.getenv(varOrFile);
+        final String envVal = getEnv().get(varOrFile);
         if (!empty(envVal)) return envVal;
         try {
             return FileUtil.toString(varOrFile);
@@ -83,5 +84,7 @@ public class BaseMainOptions {
             return die(desc+": error reading: "+varOrFile+": "+e);
         }
     }
+
+    public Map<String, String> getEnv() { return System.getenv(); }
 
 }
