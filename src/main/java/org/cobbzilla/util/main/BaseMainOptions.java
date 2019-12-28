@@ -2,6 +2,7 @@ package org.cobbzilla.util.main;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.cobbzilla.util.io.FileUtil;
 import org.kohsuke.args4j.Option;
 
 import java.io.*;
@@ -67,4 +68,20 @@ public class BaseMainOptions {
             die("No such field: "+field+": "+e, e);
         }
     }
+
+    public static String keyValue(String v, String desc) {
+        if (empty(v)) return v;
+        if (!v.startsWith("@")) return v;
+        final String varOrFile = v.substring(1);
+        final String envVal = System.getenv(varOrFile);
+        if (!empty(envVal)) return envVal;
+        try {
+            return FileUtil.toString(varOrFile);
+        } catch (FileNotFoundException e) {
+            return die(desc+": no env var or file named "+varOrFile);
+        } catch (Exception e) {
+            return die(desc+": error reading: "+varOrFile+": "+e);
+        }
+    }
+
 }
