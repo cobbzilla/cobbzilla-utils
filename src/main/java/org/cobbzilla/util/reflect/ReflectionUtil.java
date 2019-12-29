@@ -19,6 +19,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.reflect.Modifier.isFinal;
+import static java.lang.reflect.Modifier.isStatic;
 import static org.cobbzilla.util.collection.ArrayUtil.arrayToString;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.string.StringUtil.uncapitalize;
@@ -1070,6 +1072,15 @@ public class ReflectionUtil {
             map.put(e.getKey(), e.getValue());
         }
         return map;
+    }
+
+    public static boolean isStaticFinalString(Field f, String prefix) {
+        return isStaticFinal(f, String.class, prefix);
+    }
+
+    public static boolean isStaticFinal(Field f, Class type, String prefix) {
+        final int mods = f.getModifiers();
+        return isStatic(mods) && isFinal(mods) && f.getType().equals(type) && f.getName().startsWith(prefix);
     }
 
 }
