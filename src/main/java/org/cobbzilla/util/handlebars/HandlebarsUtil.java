@@ -264,9 +264,9 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
             }
         });
 
-        hb.registerHelper("exists", (src, options) -> empty(src) ? null : options.apply(options.fn));
+        hb.registerHelper("exists", (src, options) -> !empty(src) ? null : options.apply(options.fn));
 
-        hb.registerHelper("not_exists", (src, options) -> !empty(src) ? null : options.apply(options.fn));
+        hb.registerHelper("not_exists", (src, options) -> empty(src) ? null : options.apply(options.fn));
 
         hb.registerHelper("sha256", (src, options) -> {
             if (empty(src)) return "";
