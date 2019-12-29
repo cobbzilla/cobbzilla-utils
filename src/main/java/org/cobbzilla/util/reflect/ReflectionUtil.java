@@ -1074,13 +1074,15 @@ public class ReflectionUtil {
         return map;
     }
 
-    public static boolean isStaticFinalString(Field f, String prefix) {
-        return isStaticFinal(f, String.class, prefix);
-    }
+    public static boolean isStaticFinalString(Field f) { return isStaticFinal(f, String.class, ""); }
+
+    public static boolean isStaticFinalString(Field f, String prefix) { return isStaticFinal(f, String.class, prefix); }
+
+    public static boolean isStaticFinal(Field f, Class type) { return isStaticFinal(f, type, ""); }
 
     public static boolean isStaticFinal(Field f, Class type, String prefix) {
         final int mods = f.getModifiers();
-        return isStatic(mods) && isFinal(mods) && f.getType().equals(type) && f.getName().startsWith(prefix);
+        return isStatic(mods) && isFinal(mods) && type.isAssignableFrom(f.getType()) && f.getName().startsWith(prefix);
     }
 
     public static <T> T constValue(Field f) {
