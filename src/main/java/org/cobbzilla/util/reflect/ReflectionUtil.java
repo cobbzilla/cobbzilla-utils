@@ -1083,4 +1083,12 @@ public class ReflectionUtil {
         return isStatic(mods) && isFinal(mods) && f.getType().equals(type) && f.getName().startsWith(prefix);
     }
 
+    public static String constValue(Field f) {
+        try {
+            return f.get(null).toString();
+        } catch (Exception e) {
+            return die("constValue: "+e);
+        }
+    }
+
 }
