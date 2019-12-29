@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.iterators.ArrayIterator;
+import org.apache.commons.collections4.map.SingletonMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.IOUtils;
@@ -264,9 +265,9 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
             }
         });
 
-        hb.registerHelper("exists", (src, options) -> !empty(src) ? options.apply(options.fn) : null);
+        hb.registerHelper("exists", (src, options) -> !empty(src) ? options.apply(options.fn) : options.inverse(options.fn));
 
-        hb.registerHelper("not_exists", (src, options) -> empty(src) ? options.apply(options.fn) : null);
+        hb.registerHelper("not_exists", (src, options) -> empty(src) ? options.apply(options.fn) : options.inverse(options.fn));
 
         hb.registerHelper("sha256", (src, options) -> {
             if (empty(src)) return "";
