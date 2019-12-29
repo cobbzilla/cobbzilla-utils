@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.ArrayUtils;
+import org.cobbzilla.util.string.StringUtil;
 
 import java.io.Closeable;
 import java.lang.annotation.Annotation;
@@ -1074,11 +1075,11 @@ public class ReflectionUtil {
         return map;
     }
 
-    public static boolean isStaticFinalString(Field f) { return isStaticFinal(f, String.class, ""); }
+    public static boolean isStaticFinalString(Field f) { return isStaticFinal(f, String.class, StringUtil.EMPTY); }
 
     public static boolean isStaticFinalString(Field f, String prefix) { return isStaticFinal(f, String.class, prefix); }
 
-    public static boolean isStaticFinal(Field f, Class type) { return isStaticFinal(f, type, ""); }
+    public static boolean isStaticFinal(Field f, Class type) { return isStaticFinal(f, type, StringUtil.EMPTY); }
 
     public static boolean isStaticFinal(Field f, Class type, String prefix) {
         final int mods = f.getModifiers();
