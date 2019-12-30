@@ -2,9 +2,14 @@ package org.cobbzilla.util.http;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
+import static org.cobbzilla.util.string.StringUtil.urlDecode;
 
 public class URIUtil {
 
@@ -66,6 +71,32 @@ public class URIUtil {
 
     public static boolean isHost(String uriString, String host) {
         return !empty(uriString) && toUri(uriString).getHost().equals(host);
+    }
+
+    // adapted from https://stackoverflow.com/a/13592567/1251543
+    public static Map<String, String> queryParams(String query) {
+        final Map<String, String> query_pairs = new LinkedHashMap<>();
+        final String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            final int idx = pair.indexOf("=");
+            final String key = idx > 0 ? urlDecode(pair.substring(0, idx)) : pair;
+            final String value = idx > 0 && pair.length() > idx + 1 ? urlDecode(pair.substring(idx + 1)) : null;
+            query_pairs.put(key, value);
+        }
+        return query_pairs;
+    }
+
+    // adapted from https://stackoverflow.com/a/13592567/1251543
+    public static Map<String, List<String>> queryMultiParams(String query) {
+        final Map<String, List<String>> query_pairs = new LinkedHashMap<>();
+        final String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            final int idx = pair.indexOf("=");
+            final String key = idx > 0 ? urlDecode(pair.substring(0, idx)) : pair;
+            final String value = idx > 0 && pair.length() > idx + 1 ? urlDecode(pair.substring(idx + 1)) : null;
+            query_pairs.computeIfAbsent(key, k -> new LinkedList<>()).add(value);
+        }
+        return query_pairs;
     }
 
 }

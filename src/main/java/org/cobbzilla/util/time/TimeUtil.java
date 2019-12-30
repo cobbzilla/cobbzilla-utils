@@ -10,6 +10,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import static java.util.concurrent.TimeUnit.*;
+import static org.apache.commons.lang3.LocaleUtils.toLocale;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 
 public class TimeUtil {
@@ -21,22 +22,31 @@ public class TimeUtil {
 
     public static final DateTimeFormatter DATE_FORMAT_MMDDYYYY = DateTimeFormat.forPattern("MM/dd/yyyy");
     public static final DateTimeFormatter DATE_FORMAT_MMMM_D_YYYY = DateTimeFormat.forPattern("MMMM d, yyyy");
+    public static final DateTimeFormatter DATE_FORMAT_MMMM_D_YYYY2 = DateTimeFormat.forPattern("MMMM d yyyy");
     public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD = DateTimeFormat.forPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter DATE_FORMAT_YYYY_MM = DateTimeFormat.forPattern("yyyy-MM");
+    public static final DateTimeFormatter DATE_FORMAT_YYYY = DateTimeFormat.forPattern("yyyy");
+    public static final DateTimeFormatter DATE_FORMAT_YYYYMM = DateTimeFormat.forPattern("yyyyMM");
     public static final DateTimeFormatter DATE_FORMAT_YYYYMMDD = DateTimeFormat.forPattern("yyyyMMdd");
+    public static final DateTimeFormatter DATE_FORMAT_YYYY_MMM = DateTimeFormat.forPattern("yyyy MMM");
+    public static final DateTimeFormatter DATE_FORMAT_YYYY_MMM_DD = DateTimeFormat.forPattern("yyyy MMM dd");
     public static final DateTimeFormatter DATE_FORMAT_MMM_DD_YYYY = DateTimeFormat.forPattern("MMM dd, yyyy");
-    public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH = DateTimeFormat.forPattern("yyyy-MM-dd-HH");
     public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH_mm_ss = DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss");
     public static final DateTimeFormatter DATE_FORMAT_YYYYMMDDHHMMSS = DateTimeFormat.forPattern("yyyyMMddHHmmss");
-    public static final DateTimeFormatter DATE_FORMAT_YYYY_MM = DateTimeFormat.forPattern("yyyy-MM");
+    public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH  = DateTimeFormat.forPattern("yyyy-MM-dd-HH");
     public static final DateTimeFormatter DATE_FORMAT_HYPHEN_MMDDYYYY = DateTimeFormat.forPattern("MM-dd-yyyy");
+    public static final DateTimeFormatter DATE_FORMAT_HYPHEN_MMMDDYYYY = DateTimeFormat.forPattern("MMM-dd-yyyy");
     public static final DateTimeFormatter DATE_FORMAT_EEE_DD_MMM_YYYY_HH_MM_SS_ZZZ = DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss zzz");
     public static final DateTimeFormatter DATE_FORMAT_IF_MODIFIED_SINCE = DATE_FORMAT_EEE_DD_MMM_YYYY_HH_MM_SS_ZZZ;
     public static final DateTimeFormatter DATE_FORMAT_LAST_MODIFIED = DATE_FORMAT_IF_MODIFIED_SINCE;
 
     public static final DateTimeFormatter[] DATE_TIME_FORMATS = {
-            DATE_FORMAT_YYYY_MM_DD, DATE_FORMAT_YYYY_MM_DD, DATE_FORMAT_YYYYMMDD,
-            DATE_FORMAT_YYYY_MM_DD_HH_mm_ss, DATE_FORMAT_YYYYMMDDHHMMSS,
-            DATE_FORMAT_HYPHEN_MMDDYYYY, DATE_FORMAT_MMDDYYYY
+            DATE_FORMAT_YYYY_MM_DD_HH_mm_ss,
+            DATE_FORMAT_YYYY_MM_DD, DATE_FORMAT_YYYY_MM, DATE_FORMAT_YYYY, DATE_FORMAT_MMMM_D_YYYY2,
+            DATE_FORMAT_YYYYMMDD, DATE_FORMAT_YYYYMM,
+            DATE_FORMAT_YYYYMMDDHHMMSS, DATE_FORMAT_MMMM_D_YYYY,
+            DATE_FORMAT_YYYY_MMM, DATE_FORMAT_YYYY_MMM_DD,
+            DATE_FORMAT_HYPHEN_MMDDYYYY, DATE_FORMAT_HYPHEN_MMMDDYYYY, DATE_FORMAT_MMDDYYYY
     };
 
     // For now only m (months) and d (days) are supported
@@ -52,10 +62,25 @@ public class TimeUtil {
         return empty(time) ? null : formatter.withZone(timeZone).parseDateTime(time).getMillis();
     }
 
+    public static Long parseWithLocale(String time, DateTimeFormatter formatter, String locale) {
+        return empty(time) ? null : formatter.withLocale(toLocale(locale)).parseDateTime(time).getMillis();
+    }
+
     public static Object parse(String val) {
         for (DateTimeFormatter f : DATE_TIME_FORMATS) {
             try {
                 return TimeUtil.parse(val, f);
+            } catch (Exception ignored) {
+                // noop
+            }
+        }
+        return null;
+    }
+
+    public static Long parseWithLocale(String val, String locale) {
+        for (DateTimeFormatter f : DATE_TIME_FORMATS) {
+            try {
+                return TimeUtil.parseWithLocale(val, f, locale);
             } catch (Exception ignored) {
                 // noop
             }
