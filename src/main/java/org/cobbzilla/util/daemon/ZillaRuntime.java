@@ -339,7 +339,8 @@ public class ZillaRuntime {
     public static String hashOf (Object... things) {
         final StringBuilder b = new StringBuilder();
         for (Object thing : things) {
-            b.append(thing == null ? "null" : thing).append(":::");
+            if (b.length() > 0) b.append(":::");
+            b.append(thing == null ? "null" : (thing instanceof Collection ? hashOf(thing) : ""+thing));
         }
         return b.toString();
     }
