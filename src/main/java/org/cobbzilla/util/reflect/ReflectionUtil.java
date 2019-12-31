@@ -18,10 +18,12 @@ import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
+import static org.apache.commons.lang3.reflect.FieldUtils.getAllFields;
 import static org.cobbzilla.util.collection.ArrayUtil.arrayToString;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.string.StringUtil.uncapitalize;
@@ -395,6 +397,22 @@ public class ReflectionUtil {
             }
         }
         return thing;
+    }
+
+    public static <T extends Annotation> List<String> fieldNamesWithAnnotation(String className, Class<T> aClass) {
+        return fieldsWithAnnotation(className, aClass).stream().map(Field::getName).collect(Collectors.toList());
+    }
+
+    public static <T extends Annotation> List<Field> fieldsWithAnnotation(String className, Class<T> aClass) {
+        final Set<Field> matches = new LinkedHashSet<>();
+        Class c = forName(className);
+        while (!c.equals(Object.class)) {
+            for (Field f : getAllFields(c)) {
+                if (f.getAnnotation(aClass) != null) matches.add(f);
+            }
+            c = c.getSuperclass();
+        }
+        return new ArrayList<>(matches);
     }
 
     private enum Accessor { get, set }
