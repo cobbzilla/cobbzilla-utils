@@ -275,6 +275,15 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
             return new Handlebars.SafeString(src.toString());
         });
 
+        hb.registerHelper("safeSql", (src, options) -> {
+            if (empty(src)) return "";
+            final String illegalChars = src.toString().replaceAll("[A-Za-z0-9=<>_\\()\\s\\.]+", "");
+            if (illegalChars.length() != 0) {
+                return die("safeSql: found illegal SQL chars ("+illegalChars+") in: "+src);
+            }
+            return new Handlebars.SafeString(src.toString());
+        });
+
         hb.registerHelper("format_epoch", (val, options) -> {
             if (empty(val)) return "";
             if (options.params.length != 2) return die("format_epoch: Usage: {{format_epoch expr format timezone}}");

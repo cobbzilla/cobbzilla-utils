@@ -75,6 +75,7 @@ public class URIUtil {
 
     // adapted from https://stackoverflow.com/a/13592567/1251543
     public static Map<String, String> queryParams(String query) {
+        if (query.contains("?")) query = query.substring(query.indexOf("?")+1);
         final Map<String, String> query_pairs = new LinkedHashMap<>();
         final String[] pairs = query.split("&");
         for (String pair : pairs) {

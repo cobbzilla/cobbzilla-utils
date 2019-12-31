@@ -34,6 +34,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.cobbzilla.util.io.FileUtil.abs;
 import static org.cobbzilla.util.io.FileUtil.list;
 import static org.cobbzilla.util.reflect.ReflectionUtil.instantiate;
+import static org.cobbzilla.util.security.ShaUtil.sha256_hex;
 import static org.cobbzilla.util.string.StringUtil.truncate;
 import static org.cobbzilla.util.system.Sleep.sleep;
 import static org.cobbzilla.util.time.TimeUtil.formatDuration;
@@ -339,10 +340,15 @@ public class ZillaRuntime {
     public static String hashOf (Object... things) {
         final StringBuilder b = new StringBuilder();
         for (Object thing : things) {
-            if (b.length() > 0) b.append(":::");
-            b.append(thing == null ? "null" : (thing instanceof Collection ? hashOf(thing) : ""+thing));
+            if (b.length() > 0) b.append("\t");
+            b.append(thing == null ? "null" : (thing instanceof Object[]) ? Arrays.deepHashCode((Object[]) thing) : thing.hashCode());
         }
-        return b.toString();
+        return sha256_hex(b.toString());
+    }
+
+    // from https://stackoverflow.com/a/8563667/1251543
+    public static String hexToBase36(String hex) {
+        return new BigInteger(hex, 16).toString(36);
     }
 
     public static Collection<String> stringRange(Number start, Number end) {
