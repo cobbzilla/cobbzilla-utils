@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.ArrayUtils;
+import org.cobbzilla.util.collection.ExpirationMap;
 import org.cobbzilla.util.string.StringUtil;
 
 import java.io.Closeable;
@@ -403,16 +404,24 @@ public class ReflectionUtil {
         return fieldsWithAnnotation(className, aClass).stream().map(Field::getName).collect(Collectors.toList());
     }
 
-    public static <T extends Annotation> List<Field> fieldsWithAnnotation(String className, Class<T> aClass) {
-        final Set<Field> matches = new LinkedHashSet<>();
-        Class c = forName(className);
-        while (!c.equals(Object.class)) {
-            for (Field f : getAllFields(c)) {
-                if (f.getAnnotation(aClass) != null) matches.add(f);
+    private static Map<String, List<Field>> _fwaCache = new ExpirationMap<>();
+    public static <T extends Annotation> List<Field> fieldsWithAnnotation(Class clazz, Class<T> aClass) {
+        final String className = clazz.getName();
+        return _fwaCache.computeIfAbsent(className, k -> {
+            final Set<Field> matches = new LinkedHashSet<>();
+            Class c = forName(className);
+            while (!c.equals(Object.class)) {
+                for (Field f : getAllFields(c)) {
+                    if (f.getAnnotation(aClass) != null) matches.add(f);
+                }
+                c = c.getSuperclass();
             }
-            c = c.getSuperclass();
-        }
-        return new ArrayList<>(matches);
+            return new ArrayList<>(matches);
+        });
+    }
+
+    public static <T extends Annotation> List<Field> fieldsWithAnnotation(String className, Class<T> aClass) {
+        return fieldsWithAnnotation(forName(className), aClass);
     }
 
     private enum Accessor { get, set }
