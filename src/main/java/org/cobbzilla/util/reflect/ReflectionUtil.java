@@ -933,7 +933,7 @@ public class ReflectionUtil {
                 case "long":    return (long) 0;
                 case "float":   return (float) 0;
                 case "double":  return (double) 0;
-                default: return die("instantiate: unrecognized primitive type: "+clazz.getName());
+                default: return die("getNullArgument: unrecognized primitive type: "+clazz.getName());
             }
         }
         return null;
