@@ -62,6 +62,7 @@ public class ExpirationMap<K, V> implements Map<K, V> {
     }
 
     @Override public V get(Object key) {
+        if (lastCleaned+cleanInterval > now()) cleanExpired();
         final ExpirationMapEntry<V> value = map.get(key);
         return value == null || value.expired() ? null : value.touch().value;
     }
