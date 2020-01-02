@@ -1,5 +1,6 @@
 package org.cobbzilla.util.dns;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,6 +8,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 
@@ -14,6 +16,8 @@ import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 public class DnsRecordMatch extends DnsRecordBase {
 
     @Getter @Setter private String pattern;
+    @JsonIgnore @Getter(lazy=true) private final Pattern _pattern = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+
     @Getter @Setter private Set<String> fqdns;
     public boolean hasFqdns () { return fqdns != null && !fqdns.isEmpty(); }
 
@@ -39,7 +43,7 @@ public class DnsRecordMatch extends DnsRecordBase {
         if (hasType() && !getType().equals(record.getType())) return false;
         if (hasFqdn() && !getFqdn().equals(record.getFqdn())) return false;
         if (hasSubdomain() && record.hasFqdn() && !record.getFqdn().endsWith(getSubdomain())) return false;
-        if (hasPattern() && record.hasFqdn() && !record.getFqdn().matches(getPattern())) return false;
+        if (hasPattern() && record.hasFqdn() && !get_pattern().matcher(record.getFqdn()).find()) return false;
         if (hasFqdns() && record.hasFqdn() && !getFqdns().contains(record.getFqdn())) return false;
         return true;
     }
