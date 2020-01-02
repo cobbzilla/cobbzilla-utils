@@ -39,12 +39,20 @@ public class DnsRecordMatch extends DnsRecordBase {
 
     public DnsRecordMatch(String fqdn) { this(null, fqdn); }
 
+    public static DnsRecordMatch invert(DnsRecordMatch other) {
+        return new DnsRecordMatch() {
+            @Override public boolean matches(DnsRecord record) {
+                return !other.matches(record);
+            }
+        };
+    }
+
     public boolean matches (DnsRecord record) {
         if (hasType() && !getType().equals(record.getType())) return false;
-        if (hasFqdn() && !getFqdn().equals(record.getFqdn())) return false;
-        if (hasSubdomain() && record.hasFqdn() && !record.getFqdn().endsWith(getSubdomain())) return false;
+        if (hasFqdn() && !getFqdn().equalsIgnoreCase(record.getFqdn())) return false;
+        if (hasSubdomain() && record.hasFqdn() && !record.getFqdn().toLowerCase().endsWith(getSubdomain().toLowerCase())) return false;
         if (hasPattern() && record.hasFqdn() && !get_pattern().matcher(record.getFqdn()).find()) return false;
-        if (hasFqdns() && record.hasFqdn() && !getFqdns().contains(record.getFqdn())) return false;
+        if (hasFqdns() && record.hasFqdn() && getFqdns().stream().noneMatch(f -> record.getFqdn().equalsIgnoreCase(f))) return false;
         return true;
     }
 

@@ -31,9 +31,10 @@ public class DnsRecordBase {
     @Getter @Setter protected String value;
     public boolean hasValue () { return !empty(value); }
 
-    @JsonIgnore
-    public DnsRecordMatch getMatcher() {
+    @JsonIgnore public DnsRecordMatch getMatcher() {
         return (DnsRecordMatch) new DnsRecordMatch().setFqdn(fqdn).setType(type).setValue(value);
     }
+
+    @JsonIgnore public DnsRecordMatch getNonMatcher() { return DnsRecordMatch.invert(getMatcher()); }
 
 }
