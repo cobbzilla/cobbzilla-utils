@@ -2,6 +2,7 @@ package org.cobbzilla.util.collection;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.Collection;
@@ -15,53 +16,36 @@ import java.util.stream.Collectors;
 import static org.cobbzilla.util.daemon.ZillaRuntime.notSupported;
 import static org.cobbzilla.util.daemon.ZillaRuntime.now;
 
+@Accessors(chain=true)
 public class ExpirationMap<K, V> implements Map<K, V> {
 
     private final Map<K, ExpirationMapEntry<V>> map;
-    private long expiration = TimeUnit.HOURS.toMillis(1);
-    private long cleanInterval = TimeUnit.HOURS.toMillis(4);
+
+    @Getter @Setter private long expiration = TimeUnit.HOURS.toMillis(1);
+    @Getter @Setter private long maxExpiration = TimeUnit.HOURS.toMillis(2);
+    @Getter @Setter private long cleanInterval = TimeUnit.HOURS.toMillis(4);
+
+    public ExpirationMap<K, V> setExpirations(long val) {
+        this.expiration = this.maxExpiration = this.cleanInterval = val;
+        return this;
+    }
+
     private long lastCleaned = 0;
 
     public ExpirationMap() {
         this.map = new ConcurrentHashMap<>();
     }
-
-    public ExpirationMap(long expiration) {
-        this.map = new ConcurrentHashMap<>();
-        this.expiration = expiration;
-    }
-
-    public ExpirationMap(long expiration, long cleanInterval) {
-        this(expiration);
-        this.cleanInterval = cleanInterval;
-    }
-
-    public ExpirationMap(long expiration, long cleanInterval, int initialCapacity) {
-        this.map = new ConcurrentHashMap<>(initialCapacity);
-        this.expiration = expiration;
-        this.cleanInterval = cleanInterval;
-    }
-
-    public ExpirationMap(long expiration, long cleanInterval, int initialCapacity, float loadFactor) {
-        this.map = new ConcurrentHashMap<>(initialCapacity, loadFactor);
-        this.expiration = expiration;
-        this.cleanInterval = cleanInterval;
-    }
-
-    public ExpirationMap(long expiration, long cleanInterval, int initialCapacity, float loadFactor, int concurrencyLevel) {
-        this.map = new ConcurrentHashMap<>(initialCapacity, loadFactor, concurrencyLevel);
-        this.expiration = expiration;
-        this.cleanInterval = cleanInterval;
-    }
+    public ExpirationMap(long val) { this(); setExpirations(val); }
 
     @Accessors(chain=true)
     private class ExpirationMapEntry<VAL> {
         public final VAL value;
+        public volatile long ctime = now();
         public volatile long atime = now();
         public ExpirationMapEntry(VAL value) { this.value = value; }
 
-        public VAL touch() { atime = now(); return value; }
-        public boolean expired() { return now() > atime+expiration; }
+        public ExpirationMapEntry<VAL> touch() { atime = now(); return this; }
+        public boolean expired() { return now() > ctime+maxExpiration || now() > atime+expiration; }
     }
 
     @Override public int size() { return map.size(); }
@@ -79,7 +63,7 @@ public class ExpirationMap<K, V> implements Map<K, V> {
 
     @Override public V get(Object key) {
         final ExpirationMapEntry<V> value = map.get(key);
-        return value == null ? null : value.touch();
+        return value == null || value.touch().expired() ? null : value.touch().value;
     }
 
     @Override public V put(K key, V value) {
