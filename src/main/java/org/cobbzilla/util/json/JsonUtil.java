@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.io.JsonStringEncoder;
-import com.fasterxml.jackson.core.util.BufferRecyclers;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.*;
 import org.cobbzilla.util.io.FileSuffixFilter;
@@ -18,9 +17,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.cobbzilla.util.daemon.ZillaRuntime.big;
-import static org.cobbzilla.util.daemon.ZillaRuntime.die;
-import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
+import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 
 public class JsonUtil {
 
@@ -522,6 +519,6 @@ public class JsonUtil {
         }
     }
 
-    public static JsonStringEncoder getJsonStringEncoder() { return BufferRecyclers.getJsonStringEncoder(); }
+    public static JsonStringEncoder getJsonStringEncoder() { return JsonStringEncoder.getInstance(); }
 
 }

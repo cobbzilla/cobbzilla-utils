@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 
-import static org.apache.commons.lang3.StringUtils.chop;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 
@@ -16,7 +15,7 @@ public class DnsRecordBase {
     @Getter @Setter protected String fqdn;
     public boolean hasFqdn() { return !empty(fqdn); }
 
-    @JsonIgnore public String getNormalFqdn() { return empty(fqdn) ? fqdn : fqdn.endsWith(".") ? chop(fqdn) : fqdn; }
+    public static String dropTailingDot(String name) { return name.endsWith(".") ? name.substring(0, name.length()-1) : name; }
 
     public String getHost (String suffix) {
         if (!hasFqdn()) return die("getHost: fqdn not set");

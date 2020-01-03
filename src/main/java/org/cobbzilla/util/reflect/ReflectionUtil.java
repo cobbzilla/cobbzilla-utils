@@ -120,7 +120,7 @@ public class ReflectionUtil {
         try {
             return (Class<? extends T>) Class.forName(clazz);
         } catch (Exception e) {
-            return die("Class.forName("+clazz+") error: "+e, e);
+            return die("Class.forName("+clazz+") error: "+e);
         }
     }
 
