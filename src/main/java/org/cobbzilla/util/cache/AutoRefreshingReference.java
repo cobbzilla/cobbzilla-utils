@@ -7,6 +7,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.now;
 
+// Wraps an AtomicReference and presents a similar 'get' method, but will refresh the underlying
+// object via the 'refresh' method if it is null or stale.
+//
+// Consider using Refreshable, a subclass with a more functional approach
 public abstract class AutoRefreshingReference<T> {
 
     @Getter private final AtomicReference<T> object = new AtomicReference<>();
