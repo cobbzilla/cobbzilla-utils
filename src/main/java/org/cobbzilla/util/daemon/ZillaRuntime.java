@@ -170,12 +170,12 @@ public class ZillaRuntime {
         throw e;
     }
 
-    public static String shortErrorString(Exception e) { return e.getClass().getName()+": "+e.getMessage(); }
+    public static String shortError(Exception e) { return e.getClass().getName()+": "+e.getMessage(); }
 
     public static String errorString(Exception e) { return errorString(e, 1000); }
 
     public static String errorString(Exception e, int maxlen) {
-        return truncate(shortErrorString(e)+"\n"+ getStackTrace(e), maxlen);
+        return truncate(shortError(e)+"\n"+ getStackTrace(e), maxlen);
     }
 
     public static boolean empty(String s) { return s == null || s.length() == 0; }
