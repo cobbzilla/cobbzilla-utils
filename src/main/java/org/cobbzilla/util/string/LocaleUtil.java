@@ -86,16 +86,20 @@ public class LocaleUtil {
         return localeFile.exists() ? localeFile : null;
     }
 
-    public static Locale fromString(String localeString) {
+    public static Locale fromStringOrDie(String localeString) { return _fromString(localeString, true); }
+
+    public static Locale fromString(String localeString) { return _fromString(localeString, false); }
+
+    public static Locale _fromString(String localeString, boolean throwEx) {
         final String[] parts = empty(localeString) ? StringUtil.EMPTY_ARRAY : localeString.split("[-_]+");
         switch (parts.length) {
             case 3: return new Locale(parts[0], parts[1], parts[2]);
             case 2: return new Locale(parts[0], parts[1]);
             case 1: return new Locale(parts[0]);
-            case 0: return Locale.getDefault();
+            case 0: return throwEx ? die("fromString: empty locale string") : Locale.getDefault();
             default:
                 log.warn("fromString: invalid locale string: "+localeString);
-                return Locale.getDefault();
+                return throwEx ? die("fromString: invalid locale string: "+localeString) : Locale.getDefault();
         }
     }
 
