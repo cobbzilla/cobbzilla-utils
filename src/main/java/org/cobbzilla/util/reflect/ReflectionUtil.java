@@ -404,12 +404,16 @@ public class ReflectionUtil {
         return fieldsWithAnnotation(className, aClass).stream().map(Field::getName).collect(Collectors.toList());
     }
 
+    public static <T extends Annotation> List<String> fieldNamesWithAnnotation(Class clazz, Class<T> aClass) {
+        return fieldsWithAnnotation(clazz, aClass).stream().map(Field::getName).collect(Collectors.toList());
+    }
+
     private static Map<String, List<Field>> _fwaCache = new ExpirationMap<>();
-    public static <T extends Annotation> List<Field> fieldsWithAnnotation(Class clazz, Class<T> aClass) {
+    public static <T extends Annotation> List<Field> fieldsWithAnnotation(final Class clazz, Class<T> aClass) {
         final String className = clazz.getName();
-        return _fwaCache.computeIfAbsent(className, k -> {
+        return _fwaCache.computeIfAbsent(className+":"+aClass.getName(), k -> {
             final Set<Field> matches = new LinkedHashSet<>();
-            Class c = forName(className);
+            Class c = clazz;
             while (!c.equals(Object.class)) {
                 for (Field f : getAllFields(c)) {
                     if (f.getAnnotation(aClass) != null) matches.add(f);
