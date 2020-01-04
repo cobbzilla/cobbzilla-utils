@@ -19,6 +19,7 @@ import java.lang.reflect.*;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -408,15 +409,27 @@ public class ReflectionUtil {
         return fieldsWithAnnotation(clazz, aClass).stream().map(Field::getName).collect(Collectors.toList());
     }
 
+    public static <T extends Annotation> List<String> fieldNamesMatching(Class clazz, Function<Field, Boolean> matcher) {
+        return fieldsMatching(clazz, matcher).stream().map(Field::getName).collect(Collectors.toList());
+    }
+
+    public static <T extends Annotation> List<Field> fieldsWithAnnotation(final Class clazz, final Class<T> aClass) {
+        return fieldsMatching(clazz, f -> f.getAnnotation(aClass) != null);
+    }
+
+    public static <T extends Annotation> List<Field> fieldsWithAnnotation(String className, Class<T> aClass) {
+        return fieldsWithAnnotation(forName(className), aClass);
+    }
+
     private static Map<String, List<Field>> _fwaCache = new ExpirationMap<>();
-    public static <T extends Annotation> List<Field> fieldsWithAnnotation(final Class clazz, Class<T> aClass) {
+    public static <T extends Annotation> List<Field> fieldsMatching(final Class clazz, Function<Field, Boolean> matcher) {
         final String className = clazz.getName();
-        return _fwaCache.computeIfAbsent(className+":"+aClass.getName(), k -> {
+        return _fwaCache.computeIfAbsent(className+":"+matcher.hashCode(), k -> {
             final Set<Field> matches = new LinkedHashSet<>();
             Class c = clazz;
             while (!c.equals(Object.class)) {
                 for (Field f : getAllFields(c)) {
-                    if (f.getAnnotation(aClass) != null) matches.add(f);
+                    if (matcher.apply(f)) matches.add(f);
                 }
                 c = c.getSuperclass();
             }
@@ -424,8 +437,8 @@ public class ReflectionUtil {
         });
     }
 
-    public static <T extends Annotation> List<Field> fieldsWithAnnotation(String className, Class<T> aClass) {
-        return fieldsWithAnnotation(forName(className), aClass);
+    public static List<String> fieldNamesWithAnnotations(final Class clazz, Class<? extends Annotation> ...aClasses) {
+        return fieldNamesMatching(clazz, f -> Arrays.stream(aClasses).anyMatch(c -> f.getAnnotation(c) != null));
     }
 
     private enum Accessor { get, set }
