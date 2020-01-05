@@ -120,8 +120,21 @@ public class ReflectionUtil {
         if (clazz.endsWith("[]")) return arrayClass(forName(clazz.substring(0, clazz.length()-2)));
         try {
             return (Class<? extends T>) Class.forName(clazz);
+        } catch (ClassNotFoundException e) {
+            switch (clazz) {
+                case "boolean": return (Class<? extends T>) boolean.class;
+                case "byte":    return (Class<? extends T>) byte.class;
+                case "short":   return (Class<? extends T>) short.class;
+                case "char":    return (Class<? extends T>) char.class;
+                case "int":     return (Class<? extends T>) int.class;
+                case "long":    return (Class<? extends T>) long.class;
+                case "float":   return (Class<? extends T>) float.class;
+                case "double":  return (Class<? extends T>) double.class;
+            }
+            return die("Class.forName("+clazz+") error: "+shortError(e));
+
         } catch (Exception e) {
-            return die("Class.forName("+clazz+") error: "+e);
+            return die("Class.forName("+clazz+") error: "+shortError(e));
         }
     }
 
