@@ -1,10 +1,14 @@
 package org.cobbzilla.util.io;
 
 import lombok.Cleanup;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 
-import java.io.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.io.FileUtil.abs;
@@ -35,7 +39,7 @@ public class Decompressors {
         return isTarball(name) || isZipFile(name);
     }
 
-    private static void extractFile(ZipInputStream in, File outdir, String name) throws IOException {
+    private static void extractFile(InputStream in, File outdir, String name) throws IOException {
         @Cleanup final FileOutputStream out = new FileOutputStream(new File(outdir, name));
         StreamUtil.copyLarge(in, out);
     }
@@ -52,15 +56,16 @@ public class Decompressors {
 
     /***
      * Extract zipfile to outdir with complete directory structure
+     * Uses ZipSecureFile to avoid zip-bombs
      * @param zipfile Input .zip file
      * @param outdir Output directory
      */
     public static void extract(File zipfile, File outdir) throws IOException {
-        @Cleanup final ZipInputStream zin = new ZipInputStream(new FileInputStream(zipfile));
-        ZipEntry entry;
-        String name, dir;
-        while ((entry = zin.getNextEntry()) != null) {
-            name = entry.getName();
+        @Cleanup final ZipSecureFile zip = new ZipSecureFile(zipfile);
+        final Enumeration<ZipArchiveEntry> entries = zip.getEntriesInPhysicalOrder();
+        while (entries.hasMoreElements()) {
+            final ZipArchiveEntry entry = entries.nextElement();
+            final String name = entry.getName();
             if (entry.isDirectory()) {
                 mkdirs(outdir,name);
                 continue;
@@ -71,10 +76,10 @@ public class Decompressors {
              *   /foo/foo.txt
              *   /foo/
              */
-            dir = dirpart(name);
+            final String dir = dirpart(name);
             if (dir != null) mkdirs(outdir,dir);
 
-            extractFile(zin, outdir, name);
+            extractFile(zip.getInputStream(entry), outdir, name);
         }
     }
 }

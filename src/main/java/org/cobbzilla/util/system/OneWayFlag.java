@@ -31,7 +31,7 @@ public class OneWayFlag extends AtomicBoolean {
 
     public boolean check () {
         if (get()) return true;
-        final Boolean ok;
+        final boolean ok;
         try {
             ok = check.call();
         } catch (Exception e) {
