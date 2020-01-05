@@ -49,7 +49,10 @@ public class DnsRecordMatch extends DnsRecordBase {
 
     public boolean matches (DnsRecord record) {
         if (hasType() && !getType().equals(record.getType())) return false;
-        if (hasFqdn() && !getFqdn().equalsIgnoreCase(record.getFqdn())) return false;
+        if (hasFqdn() && !getFqdn().equalsIgnoreCase(record.getFqdn())
+                && (!record.getFqdn().startsWith(".") || !getFqdn().equalsIgnoreCase(record.getFqdn().substring(1)))) {
+            return false;
+        }
         if (hasSubdomain() && record.hasFqdn() && !record.getFqdn().toLowerCase().endsWith(getSubdomain().toLowerCase())) return false;
         if (hasPattern() && record.hasFqdn() && !get_pattern().matcher(record.getFqdn()).find()) return false;
         if (hasFqdns() && record.hasFqdn() && getFqdns().stream().noneMatch(f -> record.getFqdn().equalsIgnoreCase(f))) return false;

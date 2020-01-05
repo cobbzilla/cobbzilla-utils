@@ -29,7 +29,7 @@ public class ShaUtil {
 
     public static byte[] sha256 (String data) {
         try {
-            return sha256(data.getBytes(StringUtil.UTF8));
+            return sha256(data.getBytes(StringUtil.UTF8cs));
         } catch (Exception e) {
             return die("sha256: bad data: "+e, e);
         }
