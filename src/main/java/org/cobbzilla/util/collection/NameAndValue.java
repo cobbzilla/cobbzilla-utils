@@ -18,9 +18,9 @@ public class NameAndValue {
     public static final NameAndValue[] EMPTY_ARRAY = new NameAndValue[0];
     public static final Comparator<NameAndValue> NAME_COMPARATOR = Comparator.comparing(NameAndValue::getName);
 
-    public static List<NameAndValue> map2list(Map<String, Object> map) {
+    public static List<NameAndValue> map2list(Map<String, ?> map) {
         final List<NameAndValue> list = new ArrayList<>(map.size());
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
             list.add(new NameAndValue(entry.getKey(), entry.getValue() == null ? null : entry.getValue().toString()));
         }
         return list;
