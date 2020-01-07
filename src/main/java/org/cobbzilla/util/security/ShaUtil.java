@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.io.FileUtil.abs;
+import static org.cobbzilla.util.string.StringUtil.UTF8cs;
 import static org.cobbzilla.util.string.StringUtil.split;
 import static org.cobbzilla.util.system.Bytes.MB;
 import static org.cobbzilla.util.system.CommandShell.exec;
@@ -29,7 +30,7 @@ public class ShaUtil {
 
     public static byte[] sha256 (String data) {
         try {
-            return sha256(data.getBytes(StringUtil.UTF8cs));
+            return sha256(data.getBytes(UTF8cs));
         } catch (Exception e) {
             return die("sha256: bad data: "+e, e);
         }
@@ -49,7 +50,7 @@ public class ShaUtil {
     public static String sha256_base64 (byte[] data) throws Exception { return Base64.encodeBytes(sha256(data)); }
 
     public static String sha256_filename (String data) throws Exception {
-        return sha256_filename(data.getBytes(StringUtil.UTF8cs));
+        return sha256_filename(data.getBytes(UTF8cs));
     }
 
     public static String sha256_filename (byte[] data) {
