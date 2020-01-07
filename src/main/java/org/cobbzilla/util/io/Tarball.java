@@ -41,7 +41,7 @@ public class Tarball {
 
     public static void unroll(File tarball, File dir) throws IOException, ArchiveException {
 
-        final String path = abs(tarball);
+        final String path = tarball.getAbsolutePath();
         final FileInputStream fileIn = new FileInputStream(tarball);
         final CompressorInputStream zipIn;
 
