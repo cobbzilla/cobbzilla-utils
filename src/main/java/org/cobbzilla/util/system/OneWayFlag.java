@@ -18,6 +18,11 @@ public class OneWayFlag extends AtomicBoolean {
     private final String name;
     private final Callable<Boolean> check;
 
+    public OneWayFlag(String name) {
+        this.name = name;
+        this.check = new ReturnFalseExactlyOnce();
+    }
+
     public OneWayFlag(String name, Callable<Boolean> check) {
         this.name = name;
         this.check = check;
@@ -42,4 +47,11 @@ public class OneWayFlag extends AtomicBoolean {
         return ok;
     }
 
+    private class ReturnFalseExactlyOnce implements Callable<Boolean> {
+        @Override public Boolean call() {
+            final boolean val = get();
+            if (!val) set(true);
+            return val;
+        }
+    }
 }
