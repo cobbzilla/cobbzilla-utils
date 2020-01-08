@@ -68,7 +68,9 @@ public class ZillaRuntime {
 
     public interface ExceptionRunnable { void handle(Exception e); }
 
-    public static final ExceptionRunnable DEFAULT_EX_RUNNABLE = e -> log.error("Error: " + e);
+    public static final ExceptionRunnable DEFAULT_EX_RUNNABLE = e -> {
+        log.error("Error: " + e);
+    };
 
     public static ExceptionRunnable exceptionRunnable (Class<? extends Throwable>[] fatalExceptionClasses) {
         return e -> {

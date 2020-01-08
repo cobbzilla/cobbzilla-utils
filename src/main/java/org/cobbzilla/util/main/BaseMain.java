@@ -24,7 +24,15 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
 
     public void runOrDie () { try { run(); } catch (Exception e) { die("runOrDie: "+e, e); } }
 
+    public void runOrDie (ZillaRuntime.ExceptionRunnable errorHandler) {
+        try { run(); } catch (Exception e) { errorHandler.handle(e); }
+    }
+
     public Thread runInBackground () { return background(this::runOrDie); }
+
+    public Thread runInBackground (ZillaRuntime.ExceptionRunnable errorHandler) {
+        return background(() -> runOrDie(errorHandler));
+    }
 
     @Getter private String[] args;
     public void setArgs(String[] args) throws CmdLineException {
