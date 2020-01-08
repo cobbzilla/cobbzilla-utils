@@ -1,8 +1,10 @@
 package org.cobbzilla.util.main;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.cobbzilla.util.daemon.ExceptionHandler;
 import org.cobbzilla.util.daemon.ZillaRuntime;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -21,18 +23,6 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
     @Getter(value=AccessLevel.PROTECTED) private final CmdLineParser parser = new CmdLineParser(getOptions());
 
     protected abstract void run() throws Exception;
-
-    public void runOrDie () { try { run(); } catch (Exception e) { die("runOrDie: "+e, e); } }
-
-    public void runOrDie (ZillaRuntime.ExceptionRunnable errorHandler) {
-        try { run(); } catch (Exception e) { errorHandler.handle(e); }
-    }
-
-    public Thread runInBackground () { return background(this::runOrDie); }
-
-    public Thread runInBackground (ZillaRuntime.ExceptionRunnable errorHandler) {
-        return background(() -> runOrDie(errorHandler));
-    }
 
     @Getter private String[] args;
     public void setArgs(String[] args) throws CmdLineException {
@@ -115,5 +105,22 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
         err(message + ": " + e.getClass().getName() + (!empty(e.getMessage()) ? ": "+e.getMessage(): ""));
         System.exit(1);
         return null;
+    }
+
+    public Thread runInBackground (ExceptionHandler errorHandler) {
+        return background(new RunWithHandler(this, errorHandler), errorHandler);
+    }
+
+    @AllArgsConstructor
+    private static class RunWithHandler implements Runnable {
+        private final BaseMain runnable;
+        private final ExceptionHandler errorHandler;
+        @Override public void run() {
+            try {
+                runnable.run();
+            } catch (Exception e) {
+                errorHandler.handle(e);
+            }
+        }
     }
 }

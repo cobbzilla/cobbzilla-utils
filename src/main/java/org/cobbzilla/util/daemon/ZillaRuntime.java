@@ -31,6 +31,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.LongStream.range;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.cobbzilla.util.daemon.ExceptionHandler.DEFAULT_EX_RUNNABLE;
 import static org.cobbzilla.util.io.FileUtil.abs;
 import static org.cobbzilla.util.io.FileUtil.list;
 import static org.cobbzilla.util.reflect.ReflectionUtil.instantiate;
@@ -66,27 +67,9 @@ public class ZillaRuntime {
     public static boolean bool(Boolean b) { return b != null && b; }
     public static boolean bool(Boolean b, boolean val) { return b != null ? b : val; }
 
-    public interface ExceptionRunnable { void handle(Exception e); }
-
-    public static final ExceptionRunnable DEFAULT_EX_RUNNABLE = e -> {
-        log.error("Error: " + e);
-    };
-
-    public static ExceptionRunnable exceptionRunnable (Class<? extends Throwable>[] fatalExceptionClasses) {
-        return e -> {
-            for (Class<? extends Throwable> c : fatalExceptionClasses) {
-                if (c.isAssignableFrom(e.getClass())) {
-                    if (e instanceof RuntimeException) throw (RuntimeException) e;
-                    die("fatal exception: "+e);
-                }
-            }
-            DEFAULT_EX_RUNNABLE.handle(e);
-        };
-    }
-
     public static Thread background (Runnable r) { return background(r, DEFAULT_EX_RUNNABLE); }
 
-    public static Thread background (Runnable r, ExceptionRunnable ex) {
+    public static Thread background (Runnable r, ExceptionHandler ex) {
         final Thread t = new Thread(() -> {
             try {
                 r.run();
@@ -124,7 +107,7 @@ public class ZillaRuntime {
     public static <T> T retry (Callable<T> func,
                                int tries,
                                Function<Integer, Long> backoff,
-                               ExceptionRunnable ex) {
+                               ExceptionHandler ex) {
         Exception lastEx = null;
         try {
             for (int i = 0; i < tries; i++) {
