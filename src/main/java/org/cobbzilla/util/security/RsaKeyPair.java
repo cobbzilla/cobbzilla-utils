@@ -15,6 +15,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.io.FileUtil.*;
 import static org.cobbzilla.util.string.StringUtil.safeShellArg;
+import static org.cobbzilla.util.system.Bytes.KB;
 import static org.cobbzilla.util.system.CommandShell.exec;
 import static org.cobbzilla.util.system.CommandShell.execScript;
 
@@ -39,6 +40,8 @@ public class RsaKeyPair {
     }
 
     public static boolean isValidSshPublicKey (String key) {
+        // sanity checks, avoid writing large files to disk
+        if (empty(key) || key.length() < 200 || key.length() > 8*KB) return false;
         try {
             @Cleanup final TempDir temp = new TempDir();
             final File f = FileUtil.toFile(temp+"/key.pub", key);

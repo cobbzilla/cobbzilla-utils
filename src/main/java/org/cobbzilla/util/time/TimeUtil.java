@@ -76,7 +76,7 @@ public class TimeUtil {
     }
 
     public static Long parseISO8601(String val) { return DATE_FORMAT_ISO_8601.parseMillis(val); }
-    public static String formatISO8601(long val) { return DATE_FORMAT_ISO_8601.print(val); }
+    public static String formatISO8601(long val) { return new DateTime(val).toString(); }
 
     public static Long parseWithLocale(String val, String locale) {
         for (DateTimeFormatter f : DATE_TIME_FORMATS) {
