@@ -45,7 +45,7 @@ public class RsaKeyPair {
             final CommandResult result = exec("ssh-keygen -l -f " + abs(f));
             return result.isZeroExitStatus() && result.getStdout().length() > 0;
         } catch (Exception e) {
-            log.error("isValidSshPublicKey: "+shortError(e));
+            log.warn("isValidSshPublicKey: "+shortError(e));
             return false;
         }
     }
