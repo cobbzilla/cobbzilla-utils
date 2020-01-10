@@ -4,10 +4,7 @@ import org.cobbzilla.util.string.StringUtil;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.DurationFieldType;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
+import org.joda.time.format.*;
 
 import static java.util.concurrent.TimeUnit.*;
 import static org.apache.commons.lang3.LocaleUtils.toLocale;
@@ -37,6 +34,7 @@ public class TimeUtil {
     public static final DateTimeFormatter DATE_FORMAT_HYPHEN_MMDDYYYY = DateTimeFormat.forPattern("MM-dd-yyyy");
     public static final DateTimeFormatter DATE_FORMAT_HYPHEN_MMMDDYYYY = DateTimeFormat.forPattern("MMM-dd-yyyy");
     public static final DateTimeFormatter DATE_FORMAT_EEE_DD_MMM_YYYY_HH_MM_SS_ZZZ = DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss zzz");
+    public static final DateTimeFormatter DATE_FORMAT_ISO_8601 = ISODateTimeFormat.dateTimeParser();
     public static final DateTimeFormatter DATE_FORMAT_IF_MODIFIED_SINCE = DATE_FORMAT_EEE_DD_MMM_YYYY_HH_MM_SS_ZZZ;
     public static final DateTimeFormatter DATE_FORMAT_LAST_MODIFIED = DATE_FORMAT_IF_MODIFIED_SINCE;
 
@@ -66,7 +64,7 @@ public class TimeUtil {
         return empty(time) ? null : formatter.withLocale(toLocale(locale)).parseDateTime(time).getMillis();
     }
 
-    public static Object parse(String val) {
+    public static Long parse(String val) {
         for (DateTimeFormatter f : DATE_TIME_FORMATS) {
             try {
                 return TimeUtil.parse(val, f);
@@ -76,6 +74,9 @@ public class TimeUtil {
         }
         return null;
     }
+
+    public static Long parseISO8601(String val) { return DATE_FORMAT_ISO_8601.parseMillis(val); }
+    public static String formatISO8601(long val) { return DATE_FORMAT_ISO_8601.print(val); }
 
     public static Long parseWithLocale(String val, String locale) {
         for (DateTimeFormatter f : DATE_TIME_FORMATS) {
