@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
+import org.cobbzilla.util.io.FileUtil;
 import org.cobbzilla.util.io.TempDir;
 import org.cobbzilla.util.string.Base64;
+import org.cobbzilla.util.system.CommandResult;
 
 import java.io.File;
 
@@ -13,6 +15,7 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.io.FileUtil.*;
 import static org.cobbzilla.util.string.StringUtil.safeShellArg;
+import static org.cobbzilla.util.system.CommandShell.exec;
 import static org.cobbzilla.util.system.CommandShell.execScript;
 
 @NoArgsConstructor @Accessors(chain=true) @EqualsAndHashCode(of={"publicKey"}) @Slf4j
@@ -32,6 +35,18 @@ public class RsaKeyPair {
             return sshKey.startsWith("ssh-rsa ") ? sshKey : die("error: "+sshKey);
         } catch (Exception e) {
             return die("initSshPublicKey: "+e.getMessage());
+        }
+    }
+
+    public static boolean isValidSshPublicKey (String key) {
+        try {
+            @Cleanup final TempDir temp = new TempDir();
+            final File f = FileUtil.toFile(temp+"/key.pub", key);
+            final CommandResult result = exec("ssh-keygen -l -f " + abs(f));
+            return result.isZeroExitStatus() && result.getStdout().length() > 0;
+        } catch (Exception e) {
+            log.error("isValidSshPublicKey: "+shortError(e));
+            return false;
         }
     }
 

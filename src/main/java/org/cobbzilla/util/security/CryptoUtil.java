@@ -13,8 +13,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.Key;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
@@ -29,15 +27,6 @@ public class CryptoUtil {
 
     public static final String RSA_PREFIX = "-----BEGIN RSA PRIVATE KEY-----";
     public static final String RSA_SUFFIX = "-----END RSA PRIVATE KEY-----";
-
-    private static final MessageDigest MESSAGE_DIGEST;
-    static {
-        try {
-            MESSAGE_DIGEST = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw (RuntimeException) die("error creating SHA-256 MessageDigest: "+e);
-        }
-    }
 
     public static byte[] toBytes(InputStream data) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
