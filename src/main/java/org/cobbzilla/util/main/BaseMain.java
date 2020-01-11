@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.cobbzilla.util.daemon.ExceptionHandler;
+import org.cobbzilla.util.error.ExceptionHandler;
 import org.cobbzilla.util.daemon.ZillaRuntime;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;

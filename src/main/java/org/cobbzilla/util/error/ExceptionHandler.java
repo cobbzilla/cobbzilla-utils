@@ -1,5 +1,6 @@
-package org.cobbzilla.util.daemon;
+package org.cobbzilla.util.error;
 
+import org.cobbzilla.util.daemon.ZillaRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

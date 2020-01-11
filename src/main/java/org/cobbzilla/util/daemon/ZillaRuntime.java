@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.cobbzilla.util.collection.ToStringTransformer;
+import org.cobbzilla.util.error.ExceptionHandler;
 import org.cobbzilla.util.error.GeneralErrorHandler;
 import org.cobbzilla.util.io.StreamUtil;
 import org.cobbzilla.util.string.StringUtil;
@@ -31,7 +32,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.LongStream.range;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.cobbzilla.util.daemon.ExceptionHandler.DEFAULT_EX_RUNNABLE;
+import static org.cobbzilla.util.error.ExceptionHandler.DEFAULT_EX_RUNNABLE;
 import static org.cobbzilla.util.io.FileUtil.abs;
 import static org.cobbzilla.util.io.FileUtil.list;
 import static org.cobbzilla.util.reflect.ReflectionUtil.instantiate;
@@ -235,7 +236,7 @@ public class ZillaRuntime {
         }
         return die("sorted: cannot sort a "+o.getClass().getSimpleName()+", can only sort arrays and Collections");
     }
-    public static <T> List sortedList(T o) {
+    public static <T> List toList(T o) {
         if (o == null) return null;
         if (o instanceof Collection) return new ArrayList((Collection) o);
         if (o instanceof Object[]) return Arrays.asList((Object[]) o);
@@ -343,10 +344,10 @@ public class ZillaRuntime {
     public static String zcat() { return SystemUtils.IS_OS_MAC ? "gzcat" : "zcat"; }
     public static String zcat(File f) { return (SystemUtils.IS_OS_MAC ? "gzcat" : "zcat") + " " + abs(f); }
 
-    public static final String[] OMIT_DEBUG_OPTIONS = {"-Xdebug", "-agentlib", "-Xrunjdwp"};
+    public static final String[] JAVA_DEBUG_OPTIONS = {"-Xdebug", "-agentlib", "-Xrunjdwp"};
 
     public static boolean isDebugOption (String arg) {
-        for (String opt : OMIT_DEBUG_OPTIONS) if (arg.startsWith(opt)) return true;
+        for (String opt : JAVA_DEBUG_OPTIONS) if (arg.startsWith(opt)) return true;
         return false;
     }
 
