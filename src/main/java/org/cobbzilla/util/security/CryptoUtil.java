@@ -17,7 +17,7 @@ import java.security.Key;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.retry;
-import static org.cobbzilla.util.string.StringUtil.UTF8;
+import static org.cobbzilla.util.string.StringUtil.UTF8cs;
 
 @Slf4j
 public class CryptoUtil {
@@ -96,7 +96,7 @@ public class CryptoUtil {
     }
 
     public static String string_encrypt(String data, String key) {
-        try { return Base64.encodeBytes(encryptOrDie(pad(data).getBytes(UTF8), key)); } catch (Exception e) {
+        try { return Base64.encodeBytes(encryptOrDie(pad(data).getBytes(UTF8cs), key)); } catch (Exception e) {
             return die("Error encrypting: "+e, e);
         }
     }
