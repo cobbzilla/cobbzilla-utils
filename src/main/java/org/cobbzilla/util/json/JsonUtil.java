@@ -24,6 +24,9 @@ public class JsonUtil {
     public static final String EMPTY_JSON = "{}";
     public static final String EMPTY_JSON_ARRAY = "[]";
 
+    public static final ThreadLocal<Boolean> verboseErrors = new ThreadLocal<>();
+    public static boolean verboseErrors() { return verboseErrors.get() != null && verboseErrors.get(); }
+
     public static final JsonNode MISSING = MissingNode.getInstance();
 
     public static final FileFilter JSON_FILES = new FileSuffixFilter(".json");
@@ -126,13 +129,15 @@ public class JsonUtil {
 
     public static String toJsonOrDie (Object o) {
         try { return toJson(o); } catch (Exception e) {
-            return die("toJson: exception writing object ("+o+"): "+e, e);
+            final String msg = "toJson: exception writing object (" + o + "): " + shortError(e);
+            return verboseErrors() ? die(msg, e) : die(msg);
         }
     }
 
     public static String toJsonOrDie (Object o, ObjectMapper m) {
         try { return toJson(o, m); } catch (Exception e) {
-            return die("toJson: exception writing object ("+o+"): "+e, e);
+            final String msg = "toJson: exception writing object (" + o + "): " + shortError(e);
+            return verboseErrors() ? die(msg, e) : die(msg);
         }
     }
 
@@ -159,7 +164,8 @@ public class JsonUtil {
 
     public static String toJsonOrDie (Object o, Class jsonView) {
         try { return toJson(o, jsonView); } catch (Exception e) {
-            return die("toJson: exception writing object ("+o+"): "+e, e);
+            final String msg = "toJson: exception writing object (" + o + "): " + shortError(e);
+            return verboseErrors() ? die(msg, e) : die(msg);
         }
     }
 
@@ -229,7 +235,8 @@ public class JsonUtil {
         try {
             return mapper.readValue(json, clazz);
         } catch (IOException e) {
-            return die("fromJsonOrDie: exception while reading: "+json+": "+e, e);
+            final String msg = "fromJsonOrDie: exception while reading: " + json + ": " + shortError(e);
+            return verboseErrors() ? die(msg, e) : die(msg);
         }
     }
 
@@ -261,7 +268,8 @@ public class JsonUtil {
         try {
             return fromJson(node, path, clazz, mapper);
         } catch (Exception e) {
-            return die("fromJsonOrDie: exception while reading: "+node+": "+e, e);
+            final String msg = "fromJsonOrDie: exception while reading: " + node + ": " + shortError(e);
+            return verboseErrors() ? die(msg, e) : die(msg);
         }
     }
     public static <T> T fromJson(JsonNode node, String path, Class<T> clazz, ObjectMapper mapper) throws Exception {
@@ -473,7 +481,8 @@ public class JsonUtil {
         try {
             return mergeJson(json, request);
         } catch (Exception e) {
-            return die("mergeJsonOrDie: "+e, e);
+            final String msg = "mergeJsonOrDie: " + shortError(e);
+            return verboseErrors() ? die(msg, e) : die(msg);
         }
     }
     public static String mergeJson(String json, String request) throws Exception {
@@ -507,7 +516,8 @@ public class JsonUtil {
         try {
             return mergeJsonNodes(json, request);
         } catch (Exception e) {
-            return die("mergeJsonNodesOrDie: "+e, e);
+            final String msg = "mergeJsonNodesOrDie: " + shortError(e);
+            return verboseErrors() ? die(msg, e) : die(msg);
         }
     }
 
@@ -515,7 +525,8 @@ public class JsonUtil {
         try {
             return mergeJson(json, request);
         } catch (Exception e) {
-            return die("mergeJsonOrDie: "+e, e);
+            final String msg = "mergeJsonOrDie: " + shortError(e);
+            return verboseErrors() ? die(msg, e) : die(msg);
         }
     }
 
