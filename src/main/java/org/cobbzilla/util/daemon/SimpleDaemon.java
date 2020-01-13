@@ -31,14 +31,14 @@ public abstract class SimpleDaemon implements Runnable {
     public void onStop () {}
 
     public void start() {
-        log.info(name+": Starting daemon");
+        log.info(getName()+": Starting daemon");
         synchronized (lock) {
             if (mainThread != null) {
-                log.warn(name+": daemon is already running, not starting it again");
+                log.warn(getName()+": daemon is already running, not starting it again");
                 return;
             }
             mainThread = new Thread(this);
-            mainThread.setName(name);
+            mainThread.setName(getName());
         }
         mainThread.setDaemon(true);
         mainThread.start();
@@ -46,7 +46,7 @@ public abstract class SimpleDaemon implements Runnable {
 
     private boolean alreadyStopped() {
         if (mainThread == null) {
-            log.warn(name+": daemon is already stopped");
+            log.warn(getName()+": daemon is already stopped");
             return true;
         }
         return false;
@@ -95,19 +95,19 @@ public abstract class SimpleDaemon implements Runnable {
         onStart();
         long delay = getStartupDelay();
         if (delay > 0) {
-            log.debug(name + ": Delaying daemon startup for " + delay + "ms...");
+            log.debug(getName()+": Delaying daemon startup for " + delay + "ms...");
             if (!wait(delay, "run[startup-delay]")) {
                 if (!canInterruptSleep()) return;
             }
         }
-        log.debug(name + ": Daemon thread now running");
+        log.debug(getName()+": Daemon thread now running");
 
         try {
-            log.debug(name + ": Daemon thread invoking init");
+            log.debug(getName()+": Daemon thread invoking init");
             init();
 
             while (!isDone) {
-                log.debug(name + ": Daemon thread invoking process");
+                log.debug(getName()+": Daemon thread invoking process");
                 try {
                     process();
                     lastProcessTime = now();
@@ -122,14 +122,14 @@ public abstract class SimpleDaemon implements Runnable {
                 }
             }
         } catch (Exception e) {
-            log.error(name + ": Error in daemon, exiting: " + e, e);
+            log.error(getName()+": Error in daemon, exiting: " + e, e);
 
         } finally {
             cleanup();
             try {
                 onStop();
             } catch (Exception e) {
-                log.error(name + ": Error in onStop, exiting and ignoring error: " + e, e);
+                log.error(getName()+": Error in onStop, exiting and ignoring error: " + e, e);
             }
         }
     }
@@ -142,9 +142,9 @@ public abstract class SimpleDaemon implements Runnable {
             return true;
         } catch (RuntimeException e) {
             if (isDone) {
-                log.info("sleep("+delay+") interrupted but daemon is done");
+                log.info(getName()+": sleep("+delay+") interrupted but daemon is done");
             } else {
-                log.error("sleep("+delay+") interrupted, exiting: "+e);
+                log.error(getName()+": sleep("+delay+") interrupted, exiting: "+e);
             }
             return false;
         }
