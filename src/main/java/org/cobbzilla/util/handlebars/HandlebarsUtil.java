@@ -660,8 +660,10 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
                     return s;
                 }
             }
+        } else if (v instanceof Comparable) {
+            return (Comparable) v;
         } else {
-            return die("don't know to compare objects of class "+v.getClass());
+            return die("cval: cannot compare object with type: "+v.getClass().getName());
         }
     }
 
