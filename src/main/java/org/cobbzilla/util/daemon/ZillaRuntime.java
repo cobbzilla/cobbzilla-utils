@@ -149,7 +149,7 @@ public class ZillaRuntime {
         final String message = e.getMessage();
         final Throwable cause = e.getCause();
         if (errorApi != null) {
-            if (cause != null && cause instanceof Exception) errorApi.report(message, (Exception) cause);
+            if (cause instanceof Exception) errorApi.report(message, (Exception) cause);
             else errorApi.report(e);
         }
         if (cause != null) log.error("Inner exception: " + message, cause);
