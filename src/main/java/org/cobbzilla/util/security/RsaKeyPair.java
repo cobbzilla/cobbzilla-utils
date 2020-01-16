@@ -135,14 +135,14 @@ public class RsaKeyPair {
     }
 
     public RsaMessage encrypt(String data, RsaKeyPair recipient) {
-        return retry(() -> {
-            @Cleanup("delete") final TempDir temp = new TempDir();
-
-            secureFile(temp, "data", data);
-            secureFile(temp, "recipient.crt", recipient.getPublicKey());
-            secureFile(temp, "sender.key", getPrivateKey());
-            secureFile(temp, "sender.crt", getPublicKey());
+        Exception lastEx = null;
+        for (int i=0; i<MAX_RETRIES; i++) {
             try {
+                @Cleanup("delete") final TempDir temp = new TempDir();
+                secureFile(temp, "data", data);
+                secureFile(temp, "recipient.crt", recipient.getPublicKey());
+                secureFile(temp, "sender.key", getPrivateKey());
+                secureFile(temp, "sender.crt", getPublicKey());
                 execScript("cd "+abs(temp)+" && " +
                         // generate random symmetric key
                         "openssl rand -out secret.key 32 && " +
@@ -162,9 +162,11 @@ public class RsaKeyPair {
                         .setData(Base64.readB64(temp, "data.enc"))
                         .setSignature(Base64.readB64(temp, "data.sig"));
             } catch (Exception e) {
-                return die("encrypt: "+e);
+                lastEx = e;
+                log.warn("encrypt: "+shortError(e));
             }
-        }, MAX_RETRIES);
+        }
+        return die("encrypt: "+lastEx);
     }
 
     public String decrypt(RsaMessage message, RsaKeyPair sender) {
