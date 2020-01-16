@@ -129,9 +129,12 @@ public class ZillaRuntime {
         return die("retry: max tries ("+tries+") exceeded. last exception: "+lastEx);
     }
 
-    public static Thread daemon (Runnable r) {
+    public static Thread daemon (Runnable r) { return daemon(r, null); }
+
+    public static Thread daemon (Runnable r, String name) {
         final Thread t = new Thread(r);
         t.setDaemon(true);
+        t.setName(empty(name) ? r.getClass().getSimpleName() : name);
         t.start();
         return t;
     }
