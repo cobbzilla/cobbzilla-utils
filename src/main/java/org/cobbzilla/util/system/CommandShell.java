@@ -202,7 +202,7 @@ public class CommandShell {
         try {
             return executor.execute(commandLine);
         } catch (Exception e) {
-            return die("chmod: "+e, e);
+            throw new CommandShellException(commandLine.toString(), e);
         }
     }
 
@@ -230,7 +230,7 @@ public class CommandShell {
         try {
             return executor.execute(command);
         } catch (Exception e) {
-            return die(cmd+": "+e, e);
+            throw new CommandShellException(command.toString(), e);
         }
     }
 
@@ -250,7 +250,7 @@ public class CommandShell {
         try {
             return exec(command).getStdout().trim();
         } catch (IOException e) {
-            return die("Error executing: "+command+": "+e, e);
+            throw new CommandShellException(command, e);
         }
     }
 
@@ -277,7 +277,7 @@ public class CommandShell {
             return temp;
 
         } catch (Exception e) {
-            return die("tempScript("+contents+") failed: "+e, e);
+            throw new CommandShellException(contents, e);
         }
     }
 
@@ -288,7 +288,7 @@ public class CommandShell {
     public static String execScript (String contents, Map<String, String> env, List<Integer> exitValues) {
         final CommandResult result = scriptResult(contents, env, null, exitValues);
         if (!result.isZeroExitStatus() && (exitValues == null || !exitValues.contains(result.getExitStatus()))) {
-            die("execScript: non-zero exit: "+result);
+            throw new CommandShellException(contents, result);
         }
         return result.getStdout();
     }
@@ -310,12 +310,12 @@ public class CommandShell {
             if (!empty(exitValues)) command.setExitValues(exitValues);
             return exec(command);
         } catch (Exception e) {
-            return die("Error executing: "+e);
+            throw new CommandShellException(contents, e);
         }
     }
 
     public static CommandResult okResult(CommandResult result) {
-        if (result == null || !result.isZeroExitStatus()) die("error: "+result);
+        if (result == null || !result.isZeroExitStatus()) throw new CommandShellException(result);
         return result;
     }
 
