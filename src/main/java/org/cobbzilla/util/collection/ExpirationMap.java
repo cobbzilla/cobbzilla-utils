@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.notSupported;
@@ -90,6 +92,20 @@ public class ExpirationMap<K, V> implements Map<K, V> {
 
     @Override public Collection<V> values() {
         return map.values().stream().map(v -> v.value).collect(Collectors.toList());
+    }
+
+    @Override public V putIfAbsent(K key, V value) {
+        final ExpirationMapEntry<V> val = map.putIfAbsent(key, new ExpirationMapEntry<>(value));
+        return val == null ? null : val.value;
+    }
+
+    @Override public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+        return map.computeIfAbsent(key, k -> new ExpirationMapEntry<>(mappingFunction.apply(k))).value;
+    }
+
+    @Override public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        final ExpirationMapEntry<V> found = map.computeIfPresent(key, (k, vExpirationMapEntry) -> new ExpirationMapEntry<>(remappingFunction.apply(k, vExpirationMapEntry.value)));
+        return found == null ? null : found.value;
     }
 
     @AllArgsConstructor

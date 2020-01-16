@@ -330,7 +330,15 @@ public class ZillaRuntime {
         final StringBuilder b = new StringBuilder();
         for (Object thing : things) {
             if (b.length() > 0) b.append("\t");
-            b.append(thing == null ? "null" : (thing instanceof Object[]) ? Arrays.deepHashCode((Object[]) thing) : thing.hashCode());
+            if (thing == null) {
+                b.append("null");
+            } else if (thing instanceof String) {
+                b.append(thing);
+            } else if (thing instanceof Object[]) {
+                b.append(Arrays.deepHashCode((Object[]) thing));
+            } else {
+                b.append(thing.hashCode());
+            }
         }
         return sha256_hex(b.toString());
     }

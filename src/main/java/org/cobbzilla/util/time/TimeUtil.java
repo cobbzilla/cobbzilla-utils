@@ -29,6 +29,7 @@ public class TimeUtil {
     public static final DateTimeFormatter DATE_FORMAT_YYYY_MMM_DD = DateTimeFormat.forPattern("yyyy MMM dd");
     public static final DateTimeFormatter DATE_FORMAT_MMM_DD_YYYY = DateTimeFormat.forPattern("MMM dd, yyyy");
     public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH_mm_ss = DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss");
+    public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH_mm_ss_SSS = DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm-ss-SSS");
     public static final DateTimeFormatter DATE_FORMAT_YYYYMMDDHHMMSS = DateTimeFormat.forPattern("yyyyMMddHHmmss");
     public static final DateTimeFormatter DATE_FORMAT_YYYY_MM_DD_HH  = DateTimeFormat.forPattern("yyyy-MM-dd-HH");
     public static final DateTimeFormatter DATE_FORMAT_HYPHEN_MMDDYYYY = DateTimeFormat.forPattern("MM-dd-yyyy");
