@@ -174,12 +174,7 @@ public class ZillaRuntime {
             b.append("\ncaused by: ").append(shortError(cause));
             cause = cause.getCause();
         }
-        b.append("\n\n ----- STACK TRACES -----\n").append(getStackTrace(e));
-        cause = e.getCause();
-        while (cause != null) {
-            b.append("\n").append(e.getClass().getName()).append("\n").append(getStackTrace(cause));
-            cause = cause.getCause();
-        }
+        b.append("\n\n ----- STACK TRACE -----\n").append(getStackTrace(e));
         return b.toString();
     }
 
