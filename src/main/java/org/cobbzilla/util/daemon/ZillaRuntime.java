@@ -159,12 +159,28 @@ public class ZillaRuntime {
         throw e;
     }
 
-    public static String shortError(Exception e) { return e.getClass().getName()+": "+e.getMessage(); }
+    public static String shortError(Throwable e) { return e.getClass().getName()+": "+e.getMessage(); }
 
     public static String errorString(Exception e) { return errorString(e, 1000); }
 
     public static String errorString(Exception e, int maxlen) {
         return truncate(shortError(e)+"\n"+ getStackTrace(e), maxlen);
+    }
+
+    public static String fullError(Exception e) {
+        final StringBuilder b = new StringBuilder(shortError(e));
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            b.append("\ncaused by: ").append(shortError(cause));
+            cause = cause.getCause();
+        }
+        b.append("\n\n ----- STACK TRACES -----\n").append(getStackTrace(e));
+        cause = e.getCause();
+        while (cause != null) {
+            b.append("\n").append(e.getClass().getName()).append("\n").append(getStackTrace(cause));
+            cause = cause.getCause();
+        }
+        return b.toString();
     }
 
     public static boolean empty(String s) { return s == null || s.length() == 0; }
