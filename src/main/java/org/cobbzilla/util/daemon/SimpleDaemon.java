@@ -34,7 +34,7 @@ public abstract class SimpleDaemon implements Runnable {
         log.info(getName()+": Starting daemon");
         synchronized (lock) {
             if (mainThread != null) {
-                log.warn(getName()+": daemon is already running, not starting it again");
+                log.info(getName()+": daemon is already running, not starting it again");
                 return;
             }
             mainThread = new Thread(this);
