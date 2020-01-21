@@ -95,15 +95,18 @@ public class ExpirationMap<K, V> implements Map<K, V> {
     }
 
     @Override public V putIfAbsent(K key, V value) {
+        if (lastCleaned+cleanInterval > now()) cleanExpired();
         final ExpirationMapEntry<V> val = map.putIfAbsent(key, new ExpirationMapEntry<>(value));
         return val == null ? null : val.value;
     }
 
     @Override public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
+        if (lastCleaned+cleanInterval > now()) cleanExpired();
         return map.computeIfAbsent(key, k -> new ExpirationMapEntry<>(mappingFunction.apply(k))).value;
     }
 
     @Override public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
+        if (lastCleaned+cleanInterval > now()) cleanExpired();
         final ExpirationMapEntry<V> found = map.computeIfPresent(key, (k, vExpirationMapEntry) -> new ExpirationMapEntry<>(remappingFunction.apply(k, vExpirationMapEntry.value)));
         return found == null ? null : found.value;
     }
