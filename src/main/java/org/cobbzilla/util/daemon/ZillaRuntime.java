@@ -155,7 +155,13 @@ public class ZillaRuntime {
             if (cause instanceof Exception) errorApi.report(message, (Exception) cause);
             else errorApi.report(e);
         }
-        if (cause != null) log.error("Inner exception: " + message, cause);
+        if (cause != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("Inner exception: " + message, cause);
+            } else {
+                log.error("Inner exception: " + message + ": "+ shortError(cause));
+            }
+        }
         throw e;
     }
 
