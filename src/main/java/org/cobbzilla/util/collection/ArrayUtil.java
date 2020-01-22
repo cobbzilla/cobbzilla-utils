@@ -82,6 +82,15 @@ public class ArrayUtil {
     /**
      * Produce a delimited string from an array. Null values will appear as "null"
      * @param array the array to consider
+     * @return the result of calling .toString on each array element, or "null" for null elements, separated by the given delimiter.
+     */
+    public static String arrayToString(Object[] array) {
+        return arrayToString(array, ", ", "null");
+    }
+
+    /**
+     * Produce a delimited string from an array. Null values will appear as "null"
+     * @param array the array to consider
      * @param delim the delimiter to put in between each element
      * @return the result of calling .toString on each array element, or "null" for null elements, separated by the given delimiter.
      */
