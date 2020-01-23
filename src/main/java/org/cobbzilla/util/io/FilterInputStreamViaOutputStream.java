@@ -15,6 +15,7 @@ import static org.cobbzilla.util.reflect.ReflectionUtil.instantiate;
 public class FilterInputStreamViaOutputStream extends PipedInputStream implements Runnable {
 
     private static final int DEFAULT_PIPE_BUFFER_SIZE = (int) (64 * Bytes.KB);
+    private static final int DEFAULT_COPY_BUFFER_SIZE = (int) (8 * Bytes.KB);
     private static final long THREAD_TERMINATE_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
 
     private InputStream in;
@@ -59,17 +60,17 @@ public class FilterInputStreamViaOutputStream extends PipedInputStream implement
 
     @Override public void run() {
         try {
-            int c;
-            int counter = 0;
-            while((c = in.read()) >= 0) {
-                out.write(c);
-                counter++;
+            final byte[] buf = new byte[DEFAULT_COPY_BUFFER_SIZE];
+            int bytesRead;
+            while ((bytesRead = in.read(buf)) >= 0) {
+                out.write(buf, 0, bytesRead);
             }
             out.flush();
 
         } catch (IOException e) {
-            log.error("run: error copying bytes: "+shortError(e));
-            throw new RuntimeException(e);
+            final String msg = "run: error copying bytes: " + shortError(e);
+            log.error(msg);
+            throw new RuntimeException(msg, e);
 
         } finally {
             closeQuietly(out);
