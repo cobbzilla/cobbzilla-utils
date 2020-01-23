@@ -78,7 +78,6 @@ public class FilterInputStreamViaOutputStream extends PipedInputStream implement
     }
 
     @Override public void close() {
-        log.info("close called from "+stacktrace());
         try {
             super.close();
         } catch (Exception e) {

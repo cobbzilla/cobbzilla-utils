@@ -44,6 +44,7 @@ public class FilterInputStreamViaOutputStreamTest {
         final ByteArrayOutputStream actual = new ByteArrayOutputStream();
         final long copied = IOUtils.copyLarge(filter, actual);
         log.info("copied "+copied+" bytes, actual has "+actual.toByteArray().length+" bytes");
+        filter.close();
 
         // Decompress what we just read, we should end up back at testData
         final ByteArrayOutputStream finalCheck = new ByteArrayOutputStream();
