@@ -1,6 +1,8 @@
 package org.cobbzilla.util.io;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +19,20 @@ public class MultiReader extends Reader {
         currentReader = r;
     }
 
+    public MultiReader (InputStream in) {
+        this(new InputStreamReader(in));
+    }
+
     public void addReader (Reader r) { readers.add(r); }
 
     public void addLastReader (Reader r) {
         addReader(r);
         endOfReaders = true;
     }
+
+    public void addStream (InputStream in) { addReader(new InputStreamReader(in)); }
+
+    public void addLastStream (InputStream in) { addLastReader(new InputStreamReader(in)); }
 
     @Override public int read(char[] buf, int off, int len) throws IOException {
         int count = currentReader.read(buf, off, len);
