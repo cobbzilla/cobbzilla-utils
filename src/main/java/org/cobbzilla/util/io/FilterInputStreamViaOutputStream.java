@@ -23,6 +23,8 @@ public class FilterInputStreamViaOutputStream extends PipedInputStream implement
     private OutputStream out;
     private Thread thread;
 
+    public Class<? extends OutputStream> getOutputStreamClass () { return out == null ? null : out.getClass(); }
+
     public FilterInputStreamViaOutputStream(InputStream in, Class<? extends OutputStream> outStreamClass) {
         super(DEFAULT_PIPE_BUFFER_SIZE);
         this.in = in;
