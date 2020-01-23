@@ -1,4 +1,4 @@
-package org.cobbzilla.util.io;
+package org.cobbzilla.util.io.multi;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +26,8 @@ public class MultiStream extends InputStream {
 
     public MultiStream (InputStream r) { this(r, false); }
 
+    protected int getEndOfStreamMarker() { return 0; }
+
     public void addStream (InputStream in) {
         if (endOfStreams) {
             log.warn("addStream: endOfStreams is true, not adding InputStream");
@@ -43,7 +45,7 @@ public class MultiStream extends InputStream {
         int val = currentStream.read();
         if (val == -1) {
             if (streamIndex == streams.size()-1) {
-                return endOfStreams ? -1 : 0;
+                return endOfStreams ? -1 : getEndOfStreamMarker();
             }
             currentStream.close();
             streamIndex++;
@@ -57,7 +59,7 @@ public class MultiStream extends InputStream {
         int count = currentStream.read(buf, off, len);
         if (count == -1) {
             if (streamIndex == streams.size()-1) {
-                return endOfStreams ? -1 : 0;
+                return endOfStreams ? -1 : getEndOfStreamMarker();
             }
             currentStream.close();
             streamIndex++;

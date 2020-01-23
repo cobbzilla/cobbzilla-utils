@@ -1,7 +1,7 @@
 package org.cobbzilla.util.io.regex;
 
 import org.apache.commons.io.IOUtils;
-import org.cobbzilla.util.io.MultiReader;
+import org.cobbzilla.util.io.multi.MultiReader;
 import org.junit.Test;
 
 import java.io.IOException;

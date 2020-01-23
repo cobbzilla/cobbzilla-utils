@@ -1,4 +1,4 @@
-package org.cobbzilla.util.io;
+package org.cobbzilla.util.io.multi;
 
 import lombok.extern.slf4j.Slf4j;
 
