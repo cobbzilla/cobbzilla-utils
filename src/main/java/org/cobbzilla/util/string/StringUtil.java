@@ -21,6 +21,7 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +39,7 @@ import static org.cobbzilla.util.io.StreamUtil.loadResourceAsStringOrDie;
 public class StringUtil {
 
     public static final String UTF8 = "UTF-8";
-    public static final Charset UTF8cs = Charset.forName(UTF8);
+    public static final Charset UTF8cs = StandardCharsets.UTF_8;
 
     public static final String EMPTY = "";
     public static final String[] EMPTY_ARRAY = {};
