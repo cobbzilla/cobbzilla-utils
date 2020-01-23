@@ -76,7 +76,7 @@ public class RegexFilterReader extends BufferedReader {
         boolean eof = false;
         // fill the buffer with the underlying stream
         while (len != buffer.length) {
-            int val = super.read(buffer, len, buffer.length - len);
+            final int val = super.read(buffer, len, buffer.length - len);
             if (val == -1) {
                 eof = true;
                 break;

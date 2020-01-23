@@ -26,8 +26,6 @@ public class MultiStream extends InputStream {
 
     public MultiStream (InputStream r) { this(r, false); }
 
-    protected int getEndOfStreamMarker() { return 0; }
-
     public void addStream (InputStream in) {
         if (endOfStreams) {
             log.warn("addStream: endOfStreams is true, not adding InputStream");
@@ -42,10 +40,10 @@ public class MultiStream extends InputStream {
     }
 
     @Override public int read() throws IOException {
-        int val = currentStream.read();
+        final int val = currentStream.read();
         if (val == -1) {
             if (streamIndex == streams.size()-1) {
-                return endOfStreams ? -1 : getEndOfStreamMarker();
+                return endOfStreams ? -1 : 0;
             }
             currentStream.close();
             streamIndex++;
@@ -56,10 +54,10 @@ public class MultiStream extends InputStream {
     }
 
     @Override public int read(byte[] buf, int off, int len) throws IOException {
-        int count = currentStream.read(buf, off, len);
+        final int count = currentStream.read(buf, off, len);
         if (count == -1) {
             if (streamIndex == streams.size()-1) {
-                return endOfStreams ? -1 : getEndOfStreamMarker();
+                return endOfStreams ? -1 : 0;
             }
             currentStream.close();
             streamIndex++;
