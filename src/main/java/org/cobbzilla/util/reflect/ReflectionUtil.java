@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.MethodUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.ArrayUtils;
+import org.cobbzilla.util.collection.ExpirationEvictionPolicy;
 import org.cobbzilla.util.collection.ExpirationMap;
 import org.cobbzilla.util.string.StringUtil;
 
@@ -705,19 +706,22 @@ public class ReflectionUtil {
      */
     public static <T> Class<T> getFirstTypeParam(Class clazz) { return getTypeParam(clazz, 0); }
 
+    private static Map<String, Class> typeParamCache = new ExpirationMap<>(ExpirationEvictionPolicy.atime);
+
     public static <T> Class<T> getTypeParam(Class clazz, int index) {
-        // todo: add a cache on this thing... could do wonders
-        Class check = clazz;
-        while (check.getGenericSuperclass() == null || !(check.getGenericSuperclass() instanceof ParameterizedType)) {
-            check = check.getSuperclass();
-            if (check.equals(Object.class)) die("getTypeParam("+clazz.getName()+"): no type parameters found");
-        }
-        final ParameterizedType parameterizedType = (ParameterizedType) check.getGenericSuperclass();
-        final Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-        if (index >= actualTypeArguments.length) die("getTypeParam("+clazz.getName()+"): "+actualTypeArguments.length+" type parameters found, index "+index+" out of bounds");
-        if (actualTypeArguments[index] instanceof Class) return (Class) actualTypeArguments[index];
-        if (actualTypeArguments[index] instanceof ParameterizedType) return (Class) ((ParameterizedType) actualTypeArguments[index]).getRawType();
-        return (Class<T>) ((Type) actualTypeArguments[index]).getClass();
+        return (Class<T>) typeParamCache.computeIfAbsent(clazz.getName()+":"+index, k -> {
+            Class check = clazz;
+            while (check.getGenericSuperclass() == null || !(check.getGenericSuperclass() instanceof ParameterizedType)) {
+                check = check.getSuperclass();
+                if (check.equals(Object.class)) die("getTypeParam("+clazz.getName()+"): no type parameters found");
+            }
+            final ParameterizedType parameterizedType = (ParameterizedType) check.getGenericSuperclass();
+            final Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+            if (index >= actualTypeArguments.length) die("getTypeParam("+clazz.getName()+"): "+actualTypeArguments.length+" type parameters found, index "+index+" out of bounds");
+            if (actualTypeArguments[index] instanceof Class) return (Class) actualTypeArguments[index];
+            if (actualTypeArguments[index] instanceof ParameterizedType) return (Class) ((ParameterizedType) actualTypeArguments[index]).getRawType();
+            return ((Type) actualTypeArguments[index]).getClass();
+        });
     }
 
     /**
