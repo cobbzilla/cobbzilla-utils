@@ -1,5 +1,7 @@
 package org.cobbzilla.util.io;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -7,6 +9,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class MultiReader extends Reader {
 
     private final List<Reader> readers = new ArrayList<>();
@@ -14,16 +17,28 @@ public class MultiReader extends Reader {
     private int readerIndex = 0;
     private boolean endOfReaders = false;
 
-    public MultiReader (Reader r) {
-        addReader(r);
+    public MultiReader (Reader r, boolean last) {
+        if (last) {
+            addLastReader(r);
+        } else {
+            addReader(r);
+        }
         currentReader = r;
     }
 
-    public MultiReader (InputStream in) {
-        this(new InputStreamReader(in));
-    }
+    public MultiReader (Reader r) { this(r, false); }
 
-    public void addReader (Reader r) { readers.add(r); }
+    public MultiReader (InputStream in) { this(new InputStreamReader(in), false); }
+
+    public MultiReader (InputStream in, boolean last) { this(new InputStreamReader(in), last); }
+
+    public void addReader (Reader r) {
+        if (endOfReaders) {
+            log.warn("addReader: endOfReaders is true, not adding reader");
+        } else {
+            readers.add(r);
+        }
+    }
 
     public void addLastReader (Reader r) {
         addReader(r);
