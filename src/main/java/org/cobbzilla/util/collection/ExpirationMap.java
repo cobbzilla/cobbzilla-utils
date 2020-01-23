@@ -44,6 +44,11 @@ public class ExpirationMap<K, V> implements Map<K, V> {
         this.evictionPolicy = evictionPolicy;
     }
 
+    public ExpirationMap(ExpirationEvictionPolicy evictionPolicy) {
+        this();
+        this.evictionPolicy = evictionPolicy;
+    }
+
     @Accessors(chain=true)
     private class ExpirationMapEntry<VAL> {
         public final VAL value;
