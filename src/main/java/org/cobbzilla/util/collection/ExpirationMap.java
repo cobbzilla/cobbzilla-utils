@@ -32,12 +32,17 @@ public class ExpirationMap<K, V> implements Map<K, V> {
         return this;
     }
 
+    @Getter @Setter private ExpirationEvictionPolicy evictionPolicy = ExpirationEvictionPolicy.ctime_or_atime;
     private long lastCleaned = 0;
 
-    public ExpirationMap() {
-        this.map = new ConcurrentHashMap<>();
-    }
+    public ExpirationMap() { this.map = new ConcurrentHashMap<>(); }
+
     public ExpirationMap(long val) { this(); setExpirations(val); }
+
+    public ExpirationMap(long val, ExpirationEvictionPolicy evictionPolicy) {
+        this(val);
+        this.evictionPolicy = evictionPolicy;
+    }
 
     @Accessors(chain=true)
     private class ExpirationMapEntry<VAL> {
@@ -47,7 +52,13 @@ public class ExpirationMap<K, V> implements Map<K, V> {
         public ExpirationMapEntry(VAL value) { this.value = value; }
 
         public ExpirationMapEntry<VAL> touch() { atime = now(); return this; }
-        public boolean expired() { return now() > ctime+maxExpiration || now() > atime+expiration; }
+        public boolean expired() {
+            switch (evictionPolicy) {
+                case ctime_or_atime: default: return now() > ctime+maxExpiration || now() > atime+expiration;
+                case atime: return now() > atime+expiration;
+                case ctime: return now() > ctime+expiration;
+            }
+        }
     }
 
     @Override public int size() { return map.size(); }
