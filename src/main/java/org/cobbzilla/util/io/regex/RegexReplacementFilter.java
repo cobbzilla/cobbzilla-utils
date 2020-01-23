@@ -51,7 +51,11 @@ public class RegexReplacementFilter implements RegexStreamFilter {
             // advance start pointer and track last match end
             start = matcher.end();
         }
-        return new RegexFilterResult(result, 0);
+        if (eof) {
+            result.append(buffer.subSequence(start, buffer.length()));
+            return new RegexFilterResult(result, 0);
+        }
+        return new RegexFilterResult(result, buffer.length() - start);
     }
 
 }
