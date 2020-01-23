@@ -17,11 +17,8 @@ public class MultiReader extends Reader {
         currentReader = r;
     }
 
-    public void addReader (Reader r) {
-        synchronized (readers) {
-            readers.add(r);
-        }
-    }
+    public void addReader (Reader r) { readers.add(r); }
+
     public void addLastReader (Reader r) {
         addReader(r);
         endOfReaders = true;
