@@ -43,13 +43,13 @@ public class StringUtil {
 
     public static final String EMPTY = "";
     public static final String[] EMPTY_ARRAY = {};
-    public static final String DEFAULT_LOCALE = "en_US";
-    public static final String BYTES_PATTERN = "(\\d+)(\\p{javaSpaceChar}+)?([MgGgTtPpEe][Bb])";
+    public static final char[] EMPTY_CHAR_ARRAY = {};
     public static final String CRLF = "\r\n";
 
     public static final Transformer XFORM_TO_STRING = o -> String.valueOf(o);
 
     public static final String[] VOWELS = {"e", "a", "o", "i", "u"};
+
     public static boolean isVowel(String symbol) { return ArrayUtils.indexOf(VOWELS, symbol) != -1; }
 
     public static List<String> toStringCollection (Collection c) {

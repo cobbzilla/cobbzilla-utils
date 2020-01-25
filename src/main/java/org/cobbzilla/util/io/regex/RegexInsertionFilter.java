@@ -44,6 +44,7 @@ public class RegexInsertionFilter implements RegexStreamFilter {
         final StringBuilder result = new StringBuilder(buffer.length());
         int start = 0;
         final Matcher matcher = get_pattern().matcher(buffer.toString());
+        int matchCount = 0;
         while (matcher.find(start)) {
 
             // add everything before the first match
@@ -63,12 +64,14 @@ public class RegexInsertionFilter implements RegexStreamFilter {
 
             // advance start pointer and track last match end
             start = matcher.end();
+
+            matchCount++;
         }
 
         if (eof) {
             // we are at the end, include everything else, no remainder
             result.append(buffer.subSequence(start, buffer.length()));
-            return new RegexFilterResult(result, 0);
+            return new RegexFilterResult(result, 0, matchCount);
         }
 
         // nothing matched
@@ -76,10 +79,10 @@ public class RegexInsertionFilter implements RegexStreamFilter {
         final int totalRemainder = buffer.length() - start;
         if (totalRemainder > 1024) {
             result.append(buffer.subSequence(start, buffer.length()-1024));
-            return new RegexFilterResult(result, 1024);
+            return new RegexFilterResult(result, 1024, matchCount);
         } else {
             // leave the entire remainder, we can't be sure
-            return new RegexFilterResult(result, totalRemainder);
+            return new RegexFilterResult(result, totalRemainder, matchCount);
         }
     }
 

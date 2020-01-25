@@ -35,6 +35,7 @@ public class RegexReplacementFilter implements RegexStreamFilter {
         final StringBuilder result = new StringBuilder(buffer.length());
         int start = 0;
         final Matcher matcher = pattern.matcher(buffer.toString());
+        int matchCount = 0;
         while (matcher.find(start)) {
             // add everything before the first match
             result.append(buffer.subSequence(start, matcher.start()));
@@ -50,12 +51,14 @@ public class RegexReplacementFilter implements RegexStreamFilter {
 
             // advance start pointer and track last match end
             start = matcher.end();
+
+            matchCount++;
         }
         if (eof) {
             result.append(buffer.subSequence(start, buffer.length()));
-            return new RegexFilterResult(result, 0);
+            return new RegexFilterResult(result, 0, matchCount);
         }
-        return new RegexFilterResult(result, buffer.length() - start);
+        return new RegexFilterResult(result, buffer.length() - start, matchCount);
     }
 
 }

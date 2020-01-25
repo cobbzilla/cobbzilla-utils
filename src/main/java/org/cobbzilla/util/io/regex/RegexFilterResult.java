@@ -7,5 +7,6 @@ public class RegexFilterResult {
 
     public StringBuilder buffer;
     public int remainder;
+    public int matchCount;
 
 }
