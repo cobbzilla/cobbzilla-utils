@@ -22,7 +22,7 @@ public class RegexFilterReaderTest {
 
     @Test public void testSimpleRegexReader() throws Exception {
         final Reader reader = new StringReader(TEST_STRING_1);
-        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" a ", 0, " X ");
+        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" a ", " X ");
         final RegexFilterReader regexFilterReader = new RegexFilterReader(reader, 1024, regexStreamFilter);
         final StringWriter result = new StringWriter();
         IOUtils.copyLarge(regexFilterReader, result);
@@ -31,7 +31,7 @@ public class RegexFilterReaderTest {
 
     @Test public void testSmallBufferRegexReader() throws Exception {
         final Reader reader = new StringReader(TEST_STRING_1);
-        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" a ", 0, " X ");
+        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" a ", " X ");
         final RegexFilterReader regexFilterReader = new RegexFilterReader(reader, 8, regexStreamFilter);
         final StringWriter result = new StringWriter();
         IOUtils.copyLarge(regexFilterReader, result);
@@ -53,7 +53,7 @@ public class RegexFilterReaderTest {
         final Reader reader3 = new StringReader(MULTI_TEST_STRING_3);
         final MultiReader multiReader = new MultiReader(reader1);
 
-        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" a ", 0, " X ");
+        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" a ", " X ");
         final RegexFilterReader regexFilterReader = new RegexFilterReader(multiReader, 8, regexStreamFilter);
         final StringWriter result = new StringWriter();
 
@@ -93,7 +93,7 @@ public class RegexFilterReaderTest {
         final Reader reader4 = new StringReader(MULTI2_TEST_STRING_4);
         final MultiReader multiReader = new MultiReader(reader1);
 
-        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" barbecue", 0, " BBQ");
+        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" barbecue", " BBQ");
         final RegexFilterReader regexFilterReader = new RegexFilterReader(multiReader, 8, regexStreamFilter);
         final StringWriter result = new StringWriter();
 

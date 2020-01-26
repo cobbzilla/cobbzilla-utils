@@ -21,6 +21,8 @@ public class RegexReplacementFilter implements RegexStreamFilter {
         this.replacement = replacement;
     }
 
+    public RegexReplacementFilter(String regex, String replacement) { this(regex, 0, replacement); }
+
     @Override public void configure(JsonNode config) {
         this.pattern = Pattern.compile(config.get("pattern").textValue());
 
