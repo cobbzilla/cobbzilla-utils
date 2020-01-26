@@ -32,7 +32,8 @@ public class JsonUtil {
     public static final FileFilter JSON_FILES = new FileSuffixFilter(".json");
     public static final FilenameFilter JSON_FILENAMES = new FilenameSuffixFilter(".json");
 
-    public static final ObjectMapper COMPACT_MAPPER = new ObjectMapper();
+    public static final ObjectMapper COMPACT_MAPPER = new ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
     public static final ObjectMapper FULL_MAPPER = new ObjectMapper()
             .configure(SerializationFeature.INDENT_OUTPUT, true);
