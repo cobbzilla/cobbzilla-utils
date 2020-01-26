@@ -1155,4 +1155,16 @@ public class ReflectionUtil {
         }
     }
 
+    public static <T> T constValue(Class type, String fieldName) {
+        final Field field;
+        try {
+            field = type.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            return null;
+        } catch (Exception e) {
+            return die("constValue: "+e);
+        }
+        return constValue(field);
+    }
+
 }
