@@ -22,9 +22,12 @@ public class HttpContentTypes {
     public static final String APPLICATION_JAVASCRIPT = "application/javascript";
     public static final String APPLICATION_XML = "application/xml";
     public static final String APPLICATION_PDF = "application/pdf";
-    public static final String IMAGE_PNG = "image/png";
-    public static final String IMAGE_JPEG = "image/jpg";
-    public static final String IMAGE_GIF = "image/gif";
+
+    public static final String IMAGE_PREFIX = "image/";
+    public static final String IMAGE_PNG = IMAGE_PREFIX + "png";
+    public static final String IMAGE_JPEG = IMAGE_PREFIX + "jpg";
+    public static final String IMAGE_GIF = IMAGE_PREFIX + "gif";
+
     public static final String APPLICATION_PEM_FILE = "application/x-pem-file";
     public static final String APPLICATION_PKCS12_FILE = "application/x-pkcs12";
     public static final String APPLICATION_CER_FILE = "application/x-x509-user-cert";
