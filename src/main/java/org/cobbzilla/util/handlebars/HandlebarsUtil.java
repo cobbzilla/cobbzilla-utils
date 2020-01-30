@@ -471,10 +471,11 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
 
             final BigDecimal result;
             switch (operator) {
-                case "+": result = big(v1).add(big(v2)); break;
-                case "-": result = big(v1).subtract(big(v2)); break;
-                case "*": result = big(v1).multiply(big(v2)); break;
-                case "/": result = big(v1).divide(big(v2), MathContext.DECIMAL128); break;
+                case "+":  result = big(v1).add(big(v2)); break;
+                case "-":  result = big(v1).subtract(big(v2)); break;
+                case "*":  result = big(v1).multiply(big(v2)); break;
+                case "/": case "//":
+                          result = big(v1).divide(big(v2), MathContext.DECIMAL128); break;
                 case "%": result = big(v1).remainder(big(v2)).abs(); break;
                 case "^": result = big(v1).pow(big(v2).intValue()); break;
                 default: return die("expr: invalid operator: "+operator);
