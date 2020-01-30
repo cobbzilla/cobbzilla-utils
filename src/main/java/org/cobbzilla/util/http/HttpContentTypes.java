@@ -17,7 +17,9 @@ public class HttpContentTypes {
     public static final String TEXT_HTML = "text/html";
     public static final String TEXT_PLAIN = "text/plain";
     public static final String TEXT_CSV = "text/csv";
+    public static final String TEXT_CSS = "text/css";
     public static final String APPLICATION_JSON = "application/json";
+    public static final String APPLICATION_JAVASCRIPT = "application/javascript";
     public static final String APPLICATION_XML = "application/xml";
     public static final String APPLICATION_PDF = "application/pdf";
     public static final String IMAGE_PNG = "image/png";
@@ -63,11 +65,13 @@ public class HttpContentTypes {
             case "xml":              return APPLICATION_XML;
             case "pdf":              return APPLICATION_PDF;
             case "json":             return APPLICATION_JSON;
+            case "js":               return APPLICATION_JAVASCRIPT;
             case "gz": case "tgz":   return APPLICATION_GZIP;
             case "zip":              return APPLICATION_ZIP;
             case "jar":              return APPLICATION_JAR;
             case "txt":              return TEXT_PLAIN;
             case "csv":              return TEXT_CSV;
+            case "css":              return TEXT_CSS;
             case "pem":              return APPLICATION_PEM_FILE;
             case "p12":              return APPLICATION_PKCS12_FILE;
             case "cer":              return APPLICATION_CER_FILE;
@@ -83,12 +87,14 @@ public class HttpContentTypes {
             case TEXT_HTML:        return ".html";
             case TEXT_PLAIN:       return ".txt";
             case TEXT_CSV:         return ".csv";
+            case TEXT_CSS:         return ".css";
             case IMAGE_PNG:        return ".png";
             case IMAGE_JPEG:       return ".jpeg";
             case IMAGE_GIF:        return ".gif";
             case APPLICATION_XML:  return ".xml";
             case APPLICATION_PDF:  return ".pdf";
             case APPLICATION_JSON: return ".json";
+            case APPLICATION_JAVASCRIPT: return ".js";
             case APPLICATION_ZIP:  return ".zip";
             case APPLICATION_GZIP: return ".tar.gz";
             case APPLICATION_PEM_FILE: return ".pem";
