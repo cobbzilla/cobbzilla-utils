@@ -1,10 +1,7 @@
 package org.cobbzilla.util.collection;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.cobbzilla.util.javascript.JsEngine;
 
@@ -12,7 +9,7 @@ import java.util.*;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 
-@NoArgsConstructor @AllArgsConstructor @Accessors(chain=true)
+@NoArgsConstructor @AllArgsConstructor @Accessors(chain=true) @EqualsAndHashCode(of={"name", "value"})
 public class NameAndValue {
 
     public static final NameAndValue[] EMPTY_ARRAY = new NameAndValue[0];
