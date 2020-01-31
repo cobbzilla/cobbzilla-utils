@@ -533,4 +533,8 @@ public class JsonUtil {
 
     public static JsonStringEncoder getJsonStringEncoder() { return JsonStringEncoder.getInstance(); }
 
+    public static String jsonQuoteRegex (String val) {
+        return val.replaceAll("([-/^$*+?.()|\\[\\]{}])", "\\\\$1");
+    }
+
 }
