@@ -2,10 +2,7 @@ package org.cobbzilla.util.http;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
@@ -75,6 +72,7 @@ public class URIUtil {
 
     // adapted from https://stackoverflow.com/a/13592567/1251543
     public static Map<String, String> queryParams(String query) {
+        if (empty(query)) return Collections.emptyMap();
         if (query.contains("?")) query = query.substring(query.indexOf("?")+1);
         final Map<String, String> query_pairs = new LinkedHashMap<>();
         final String[] pairs = query.split("&");
