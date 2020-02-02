@@ -14,35 +14,43 @@ import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 @Slf4j
 public class HttpContentTypes {
 
-    public static final String TEXT_HTML = "text/html";
-    public static final String TEXT_PLAIN = "text/plain";
-    public static final String TEXT_CSV = "text/csv";
-    public static final String TEXT_CSS = "text/css";
-    public static final String APPLICATION_JSON = "application/json";
-    public static final String APPLICATION_JAVASCRIPT = "application/javascript";
-    public static final String APPLICATION_XML = "application/xml";
-    public static final String APPLICATION_PDF = "application/pdf";
+    public static final String TEXT_PREFIX = "text/";
+    public static final String TEXT_HTML = TEXT_PREFIX + "html";
+    public static final String TEXT_PLAIN = TEXT_PREFIX + "plain";
+    public static final String TEXT_CSV = TEXT_PREFIX + "csv";
+    public static final String TEXT_CSS = TEXT_PREFIX + "css";
+
+    public static final String APPLICATION_PREFIX = "application/";
+    public static final String APPLICATION_JSON = APPLICATION_PREFIX + "json";
+    public static final String APPLICATION_JAVASCRIPT = APPLICATION_PREFIX + "javascript";
+    public static final String APPLICATION_XML = APPLICATION_PREFIX + "xml";
+    public static final String APPLICATION_PDF = APPLICATION_PREFIX + "pdf";
 
     public static final String IMAGE_PREFIX = "image/";
     public static final String IMAGE_PNG = IMAGE_PREFIX + "png";
     public static final String IMAGE_JPEG = IMAGE_PREFIX + "jpg";
     public static final String IMAGE_GIF = IMAGE_PREFIX + "gif";
 
-    public static final String APPLICATION_PEM_FILE = "application/x-pem-file";
-    public static final String APPLICATION_PKCS12_FILE = "application/x-pkcs12";
-    public static final String APPLICATION_CER_FILE = "application/x-x509-user-cert";
-    public static final String APPLICATION_CRT_FILE = "application/x-x509-ca-cert";
-    public static final String APPLICATION_OCTET_STREAM = "application/octet-stream";
+    public static final String APPLICATION_PEM_FILE = APPLICATION_PREFIX + "x-pem-file";
+    public static final String APPLICATION_PKCS12_FILE = APPLICATION_PREFIX + "x-pkcs12";
+    public static final String APPLICATION_CER_FILE = APPLICATION_PREFIX + "x-x509-user-cert";
+    public static final String APPLICATION_CRT_FILE = APPLICATION_PREFIX + "x-x509-ca-cert";
+    public static final String APPLICATION_OCTET_STREAM = APPLICATION_PREFIX + "octet-stream";
     public static final String UNKNOWN = APPLICATION_OCTET_STREAM;
-    public static final String APPLICATION_ZIP = "application/zip";
-    public static final String APPLICATION_JAR = "application/java-archive";
-    public static final String APPLICATION_GZIP = "application/gzip";
-    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
-    public static final String APPLICATION_FORM_URL_ENCODED = "application/x-www-form-urlencoded";
-    // useful when constructing HttpRequestBeans that will be used against a JSON API
+    public static final String APPLICATION_ZIP = APPLICATION_PREFIX + "zip";
+    public static final String APPLICATION_JAR = APPLICATION_PREFIX + "java-archive";
+    public static final String APPLICATION_GZIP = APPLICATION_PREFIX + "gzip";
+    public static final String APPLICATION_FORM_URL_ENCODED = APPLICATION_PREFIX + "x-www-form-urlencoded";
+    public static final String MULTIPART_PREFIX = "multipart/";
+    public static final String MULTIPART_FORM_DATA = MULTIPART_PREFIX + "form-data";
+
+    public static final String[] TYPICAL_WEB_TYPES = {
+            TEXT_HTML, TEXT_CSS, APPLICATION_JAVASCRIPT, IMAGE_PNG, IMAGE_JPEG, IMAGE_GIF, APPLICATION_PDF
+    };
 
     private static NameAndValue[] nvHttp(String type) { return new NameAndValue[]{new NameAndValue(CONTENT_TYPE, type)}; }
 
+    // useful when constructing HttpRequestBeans that will be used against an API
     public static final NameAndValue[] NV_HTTP_JSON = nvHttp(APPLICATION_JSON);
     public static final NameAndValue[] NV_HTTP_XML = nvHttp(APPLICATION_XML);
 
@@ -129,6 +137,6 @@ public class HttpContentTypes {
         return data;
     }
 
-    public static String multipartWithBoundary(String boundary) { return "multipart/form-data; boundary=" + boundary; }
+    public static String multipartWithBoundary(String boundary) { return MULTIPART_PREFIX + "form-data; boundary=" + boundary; }
 
 }
