@@ -14,6 +14,7 @@ public class HttpStatusCodes {
     public static final int NOT_FOUND = 404;
     public static final int PRECONDITION_FAILED = 412;
     public static final int UNSUPPORTED_MEDIA_TYPE = 415;
+    public static final int TOO_MANY_REQUESTS = 429;
     public static final int SERVER_ERROR = 500;
     public static final int SERVER_UNAVAILABLE = 503;
     public static final int GATEWAY_TIMEOUT = 504;
