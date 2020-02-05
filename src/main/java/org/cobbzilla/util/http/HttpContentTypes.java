@@ -139,4 +139,8 @@ public class HttpContentTypes {
 
     public static String multipartWithBoundary(String boundary) { return MULTIPART_PREFIX + "form-data; boundary=" + boundary; }
 
+    public static boolean isHtml (String contentType) {
+        final HttpContentTypeAndCharset type = new HttpContentTypeAndCharset(contentType);
+        return type.isContentType(TEXT_HTML);
+    }
 }
