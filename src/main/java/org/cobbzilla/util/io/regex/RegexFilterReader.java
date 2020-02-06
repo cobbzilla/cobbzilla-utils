@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.apache.commons.lang3.ArrayUtils.addAll;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.string.StringUtil.EMPTY_CHAR_ARRAY;
+import static org.cobbzilla.util.string.StringUtil.UTF8cs;
 
 @Slf4j @Accessors(chain=true)
 public class RegexFilterReader extends BufferedReader {
@@ -39,7 +40,7 @@ public class RegexFilterReader extends BufferedReader {
     }
 
     public RegexFilterReader(InputStream in, int bufsiz, RegexStreamFilter filter) {
-        super(new InputStreamReader(in), bufsiz);
+        super(new InputStreamReader(in, UTF8cs), bufsiz);
         this.bufsiz = bufsiz;
         this.filter = filter;
     }
