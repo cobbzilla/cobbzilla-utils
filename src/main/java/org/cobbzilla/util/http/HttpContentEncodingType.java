@@ -1,10 +1,11 @@
 package org.cobbzilla.util.http;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.nixxcode.jvmbrotli.common.BrotliLoader;
+import com.nixxcode.jvmbrotli.dec.BrotliInputStream;
+import com.nixxcode.jvmbrotli.enc.BrotliOutputStream;
 import lombok.AllArgsConstructor;
 import org.cobbzilla.util.io.FilterInputStreamViaOutputStream;
-import org.meteogroup.jbrotli.io.BrotliInputStream;
-import org.meteogroup.jbrotli.io.BrotliOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,10 @@ public enum HttpContentEncodingType {
 
     br (BrotliInputStream::new, BrotliOutputStream::new, BrotliOutputStream.class),
     bro (BrotliInputStream::new, BrotliOutputStream::new, BrotliOutputStream.class);
+
+    static {
+        BrotliLoader.isBrotliAvailable();
+    }
 
     private final HttpContentEncodingInputWrapper inputWrapper;
     private final HttpContentEncodingOutputWrapper outputWrapper;
