@@ -284,6 +284,19 @@ public class StringUtil {
         return b.toString();
     }
 
+    public static String tohexArray(byte[] data) {
+        return tohexArray(data, 0, data.length, ", ");
+    }
+    public static String tohexArray(byte[] data, int start, int len, String delim) {
+        StringBuilder b = new StringBuilder();
+        int stop = start+len;
+        for (int i=start; i<stop; i++) {
+            if (b.length() > 0) b.append(delim);
+            b.append("0x").append(getHexValue(data[i]));
+        }
+        return b.toString();
+    }
+
     /**
      * Get the hexadecimal string representation for a byte.
      * The leading 0x is not included.
