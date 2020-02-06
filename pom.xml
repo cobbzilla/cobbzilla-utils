@@ -171,23 +171,11 @@ cobbzilla-utils is available under the Apache License, version 2: http://www.apa
             <artifactId>commons-compress</artifactId>
             <version>${commons-compress.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.meteogroup.jbrotli</groupId>-->
-<!--            <artifactId>jbrotli</artifactId>-->
-<!--            <version>0.5.0</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.meteogroup.jbrotli</groupId>-->
-<!--            <artifactId>jbrotli-native-linux-x86-amd64</artifactId>-->
-<!--            <version>0.5.0</version>-->
-<!--        </dependency>-->
-        <!-- https://mvnrepository.com/artifact/com.nixxcode.jvmbrotli/jvmbrotli -->
         <dependency>
             <groupId>com.nixxcode.jvmbrotli</groupId>
             <artifactId>jvmbrotli</artifactId>
             <version>0.2.0</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.nixxcode.jvmbrotli/jvmbrotli-linux-x86-amd64 -->
         <dependency>
             <groupId>com.nixxcode.jvmbrotli</groupId>
             <artifactId>jvmbrotli-linux-x86-amd64</artifactId>
