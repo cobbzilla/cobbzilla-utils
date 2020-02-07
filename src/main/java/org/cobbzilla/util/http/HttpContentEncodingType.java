@@ -13,7 +13,7 @@ import java.util.zip.*;
 @AllArgsConstructor
 public enum HttpContentEncodingType {
 
-    none (BufferedInputStream::new, BufferedOutputStream::new, BufferedOutputStream.class),
+    identity (BufferedInputStream::new, BufferedOutputStream::new, BufferedOutputStream.class),
 
     gzip (GZIPInputStream::new, GZIPOutputStream::new, GZIPOutputStream.class),
 
@@ -24,9 +24,7 @@ public enum HttpContentEncodingType {
     br (BrotliInputStream::new, BrotliOutputStream::new, BrotliOutputStream.class),
     bro (BrotliInputStream::new, BrotliOutputStream::new, BrotliOutputStream.class);
 
-    static {
-        BrotliLoader.isBrotliAvailable();
-    }
+    static { BrotliLoader.isBrotliAvailable(); }
 
     private final HttpContentEncodingInputWrapper inputWrapper;
     private final HttpContentEncodingOutputWrapper outputWrapper;
