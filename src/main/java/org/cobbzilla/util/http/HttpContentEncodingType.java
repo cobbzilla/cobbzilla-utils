@@ -7,13 +7,13 @@ import com.nixxcode.jvmbrotli.enc.BrotliOutputStream;
 import lombok.AllArgsConstructor;
 import org.cobbzilla.util.io.FilterInputStreamViaOutputStream;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.zip.*;
 
 @AllArgsConstructor
 public enum HttpContentEncodingType {
+
+    none (BufferedInputStream::new, BufferedOutputStream::new, BufferedOutputStream.class),
 
     gzip (GZIPInputStream::new, GZIPOutputStream::new, GZIPOutputStream.class),
 
