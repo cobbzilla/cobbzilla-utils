@@ -7,8 +7,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.cobbzilla.util.daemon.ZillaRuntime.stacktrace;
-
 @Slf4j
 public class MultiStream extends InputStream {
 
@@ -69,7 +67,7 @@ public class MultiStream extends InputStream {
     }
 
     @Override public int read(byte[] buf, int off, int len) throws IOException {
-        if (log.isTraceEnabled()) log.trace("read(byte[]): trying to read "+len+" bytes. this="+this+", from="+stacktrace());
+        if (log.isTraceEnabled()) log.trace("read(byte[]): trying to read "+len+" bytes. this="+this);
         final int count = currentStream.read(buf, off, len);
         if (count == -1) {
             if (streamIndex == streams.size()-1) {
