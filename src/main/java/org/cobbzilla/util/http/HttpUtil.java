@@ -360,4 +360,18 @@ public class HttpUtil {
 
         return meta;
     }
+
+    public static final byte[] CHUNK_SEP = "\r\n".getBytes();
+    public static final int CHUNK_EXTRA_BYTES = 2 * CHUNK_SEP.length;
+    public static final byte[] CHUNK_END = "0\r\n".getBytes();
+
+    public static byte[] makeHttpChunk(byte[] buffer, int bytesRead) {
+        final byte[] httpChunkLengthBytes = Integer.toHexString(bytesRead).getBytes();
+        final byte[] httpChunk = new byte[bytesRead + httpChunkLengthBytes.length + CHUNK_EXTRA_BYTES];
+        System.arraycopy(httpChunkLengthBytes, 0, httpChunk, 0, httpChunkLengthBytes.length);
+        System.arraycopy(buffer, 0, httpChunk, httpChunkLengthBytes.length, bytesRead);
+        System.arraycopy(CHUNK_SEP, 0, httpChunk, httpChunkLengthBytes.length+bytesRead, CHUNK_SEP.length);
+        return httpChunk;
+    }
+
 }
