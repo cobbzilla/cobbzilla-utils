@@ -1,12 +1,12 @@
 package org.cobbzilla.util.io;
 
-import lombok.Getter;
-
 import java.io.ByteArrayInputStream;
 
 public class FixedByteArrayInputStream extends ByteArrayInputStream implements FixedSizeInputStream {
 
-    @Getter private final int size;
+    private final int size;
+
+    @Override public long size() { return size; }
 
     public FixedByteArrayInputStream(byte[] buf) {
         super(buf);
