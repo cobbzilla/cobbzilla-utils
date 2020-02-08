@@ -37,6 +37,7 @@ import static org.cobbzilla.util.io.FileUtil.abs;
 import static org.cobbzilla.util.io.FileUtil.list;
 import static org.cobbzilla.util.reflect.ReflectionUtil.instantiate;
 import static org.cobbzilla.util.security.ShaUtil.sha256_hex;
+import static org.cobbzilla.util.string.StringUtil.ellipsis;
 import static org.cobbzilla.util.string.StringUtil.truncate;
 import static org.cobbzilla.util.system.Sleep.sleep;
 import static org.cobbzilla.util.time.TimeUtil.formatDuration;
@@ -416,6 +417,7 @@ public class ZillaRuntime {
     }
 
     public static String stacktrace() { return getStackTrace(new Exception()); }
+    public static String shortStacktrace(int max) { return ellipsis(stacktrace(), max); }
 
     private static final AtomicLong selfDestructInitiated = new AtomicLong(-1);
     public static void setSelfDestruct (long t) { setSelfDestruct(t, 0); }

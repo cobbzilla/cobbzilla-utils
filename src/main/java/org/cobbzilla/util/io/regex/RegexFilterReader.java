@@ -18,7 +18,7 @@ import static org.cobbzilla.util.string.StringUtil.UTF8cs;
 @Slf4j @Accessors(chain=true)
 public class RegexFilterReader extends BufferedReader {
 
-    public static final int DEFAULT_BUFFER_SIZE = (int) (64 * Bytes.KB);
+    public static final int DEFAULT_BUFFER_SIZE = (int) (8 * Bytes.KB);
 
     private final int bufsiz;
     private RegexStreamFilter filter;

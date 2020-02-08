@@ -102,9 +102,10 @@ public class RegexChunkStreamer {
             addChunk(chunk);
         }
         if (chunks.isEmpty()) {
-            // we found nothing, so the whole buffer is the entire thing
+            // we found nothing, so the whole buffer is the entire thing, and it's partial so we
+            // can re-evaluate when there is more data
             addChunk(new RegexChunk()
-                    .setType(RegexChunkType.content)
+                    .setPartial(true)
                     .setData(buffer.toString()));
         } else {
             // add any remainder as the footer
