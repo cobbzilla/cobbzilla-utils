@@ -30,6 +30,7 @@ public class HttpContentTypes {
     public static final String IMAGE_PNG = IMAGE_PREFIX + "png";
     public static final String IMAGE_JPEG = IMAGE_PREFIX + "jpg";
     public static final String IMAGE_GIF = IMAGE_PREFIX + "gif";
+    public static final String IMAGE_SVG = IMAGE_PREFIX + "svg+xml";
 
     public static final String APPLICATION_PEM_FILE = APPLICATION_PREFIX + "x-pem-file";
     public static final String APPLICATION_PKCS12_FILE = APPLICATION_PREFIX + "x-pkcs12";
@@ -45,7 +46,7 @@ public class HttpContentTypes {
     public static final String MULTIPART_FORM_DATA = MULTIPART_PREFIX + "form-data";
 
     public static final String[] TYPICAL_WEB_TYPES = {
-            TEXT_HTML, TEXT_CSS, APPLICATION_JAVASCRIPT, IMAGE_PNG, IMAGE_JPEG, IMAGE_GIF, APPLICATION_PDF
+            TEXT_HTML, TEXT_CSS, APPLICATION_JAVASCRIPT, IMAGE_PNG, IMAGE_JPEG, IMAGE_GIF, IMAGE_SVG, APPLICATION_PDF
     };
 
     private static NameAndValue[] nvHttp(String type) { return new NameAndValue[]{new NameAndValue(CONTENT_TYPE, type)}; }
@@ -73,6 +74,7 @@ public class HttpContentTypes {
             case "png":              return IMAGE_PNG;
             case "jpg": case "jpeg": return IMAGE_JPEG;
             case "gif":              return IMAGE_GIF;
+            case "svg":              return IMAGE_SVG;
             case "xml":              return APPLICATION_XML;
             case "pdf":              return APPLICATION_PDF;
             case "json":             return APPLICATION_JSON;
@@ -102,6 +104,7 @@ public class HttpContentTypes {
             case IMAGE_PNG:        return ".png";
             case IMAGE_JPEG:       return ".jpeg";
             case IMAGE_GIF:        return ".gif";
+            case IMAGE_SVG:        return ".svg";
             case APPLICATION_XML:  return ".xml";
             case APPLICATION_PDF:  return ".pdf";
             case APPLICATION_JSON: return ".json";
@@ -122,7 +125,7 @@ public class HttpContentTypes {
 
     public static String escape(String mime, String data) {
         switch (mime) {
-            case APPLICATION_XML: return escapeXml10(data);
+            case APPLICATION_XML: case IMAGE_SVG: return escapeXml10(data);
             case TEXT_HTML: return escapeHtml4(data);
         }
         return data;
@@ -131,7 +134,7 @@ public class HttpContentTypes {
     public static String unescape(String mime, String data) {
         if (empty(data)) return data;
         switch (mime) {
-            case APPLICATION_XML: return unescapeXml(data);
+            case APPLICATION_XML: case IMAGE_SVG: return unescapeXml(data);
             case TEXT_HTML: return unescapeHtml4(data);
         }
         return data;

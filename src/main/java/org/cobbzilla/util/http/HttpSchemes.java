@@ -2,7 +2,7 @@ package org.cobbzilla.util.http;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public enum  HttpSchemes {
+public enum HttpSchemes {
 
     http, https;
 
