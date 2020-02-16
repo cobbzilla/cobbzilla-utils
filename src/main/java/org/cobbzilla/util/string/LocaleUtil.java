@@ -131,4 +131,16 @@ public class LocaleUtil {
         }
         return defaults;
     }
+
+    public static String currencyForLocale(String locale) { return currencyForLocale(locale, null); }
+
+    public static String currencyForLocale(String locale, String defaultLocale) {
+        if (empty(locale)) return empty(defaultLocale) ? null : currencyForLocale(defaultLocale, null);
+        final String[] parts = locale.split("_");
+        if (parts.length != 2) return empty(defaultLocale) ? null : currencyForLocale(defaultLocale, null);
+        switch (parts[1].toUpperCase()) {
+            case "US": return "USD";
+            default: return empty(defaultLocale) ? null : currencyForLocale(defaultLocale, null);
+        }
+    }
 }
