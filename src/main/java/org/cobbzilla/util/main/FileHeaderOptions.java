@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
+import static org.cobbzilla.util.json.JsonUtil.FULL_MAPPER_ALLOW_COMMENTS;
 import static org.cobbzilla.util.json.JsonUtil.json;
 import static org.cobbzilla.util.string.StringUtil.UTF8cs;
 
@@ -37,7 +38,7 @@ public class FileHeaderOptions extends BaseMainOptions {
         } else {
             input = inStream(new File(headersJson));
         }
-        final FileHeader[] headers = json(IOUtils.toString(input, UTF8cs), FileHeader[].class);
+        final FileHeader[] headers = json(IOUtils.toString(input, UTF8cs), FileHeader[].class, FULL_MAPPER_ALLOW_COMMENTS);
         return Arrays.stream(headers).collect(Collectors.toMap(FileHeader::getExt, identity()));
     }
 
