@@ -6,8 +6,7 @@ import org.cobbzilla.util.io.FilesystemWalker;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import static org.cobbzilla.util.io.FileUtil.toFileOrDie;
-import static org.cobbzilla.util.io.FileUtil.toStringOrDie;
+import static org.cobbzilla.util.io.FileUtil.*;
 
 public class FileHeaderMain extends BaseMain<FileHeaderOptions> {
 
@@ -32,6 +31,7 @@ public class FileHeaderMain extends BaseMain<FileHeaderOptions> {
                             } else {
                                 contents = header.getHeader() + "\n" + contents;
                             }
+                            out(abs(file));
                             toFileOrDie(file, contents);
                         }
                     }
