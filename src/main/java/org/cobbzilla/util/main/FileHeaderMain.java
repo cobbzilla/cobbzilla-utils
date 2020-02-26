@@ -18,6 +18,10 @@ public class FileHeaderMain extends BaseMain<FileHeaderOptions> {
         new FilesystemWalker()
                 .withDir(opts.getDir())
                 .withVisitor(file -> {
+                    if (opts.exclude(file)) {
+                        err("excluding: "+abs(file));
+                        return;
+                    }
                     final String ext = FileUtil.extension(file);
                     final FileHeader header = headers.get(ext.length() > 0 ? ext.substring(1) : ext);
                     if (header != null) {

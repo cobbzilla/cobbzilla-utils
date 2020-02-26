@@ -9,10 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
+import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
+import static org.cobbzilla.util.io.FileUtil.abs;
 import static org.cobbzilla.util.json.JsonUtil.FULL_MAPPER_ALLOW_COMMENTS;
 import static org.cobbzilla.util.json.JsonUtil.json;
 import static org.cobbzilla.util.string.StringUtil.UTF8cs;
@@ -41,5 +45,21 @@ public class FileHeaderOptions extends BaseMainOptions {
         final FileHeader[] headers = json(IOUtils.toString(input, UTF8cs), FileHeader[].class, FULL_MAPPER_ALLOW_COMMENTS);
         return Arrays.stream(headers).collect(Collectors.toMap(FileHeader::getExt, identity()));
     }
+
+    public static final String USAGE_EXCLUDE_PATHS = "Paths (or path parts) to exclude, separated by commas";
+    public static final String OPT_EXCLUDE_PATHS = "-e";
+    public static final String LONGOPT_EXCLUDE_PATHS = "--exclude-paths";
+    @Option(name=OPT_EXCLUDE_PATHS, aliases=LONGOPT_EXCLUDE_PATHS, usage=USAGE_EXCLUDE_PATHS)
+    @Getter @Setter private String excludePaths;
+
+    @Getter(lazy=true) private final List<String> excludePathPatterns = initExcludePatterns();
+
+    private List<String> initExcludePatterns() {
+        if (empty(excludePaths)) return Collections.emptyList();
+        final String[] parts = excludePaths.split(",");
+        return Arrays.stream(parts).collect(Collectors.toList());
+    }
+
+    public boolean exclude(File f) { return getExcludePathPatterns().stream().anyMatch(p -> abs(f).contains(p)); }
 
 }
