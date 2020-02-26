@@ -28,11 +28,12 @@ public class FileHeaderMain extends BaseMain<FileHeaderOptions> {
                             final Matcher prefixMatcher = header.getPrefixPattern().matcher(contents);
                             if (!prefixMatcher.find()) {
                                 err("prefix not found ("+header.getPrefix().replace("\n", "\\n")+") in file: "+abs(file));
-                                return;
+                                prefix = "";
+                            } else {
+                                prefix = contents.substring(0, prefixMatcher.start())
+                                        + contents.substring(prefixMatcher.start(), prefixMatcher.end());
+                                contents = contents.substring(prefixMatcher.end());
                             }
-                            prefix = contents.substring(0, prefixMatcher.start())
-                                    + contents.substring(prefixMatcher.start(), prefixMatcher.end());
-                            contents = contents.substring(prefixMatcher.end());
                         } else {
                             prefix = "";
                         }
