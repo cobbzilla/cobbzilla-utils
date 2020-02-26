@@ -29,6 +29,12 @@ public class FileHeaderOptions extends BaseMainOptions {
     @Option(name=OPT_DIR, aliases=LONGOPT_DIR, usage=USAGE_DIR, required=true)
     @Getter @Setter private File dir;
 
+    public static final String USAGE_SHALLOW = "Do not recurse into subdirectories";
+    public static final String OPT_SHALLOW = "-S";
+    public static final String LONGOPT_SHALLOW = "--shallow";
+    @Option(name=OPT_SHALLOW, aliases=LONGOPT_SHALLOW, usage=USAGE_SHALLOW)
+    @Getter @Setter private boolean shallow = false;
+
     public static final String USAGE_HEADERS_JSON = "JSON file with header info, or - to read from stdin";
     public static final String OPT_HEADERS_JSON = "-H";
     public static final String LONGOPT_HEADERS_JSON = "--headers";
