@@ -48,8 +48,6 @@ import static org.cobbzilla.util.time.TimeUtil.DATE_FORMAT_LAST_MODIFIED;
 @Slf4j
 public class HttpUtil {
 
-    public static final String DEFAULT_CERT_NAME = "ssl-https";
-
     public static Map<String, String> queryParams(URL url) throws UnsupportedEncodingException {
         return queryParams(url, StringUtil.UTF8);
     }
