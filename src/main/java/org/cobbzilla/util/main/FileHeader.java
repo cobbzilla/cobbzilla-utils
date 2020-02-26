@@ -11,6 +11,6 @@ public class FileHeader {
     @Getter @Setter private String header;
     @Getter @Setter private String regex;
 
-    @Getter(lazy=true) private final Pattern pattern = Pattern.compile(getRegex(), Pattern.MULTILINE);
+    @Getter(lazy=true) private final Pattern pattern = Pattern.compile(getRegex()+"\n", Pattern.MULTILINE);
 
 }
