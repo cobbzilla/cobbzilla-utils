@@ -19,34 +19,32 @@ public class FileHeaderMain extends BaseMain<FileHeaderOptions> {
                 .withDir(opts.getDir())
                 .withVisitor(file -> {
                     final String ext = FileUtil.extension(file);
-                    if (ext.startsWith(".")) {
-                        final FileHeader header = headers.get(ext.substring(1));
-                        if (header != null) {
-                            String contents = toStringOrDie(file);
-                            if (contents == null) contents = "";
-                            final String prefix;
-                            if (header.hasPrefix()) {
-                                final Matcher prefixMatcher = header.getPrefixPattern().matcher(contents);
-                                if (!prefixMatcher.find()) {
-                                    err("prefix not found ("+header.getPrefix().replace("\n", "\\n")+") in file: "+abs(file));
-                                    return;
-                                }
-                                prefix = contents.substring(0, prefixMatcher.start())
-                                        + contents.substring(prefixMatcher.start(), prefixMatcher.end());
-                                contents = contents.substring(prefixMatcher.end());
-                            } else {
-                                prefix = "";
+                    final FileHeader header = headers.get(ext.length() > 0 ? ext.substring(1) : ext);
+                    if (header != null) {
+                        String contents = toStringOrDie(file);
+                        if (contents == null) contents = "";
+                        final String prefix;
+                        if (header.hasPrefix()) {
+                            final Matcher prefixMatcher = header.getPrefixPattern().matcher(contents);
+                            if (!prefixMatcher.find()) {
+                                err("prefix not found ("+header.getPrefix().replace("\n", "\\n")+") in file: "+abs(file));
+                                return;
                             }
-                            final Matcher matcher = header.getPattern().matcher(contents);
-                            if (matcher.find()) {
-                                contents = prefix + contents.substring(0, matcher.start())
-                                        + header.getHeader() + "\n" + contents.substring(matcher.end());
-                            } else {
-                                contents = prefix + header.getHeader() + "\n" + contents;
-                            }
-                            out(abs(file));
-                            toFileOrDie(file, contents);
+                            prefix = contents.substring(0, prefixMatcher.start())
+                                    + contents.substring(prefixMatcher.start(), prefixMatcher.end());
+                            contents = contents.substring(prefixMatcher.end());
+                        } else {
+                            prefix = "";
                         }
+                        final Matcher matcher = header.getPattern().matcher(contents);
+                        if (matcher.find()) {
+                            contents = prefix + contents.substring(0, matcher.start())
+                                    + header.getHeader() + "\n" + contents.substring(matcher.end());
+                        } else {
+                            contents = prefix + header.getHeader() + "\n" + contents;
+                        }
+                        out(abs(file));
+                        toFileOrDie(file, contents);
                     }
                 }).walk();
     }
