@@ -1,5 +1,7 @@
 package org.cobbzilla.util.http;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -8,11 +10,19 @@ import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 import static org.cobbzilla.util.string.StringUtil.urlDecode;
 
+@Slf4j
 public class URIUtil {
 
     public static URI toUri(String uri) {
         try { return new URI(uri); } catch (URISyntaxException e) {
-            return die("Invalid URI: " + uri);
+            return die("toUri: invalid URI: " + uri);
+        }
+    }
+
+    public static URI toUriOrNull(String uri) {
+        try { return new URI(uri); } catch (URISyntaxException e) {
+            log.warn("toUriOrNull: invalid URI (returning null): " + uri);
+            return null;
         }
     }
 
