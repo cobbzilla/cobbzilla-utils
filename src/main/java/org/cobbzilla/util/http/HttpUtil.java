@@ -64,6 +64,8 @@ public class HttpUtil {
         return query_pairs;
     }
 
+    public static InputStream getUrlInputStream(String url) throws IOException { return get(url); }
+
     public static InputStream get (String urlString) throws IOException { return get(urlString, null); }
 
     public static InputStream get (String urlString, Map<String, String> headers) throws IOException {
