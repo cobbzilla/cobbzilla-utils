@@ -474,19 +474,20 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
                 case "+":  result = big(v1).add(big(v2)); break;
                 case "-":  result = big(v1).subtract(big(v2)); break;
                 case "*":  result = big(v1).multiply(big(v2)); break;
-                case "/": case "//":
-                          result = big(v1).divide(big(v2), MathContext.DECIMAL128); break;
+                case "/":  result = big(v1).divide(big(v2), MathContext.DECIMAL128); break;
+                case "//":  result = big(big(v1).divide(big(v2), MathContext.DECIMAL128).longValue()); break;
                 case "%": result = big(v1).remainder(big(v2)).abs(); break;
                 case "^": result = big(v1).pow(big(v2).intValue()); break;
                 default: return die("expr: invalid operator: "+operator);
             }
 
-            // can't use trigraph (?:) operator here, if we do then for some reason rval always ends up as a double
             final Number rval;
-            if (v1.contains(".") || v2.contains(".") || operator.equals("/")) {
+            if (operator.equals("//")) {
+                rval = result.longValue();
+            } else if (v1.contains(".") || v2.contains(".") || operator.equals("/")) {
                 rval = result.doubleValue();
             } else {
-                rval = result.intValue();
+                rval = result.longValue();
             }
             if (format != null) {
                 final Locale locale = LocaleUtil.fromString(options.params.length > 3 && !empty(options.param(3)) ? options.param(3) : null);
