@@ -69,14 +69,21 @@ public class HttpUtil {
     public static InputStream get (String urlString) throws IOException { return get(urlString, null); }
 
     public static InputStream get (String urlString, Map<String, String> headers) throws IOException {
+        return get(urlString, headers, null);
+    }
+
+    public static InputStream get (String urlString, Map<String, String> headers, Map<String, String> headers2) throws IOException {
         final URL url = new URL(urlString);
         final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        if (headers != null) {
-            for (Map.Entry<String, String> h : headers.entrySet()) {
-                urlConnection.setRequestProperty(h.getKey(), h.getValue());
-            }
-        }
+        if (headers != null) addHeaders(urlConnection, headers);
+        if (headers2 != null) addHeaders(urlConnection, headers2);
         return urlConnection.getInputStream();
+    }
+
+    public static void addHeaders(HttpURLConnection urlConnection, Map<String, String> headers) {
+        for (Map.Entry<String, String> h : headers.entrySet()) {
+            urlConnection.setRequestProperty(h.getKey(), h.getValue());
+        }
     }
 
     public static HttpResponseBean upload (String url,
