@@ -128,6 +128,8 @@ public class HttpRequestBean {
     }
     public boolean hasContentType () { return getContentType() != null; }
 
+    public String contentType () { return hasContentType() ? getContentType().getMimeType() : null; }
+
     @JsonIgnore public Long getContentLength() {
         if (!hasHeaders()) return null;
         final String value = getFirstHeaderValue(CONTENT_LENGTH);

@@ -35,6 +35,7 @@ import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION;
 import static org.apache.http.HttpHeaders.*;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.hexnow;
+import static org.cobbzilla.util.http.HttpContentTypes.MULTIPART_FORM_DATA;
 import static org.cobbzilla.util.http.HttpContentTypes.contentType;
 import static org.cobbzilla.util.http.HttpMethods.*;
 import static org.cobbzilla.util.http.HttpStatusCodes.NO_CONTENT;
@@ -80,15 +81,15 @@ public class HttpUtil {
         return urlConnection.getInputStream();
     }
 
-    public static InputStream post (String urlString, InputStream data, Map<String, String> headers, Map<String, String> headers2) throws IOException {
-        return upload(urlString, POST, data, headers, headers2);
+    public static InputStream post (String urlString, InputStream data, String multipartFileName, Map<String, String> headers, Map<String, String> headers2) throws IOException {
+        return upload(urlString, POST, multipartFileName, data, headers, headers2);
     }
 
-    public static InputStream put (String urlString, InputStream data, Map<String, String> headers, Map<String, String> headers2) throws IOException {
-        return upload(urlString, PUT, data, headers, headers2);
+    public static InputStream put (String urlString, InputStream data, String multipartFileName, Map<String, String> headers, Map<String, String> headers2) throws IOException {
+        return upload(urlString, PUT, multipartFileName, data, headers, headers2);
     }
 
-    public static InputStream upload (String urlString, String method, InputStream data, Map<String, String> headers, Map<String, String> headers2) throws IOException {
+    public static InputStream upload (String urlString, String method, String multipartFileName, InputStream data, Map<String, String> headers, Map<String, String> headers2) throws IOException {
         final URL url = new URL(urlString);
         final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod(method);
@@ -97,7 +98,16 @@ public class HttpUtil {
         if (data != null) {
             urlConnection.setDoOutput(true);
             final OutputStream upload = urlConnection.getOutputStream();
-            IOUtils.copyLarge(data, upload);
+            if (multipartFileName != null) {
+                urlConnection.setRequestProperty(CONTENT_TYPE, MULTIPART_FORM_DATA);
+                final MultipartEntityBuilder mb = MultipartEntityBuilder.create();
+                mb.addBinaryBody(multipartFileName, data);
+                mb.build().writeTo(upload);
+
+            } else {
+                IOUtils.copyLarge(data, upload);
+            }
+            upload.close();
         }
         return urlConnection.getInputStream();
     }
