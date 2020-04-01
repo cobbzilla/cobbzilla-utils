@@ -97,17 +97,23 @@ public class HttpUtil {
         if (headers2 != null) addHeaders(urlConnection, headers2);
         if (data != null) {
             urlConnection.setDoOutput(true);
-            final OutputStream upload = urlConnection.getOutputStream();
-            if (multipartFileName != null) {
-                urlConnection.setRequestProperty(CONTENT_TYPE, MULTIPART_FORM_DATA);
-                final MultipartEntityBuilder mb = MultipartEntityBuilder.create();
-                mb.addBinaryBody(multipartFileName, data);
-                mb.build().writeTo(upload);
+            OutputStream upload = null;
+            try {
+                if (multipartFileName != null) {
+                    urlConnection.setRequestProperty(CONTENT_TYPE, MULTIPART_FORM_DATA);
+                    final MultipartEntityBuilder mb = MultipartEntityBuilder.create();
+                    mb.addBinaryBody(multipartFileName, data);
 
-            } else {
-                IOUtils.copyLarge(data, upload);
+                    upload = urlConnection.getOutputStream();
+                    mb.build().writeTo(upload);
+
+                } else {
+                    upload = urlConnection.getOutputStream();
+                    IOUtils.copyLarge(data, upload);
+                }
+            } finally {
+                if (upload != null) upload.close();
             }
-            upload.close();
         }
         return urlConnection.getInputStream();
     }
