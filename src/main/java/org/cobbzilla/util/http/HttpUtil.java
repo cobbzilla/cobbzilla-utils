@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
@@ -32,9 +34,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.http.HttpHeaders.*;
-import static org.cobbzilla.util.daemon.ZillaRuntime.die;
-import static org.cobbzilla.util.daemon.ZillaRuntime.hexnow;
+import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.http.HttpContentTypes.MULTIPART_FORM_DATA;
 import static org.cobbzilla.util.http.HttpContentTypes.contentType;
 import static org.cobbzilla.util.http.HttpMethods.*;
@@ -48,6 +50,8 @@ import static org.cobbzilla.util.time.TimeUtil.DATE_FORMAT_LAST_MODIFIED;
 
 @Slf4j
 public class HttpUtil {
+
+    public static final String CHUNKED_ENCODING = "chunked";
 
     public static Map<String, String> queryParams(URL url) throws UnsupportedEncodingException {
         return queryParams(url, StringUtil.UTF8);
@@ -100,12 +104,19 @@ public class HttpUtil {
             OutputStream upload = null;
             try {
                 if (multipartFileName != null) {
-                    urlConnection.setRequestProperty(CONTENT_TYPE, MULTIPART_FORM_DATA);
-                    final MultipartEntityBuilder mb = MultipartEntityBuilder.create();
-                    mb.addBinaryBody(multipartFileName, data);
+                    final String boundary = randomAlphanumeric(10)+"_"+now();
+                    urlConnection.setRequestProperty(CONTENT_TYPE, MULTIPART_FORM_DATA+"; boundary="+boundary);
+                    urlConnection.setRequestProperty(TRANSFER_ENCODING, CHUNKED_ENCODING);
+                    urlConnection.setChunkedStreamingMode(4096);
+
+                    final HttpEntity entity = MultipartEntityBuilder.create()
+                            .setBoundary(boundary)
+                            .setLaxMode()
+                            .addBinaryBody(multipartFileName, data, ContentType.APPLICATION_OCTET_STREAM, multipartFileName)
+                            .build();
 
                     upload = urlConnection.getOutputStream();
-                    mb.build().writeTo(upload);
+                    entity.writeTo(upload);
 
                 } else {
                     upload = urlConnection.getOutputStream();
