@@ -80,6 +80,26 @@ public class HttpUtil {
         return urlConnection.getInputStream();
     }
 
+    public static InputStream post (String urlString, InputStream data, Map<String, String> headers, Map<String, String> headers2) throws IOException {
+        return upload(urlString, POST, data, headers, headers2);
+    }
+
+    public static InputStream put (String urlString, InputStream data, Map<String, String> headers, Map<String, String> headers2) throws IOException {
+        return upload(urlString, PUT, data, headers, headers2);
+    }
+
+    public static InputStream upload (String urlString, String method, InputStream data, Map<String, String> headers, Map<String, String> headers2) throws IOException {
+        final URL url = new URL(urlString);
+        final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod(method);
+        if (headers != null) addHeaders(urlConnection, headers);
+        if (headers2 != null) addHeaders(urlConnection, headers2);
+        urlConnection.setDoInput(true);
+        final OutputStream upload = urlConnection.getOutputStream();
+        IOUtils.copyLarge(data, upload);
+        return urlConnection.getInputStream();
+    }
+
     public static void addHeaders(HttpURLConnection urlConnection, Map<String, String> headers) {
         for (Map.Entry<String, String> h : headers.entrySet()) {
             urlConnection.setRequestProperty(h.getKey(), h.getValue());
