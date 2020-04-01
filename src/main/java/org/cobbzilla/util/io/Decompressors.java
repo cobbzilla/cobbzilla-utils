@@ -67,7 +67,7 @@ public class Decompressors {
             final ZipArchiveEntry entry = entries.nextElement();
             final String name = entry.getName();
             if (entry.isDirectory()) {
-                mkdirs(outdir,name);
+                mkdirs(outdir, name);
                 continue;
             }
             /* this part is necessary because file entry can come before
