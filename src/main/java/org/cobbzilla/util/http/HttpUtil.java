@@ -94,9 +94,11 @@ public class HttpUtil {
         urlConnection.setRequestMethod(method);
         if (headers != null) addHeaders(urlConnection, headers);
         if (headers2 != null) addHeaders(urlConnection, headers2);
-        urlConnection.setDoOutput(true);
-        final OutputStream upload = urlConnection.getOutputStream();
-        IOUtils.copyLarge(data, upload);
+        if (data != null) {
+            urlConnection.setDoOutput(true);
+            final OutputStream upload = urlConnection.getOutputStream();
+            IOUtils.copyLarge(data, upload);
+        }
         return urlConnection.getInputStream();
     }
 
