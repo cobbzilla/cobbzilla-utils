@@ -1,5 +1,6 @@
 package org.cobbzilla.util.http;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.URI;
@@ -48,17 +49,23 @@ public class URIUtil {
     }
 
     /**
-     * getRegisteredDomain("foo.bar.baz") == "bar.baz"
-     * @param uri A URI that includes a host part
+     * getRegisteredDomain("http://foo.bar.baz/...") == "bar.baz"
+     * @param url A URI that includes a host part
      * @return the "registered" domain, which includes the TLD and one level up.
      */
-    public static String getRegisteredDomain(String uri) {
-        final String host = getHost(uri);
-        final String parts[] = host.split("\\.");
+    @NonNull public static String getRegisteredDomain(@NonNull final String url) { return hostToDomain(getHost(url)); }
+
+    /**
+     * hostToDomain("foo.bar.baz") == "bar.baz"
+     * @param host A full host name
+     * @return the "registered" domain, which includes the TLD and one level up.
+     */
+    @NonNull public static String hostToDomain(@NonNull final String host) {
+        final var parts = host.split("\\.");
         switch (parts.length) {
-            case 0: throw new IllegalArgumentException("Invalid host: "+host);
+            case 0: throw new IllegalArgumentException("Invalid host: " + host);
             case 1: return host;
-            default: return parts[parts.length-2] + "." + parts[parts.length-1];
+            default: return parts[parts.length - 2] + "." + parts[parts.length - 1];
         }
     }
 
