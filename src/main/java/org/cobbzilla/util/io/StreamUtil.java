@@ -2,17 +2,22 @@ package org.cobbzilla.util.io;
 
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.cobbzilla.util.string.StringUtil;
 
 import java.io.*;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
-import static org.cobbzilla.util.daemon.ZillaRuntime.die;
-import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
-import static org.cobbzilla.util.daemon.ZillaRuntime.stdin;
-import static org.cobbzilla.util.io.FileUtil.basename;
-import static org.cobbzilla.util.io.FileUtil.extensionOrName;
-import static org.cobbzilla.util.io.FileUtil.getDefaultTempDir;
+import static org.cobbzilla.util.daemon.ZillaRuntime.*;
+import static org.cobbzilla.util.io.FileUtil.*;
+import static org.cobbzilla.util.reflect.ReflectionUtil.closeQuietly;
 
 @Slf4j
 public class StreamUtil {
@@ -220,6 +225,48 @@ public class StreamUtil {
             return stream2string(path);
         }
         return path;
+    }
+
+    // adapted from https://stackoverflow.com/a/2993908/1251543
+    public static TempDir copyClasspathDirectory(String path) {
+        final TempDir tempDir = new TempDir();
+        final URL resourceUrl = StreamUtil.class.getClassLoader().getResource(path);
+        if (resourceUrl == null) return die("copyClasspathDirectory: root resource not found");
+
+        final URLConnection urlConnection;
+        final JarFile jarFile;
+
+        try {
+            urlConnection = resourceUrl.openConnection();
+            if (urlConnection instanceof JarURLConnection) {
+                final JarURLConnection jarConnection = (JarURLConnection) urlConnection;
+                jarFile = jarConnection.getJarFile();
+                final Enumeration<JarEntry> entries = jarFile.entries();
+                while (entries.hasMoreElements()) {
+                    final JarEntry entry = entries.nextElement();
+                    if (entry.getName().startsWith(jarConnection.getEntryName())) {
+                        String fileName = StringUtils.removeStart(entry.getName(), jarConnection.getEntryName());
+                        if (!entry.isDirectory()) {
+                            InputStream entryInputStream = null;
+                            try {
+                                entryInputStream = jarFile.getInputStream(entry);
+                                stream2file(entryInputStream, new File(tempDir, fileName));
+                            } finally {
+                                closeQuietly(entryInputStream);
+                            }
+                        } else {
+                            mkdirOrDie(new File(tempDir, fileName));
+                        }
+                    }
+                }
+            } else {
+                FileUtils.copyDirectory(new File(resourceUrl.getPath()), tempDir);
+            }
+        } catch (Exception e) {
+            return die("copyClasspathDirectory: error copying resources: "+shortError(e), e);
+        }
+
+        return tempDir;
     }
 
 }
