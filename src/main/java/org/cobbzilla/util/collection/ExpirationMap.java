@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.notSupported;
 import static org.cobbzilla.util.daemon.ZillaRuntime.now;
+import static org.cobbzilla.util.time.TimeUtil.isTimestampInFuture;
+import static org.cobbzilla.util.time.TimeUtil.isTimestampInPast;
 
 @Accessors(chain=true)
 public class ExpirationMap<K, V> implements Map<K, V> {
@@ -28,12 +30,19 @@ public class ExpirationMap<K, V> implements Map<K, V> {
     @Getter @Setter private long cleanInterval = TimeUnit.HOURS.toMillis(4);
 
     public ExpirationMap<K, V> setExpirations(long val) {
+        final var isNewExpirationShorter = val < this.expiration;
         this.expiration = this.maxExpiration = this.cleanInterval = val;
+        if (isNewExpirationShorter) {
+            final var updatedNextCleaningTime = now() + this.expiration;
+            // the following calculation of nextCleaningTime is not really correct, but it doesn't really influence
+            // anything much:
+            if (this.nextCleaningTime > updatedNextCleaningTime) this.nextCleaningTime = updatedNextCleaningTime;
+        }
         return this;
     }
 
     @Getter @Setter private ExpirationEvictionPolicy evictionPolicy = ExpirationEvictionPolicy.ctime_or_atime;
-    private long lastCleaned = 0;
+    private long nextCleaningTime = now();
 
     public ExpirationMap() { this.map = new ConcurrentHashMap<>(); }
 
@@ -66,13 +75,23 @@ public class ExpirationMap<K, V> implements Map<K, V> {
         }
     }
 
-    @Override public int size() { return map.size(); }
+    @Override public int size() {
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
+        return map.size();
+    }
 
-    @Override public boolean isEmpty() { return map.isEmpty(); }
+    @Override public boolean isEmpty() {
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
+        return map.isEmpty();
+    }
 
-    @Override public boolean containsKey(Object key) { return map.containsKey(key); }
+    @Override public boolean containsKey(Object key) {
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
+        return map.containsKey(key);
+    }
 
     @Override public boolean containsValue(Object value) {
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         for (ExpirationMapEntry<V> val : map.values()) {
             if (val.value == value) return true;
         }
@@ -80,13 +99,13 @@ public class ExpirationMap<K, V> implements Map<K, V> {
     }
 
     @Override public V get(Object key) {
-        if (lastCleaned+cleanInterval > now()) cleanExpired();
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         final ExpirationMapEntry<V> value = map.get(key);
         return value == null || value.expired() ? null : value.touch().value;
     }
 
     @Override public V put(K key, V value) {
-        if (lastCleaned+cleanInterval > now()) cleanExpired();
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         final ExpirationMapEntry<V> previous = map.put(key, new ExpirationMapEntry<>(value));
         return previous == null ? null : previous.value;
     }
@@ -104,25 +123,29 @@ public class ExpirationMap<K, V> implements Map<K, V> {
 
     @Override public void clear() { map.clear(); }
 
-    @Override public Set<K> keySet() { return map.keySet(); }
+    @Override public Set<K> keySet() {
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
+        return map.keySet();
+    }
 
     @Override public Collection<V> values() {
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         return map.values().stream().map(v -> v.value).collect(Collectors.toList());
     }
 
     @Override public V putIfAbsent(K key, V value) {
-        if (lastCleaned+cleanInterval > now()) cleanExpired();
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         final ExpirationMapEntry<V> val = map.putIfAbsent(key, new ExpirationMapEntry<>(value));
         return val == null ? null : val.value;
     }
 
     @Override public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
-        if (lastCleaned+cleanInterval > now()) cleanExpired();
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         return map.computeIfAbsent(key, k -> new ExpirationMapEntry<>(mappingFunction.apply(k))).value;
     }
 
     @Override public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
-        if (lastCleaned+cleanInterval > now()) cleanExpired();
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         final ExpirationMapEntry<V> found = map.computeIfPresent(key, (k, vExpirationMapEntry) -> new ExpirationMapEntry<>(remappingFunction.apply(k, vExpirationMapEntry.value)));
         return found == null ? null : found.value;
     }
@@ -135,12 +158,13 @@ public class ExpirationMap<K, V> implements Map<K, V> {
     }
 
     @Override public Set<Entry<K, V>> entrySet() {
+        if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         return map.entrySet().stream().map(e -> new EMEntry<>(e.getKey(), e.getValue().value)).collect(Collectors.toSet());
     }
 
     private synchronized void cleanExpired () {
-        if (lastCleaned+cleanInterval < now()) return;
-        lastCleaned = now();
+        if (isTimestampInFuture(nextCleaningTime)) return;
+        nextCleaningTime = now() + cleanInterval;
         final Set<K> toRemove = new HashSet<>();
         for (Map.Entry<K, ExpirationMapEntry<V>> entry : map.entrySet()) {
             if (entry.getValue().expired()) toRemove.add(entry.getKey());

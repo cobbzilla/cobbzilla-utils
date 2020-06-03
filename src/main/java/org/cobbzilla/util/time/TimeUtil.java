@@ -223,4 +223,6 @@ public class TimeUtil {
         return new DateTime(zone).withTimeAtStartOfDay().withFieldAdded(DurationFieldType.years(), -1).withDayOfYear(1);
     }
 
+    public static boolean isTimestampInFuture(long t) { return t > now(); }
+    public static boolean isTimestampInPast(long t) { return t < now(); }
 }
