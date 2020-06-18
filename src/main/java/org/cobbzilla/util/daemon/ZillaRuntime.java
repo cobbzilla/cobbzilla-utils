@@ -186,6 +186,7 @@ public class ZillaRuntime {
     }
 
     public static boolean empty(String s) { return s == null || s.length() == 0; }
+    public static boolean notEmpty(String s) { return !empty(s); }
 
     /**
      * Determines if the parameter is "empty", by criteria described in @return
