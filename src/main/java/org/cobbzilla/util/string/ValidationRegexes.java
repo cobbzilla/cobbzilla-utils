@@ -33,9 +33,12 @@ public class ValidationRegexes {
     public static final Pattern IPv4_PATTERN = pattern("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$");
     public static final Pattern IPv6_PATTERN = pattern("^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$");
 
-    public static final String HOST_REGEX = "^([A-Z0-9]{1,63}|[A-Z0-9][A-Z0-9\\-]{0,61}[A-Z0-9])(\\.([A-Z0-9]{1,63}|[A-Z0-9][A-Z0-9\\-]{0,61}[A-Z0-9]))*$";
+    public static final String HOST = "([A-Z0-9]{1,63}|[A-Z0-9][A-Z0-9\\-]{0,61}[A-Z0-9])(\\.([A-Z0-9]{1,63}|[A-Z0-9][A-Z0-9\\-]{0,61}[A-Z0-9]))*";
+    public static final String HOST_REGEX = "^" + HOST + "$";
     public static final Pattern HOST_PATTERN  = pattern(HOST_REGEX);
-    public static final Pattern HOST_PART_PATTERN  = pattern("^([A-Z0-9]|[A-Z0-9][A-Z0-9\\-]{0,61}[A-Z0-9])$");
+    public static final String HOST_PART = "([A-Z0-9]|[A-Z0-9][A-Z0-9\\-]{0,61}[A-Z0-9])";
+    public static final String HOST_PART_REGEX = "^"+HOST_PART+"$";
+    public static final Pattern HOST_PART_PATTERN  = pattern(HOST_PART_REGEX);
     public static final Pattern PORT_PATTERN  = pattern("^[\\d]{1,5}$");
 
     public static final String DOMAIN_REGEX = "^([A-Z0-9]{1,63}|[A-Z0-9][A-Z0-9\\-]{0,61}[A-Z0-9])(\\.([A-Z0-9]{1,63}|[A-Z0-9][A-Z0-9\\-]{0,61}[A-Z0-9]))+$";
