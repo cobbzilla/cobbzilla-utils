@@ -57,13 +57,16 @@ public class ZillaRuntime {
         thread.interrupt();
         final long start = realNow();
         while (thread.isAlive() && realNow() - start < timeout) {
-            sleep(100, "terminate: waiting for thread to die: "+thread);
+            sleep(100, "terminate: waiting for thread to exit: "+thread);
         }
         if (thread.isAlive()) {
-            log.warn("terminate: thread did not die voluntarily, killing it: "+thread);
+            log.warn("terminate: thread did not respond to interrupt, killing it: "+thread);
             thread.stop();
+            return false;
+        } else {
+            log.warn("terminate: thread exited after interrupt: "+thread);
+            return true;
         }
-        return false;
     }
 
     public static boolean bool(Boolean b) { return b != null && b; }
@@ -166,7 +169,7 @@ public class ZillaRuntime {
         throw e;
     }
 
-    public static String shortError(Throwable e) { return e.getClass().getName()+": "+e.getMessage(); }
+    public static String shortError(Throwable e) { return e == null ? "null" : e.getClass().getName()+": "+e.getMessage(); }
 
     public static String errorString(Exception e) { return errorString(e, 1000); }
 
