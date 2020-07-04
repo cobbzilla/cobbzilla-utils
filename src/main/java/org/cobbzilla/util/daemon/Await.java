@@ -9,8 +9,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static org.cobbzilla.util.daemon.ZillaRuntime.die;
-import static org.cobbzilla.util.daemon.ZillaRuntime.now;
+import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.system.Sleep.sleep;
 
 @Slf4j
@@ -18,6 +17,7 @@ public class Await {
 
     public static final long DEFAULT_AWAIT_GET_SLEEP = 10;
     public static final long DEFAULT_AWAIT_RETRY_SLEEP = 100;
+    public static final long DEFAULT_AWAIT_ALL_SLEEP = 200;
 
     public static <E> E awaitFirst(Collection<Future<E>> futures, long timeout) throws TimeoutException {
         return awaitFirst(futures, timeout, DEFAULT_AWAIT_RETRY_SLEEP);
@@ -136,10 +136,36 @@ public class Await {
     }
 
     public static <T> AwaitResult<T> awaitAll(Collection<Future<?>> futures, long timeout) {
-        return awaitAll(futures, timeout, ClockProvider.SYSTEM);
+        return awaitAll(futures, timeout, ClockProvider.SYSTEM, DEFAULT_AWAIT_ALL_SLEEP, null);
     }
 
     public static <T> AwaitResult<T> awaitAll(Collection<Future<?>> futures, long timeout, ClockProvider clock) {
+        return awaitAll(futures, timeout, clock, DEFAULT_AWAIT_ALL_SLEEP, null);
+    }
+
+    public static <T> AwaitResult<T> awaitAll(Collection<Future<?>> futures, long timeout, Runnable sleepCallback) {
+        return awaitAll(futures, timeout, ClockProvider.SYSTEM, DEFAULT_AWAIT_ALL_SLEEP, sleepCallback);
+    }
+
+    public static <T> AwaitResult<T> awaitAll(Collection<Future<?>> futures,
+                                              long timeout,
+                                              long sleepTime,
+                                              Runnable sleepCallback) {
+        return awaitAll(futures, timeout, ClockProvider.SYSTEM, sleepTime, sleepCallback);
+    }
+
+    public static <T> AwaitResult<T> awaitAll(Collection<Future<?>> futures,
+                                              long timeout,
+                                              ClockProvider clock,
+                                              Runnable sleepCallback) {
+        return awaitAll(futures, timeout, clock, DEFAULT_AWAIT_ALL_SLEEP, sleepCallback);
+    }
+
+    public static <T> AwaitResult<T> awaitAll(Collection<Future<?>> futures,
+                                              long timeout,
+                                              ClockProvider clock,
+                                              long sleepTime,
+                                              Runnable sleepCallback) {
         long start = clock.now();
         final AwaitResult<T> result = new AwaitResult<>();
         final Collection<Future<?>> awaiting = new ArrayList<>(futures);
@@ -161,7 +187,14 @@ public class Await {
                 }
             }
             if (awaiting.isEmpty()) break;
-            sleep(200);
+            if (sleepCallback != null) {
+                try {
+                    sleepCallback.run();
+                } catch (Exception e) {
+                    log.warn("awaitAll: exception in sleepCallback: "+shortError(e));
+                }
+            }
+            sleep(sleepTime);
         }
 
         result.timeout(awaiting);
