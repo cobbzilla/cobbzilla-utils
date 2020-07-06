@@ -10,11 +10,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.TimeUnit.HOURS;
 import static org.cobbzilla.util.daemon.ZillaRuntime.notSupported;
 import static org.cobbzilla.util.daemon.ZillaRuntime.now;
 import static org.cobbzilla.util.time.TimeUtil.isTimestampInFuture;
@@ -25,9 +25,9 @@ public class ExpirationMap<K, V> implements Map<K, V> {
 
     private final Map<K, ExpirationMapEntry<V>> map;
 
-    @Getter @Setter private long expiration = TimeUnit.HOURS.toMillis(1);
-    @Getter @Setter private long maxExpiration = TimeUnit.HOURS.toMillis(2);
-    @Getter @Setter private long cleanInterval = TimeUnit.HOURS.toMillis(4);
+    @Getter @Setter private long expiration = HOURS.toMillis(1);
+    @Getter @Setter private long maxExpiration = HOURS.toMillis(2);
+    @Getter @Setter private long cleanInterval = HOURS.toMillis(4);
 
     public ExpirationMap<K, V> setExpirations(long val) {
         final var isNewExpirationShorter = val < this.expiration;
@@ -46,15 +46,29 @@ public class ExpirationMap<K, V> implements Map<K, V> {
 
     public ExpirationMap() { this.map = new ConcurrentHashMap<>(); }
 
+    public ExpirationMap(int initialCapacity) { this.map = new ConcurrentHashMap<>(initialCapacity); }
+
     public ExpirationMap(long val) { this(); setExpirations(val); }
+
+    public ExpirationMap(int initialCapacity, long val) { this(initialCapacity); setExpirations(val); }
 
     public ExpirationMap(long val, ExpirationEvictionPolicy evictionPolicy) {
         this(val);
         this.evictionPolicy = evictionPolicy;
     }
 
+    public ExpirationMap(int initialCapacity, long val, ExpirationEvictionPolicy evictionPolicy) {
+        this(initialCapacity, val);
+        this.evictionPolicy = evictionPolicy;
+    }
+
     public ExpirationMap(ExpirationEvictionPolicy evictionPolicy) {
         this();
+        this.evictionPolicy = evictionPolicy;
+    }
+
+    public ExpirationMap(int initialCapacity, ExpirationEvictionPolicy evictionPolicy) {
+        this(initialCapacity);
         this.evictionPolicy = evictionPolicy;
     }
 

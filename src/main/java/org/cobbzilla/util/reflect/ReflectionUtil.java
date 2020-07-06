@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.reflect.Modifier.isFinal;
 import static java.lang.reflect.Modifier.isStatic;
+import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.apache.commons.lang3.reflect.FieldUtils.getAllFields;
 import static org.cobbzilla.util.collection.ArrayUtil.arrayToString;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
@@ -110,6 +111,8 @@ public class ReflectionUtil {
         return null;
     }
 
+    private static final Map<String, Class> forNameCache = new ExpirationMap<>(100, MINUTES.toMillis(20), ExpirationEvictionPolicy.atime);
+
     /**
      * Do a Class.forName and only throw unchecked exceptions.
      * @param clazz full class name. May end in [] to indicate array class
@@ -117,26 +120,32 @@ public class ReflectionUtil {
      * @return A Class&lt;clazz&gt; object
      */
     public static <T> Class<? extends T> forName(String clazz) {
-        if (empty(clazz)) return (Class<? extends T>) Object.class;
-        if (clazz.endsWith("[]")) return arrayClass(forName(clazz.substring(0, clazz.length()-2)));
-        try {
-            return (Class<? extends T>) Class.forName(clazz);
-        } catch (ClassNotFoundException e) {
-            switch (clazz) {
-                case "boolean": return (Class<? extends T>) boolean.class;
-                case "byte":    return (Class<? extends T>) byte.class;
-                case "short":   return (Class<? extends T>) short.class;
-                case "char":    return (Class<? extends T>) char.class;
-                case "int":     return (Class<? extends T>) int.class;
-                case "long":    return (Class<? extends T>) long.class;
-                case "float":   return (Class<? extends T>) float.class;
-                case "double":  return (Class<? extends T>) double.class;
-            }
-            return die("Class.forName("+clazz+") error: "+shortError(e));
+        Class<? extends T> cached = forNameCache.get(clazz);
+        if (cached == null) {
+            if (empty(clazz)) return (Class<? extends T>) Object.class;
+            if (clazz.endsWith("[]")) return arrayClass(forName(clazz.substring(0, clazz.length()-2)));
+            try {
+                cached = (Class<? extends T>) Class.forName(clazz);
+                forNameCache.put(clazz, cached);
 
-        } catch (Exception e) {
-            return die("Class.forName("+clazz+") error: "+shortError(e));
+            } catch (ClassNotFoundException e) {
+                switch (clazz) {
+                    case "boolean": return (Class<? extends T>) boolean.class;
+                    case "byte":    return (Class<? extends T>) byte.class;
+                    case "short":   return (Class<? extends T>) short.class;
+                    case "char":    return (Class<? extends T>) char.class;
+                    case "int":     return (Class<? extends T>) int.class;
+                    case "long":    return (Class<? extends T>) long.class;
+                    case "float":   return (Class<? extends T>) float.class;
+                    case "double":  return (Class<? extends T>) double.class;
+                }
+                return die("Class.forName("+clazz+") error: "+shortError(e));
+
+            } catch (Exception e) {
+                return die("Class.forName("+clazz+") error: "+shortError(e));
+            }
         }
+        return cached;
     }
 
     public static Collection<Class> forNames(String[] classNames) {
