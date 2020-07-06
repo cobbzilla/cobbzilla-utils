@@ -8,6 +8,7 @@ public enum HttpSchemes {
 
     public static final String SCHEME_HTTP = http.schemeWithSeparator();
     public static final String SCHEME_HTTPS = https.schemeWithSeparator();
+    public static final String SCHEME_FILE = file.schemeWithSeparator();
     public static final String PROTOCOL_SEP = "://";
 
     public String schemeWithSeparator() { return this.name()+PROTOCOL_SEP; }
