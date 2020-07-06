@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum HttpSchemes {
 
-    http, https;
+    http, https, file;
 
     public static final String SCHEME_HTTP = http.schemeWithSeparator();
     public static final String SCHEME_HTTPS = https.schemeWithSeparator();
     public static final String PROTOCOL_SEP = "://";
 
-    private String schemeWithSeparator() { return this.name()+PROTOCOL_SEP; }
+    public String schemeWithSeparator() { return this.name()+PROTOCOL_SEP; }
 
     public static boolean isHttpOrHttps(String val) {
         return val != null && (val.startsWith(SCHEME_HTTP) || val.startsWith(SCHEME_HTTPS));
