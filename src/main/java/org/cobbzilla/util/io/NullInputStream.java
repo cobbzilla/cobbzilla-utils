@@ -4,7 +4,7 @@ import java.io.InputStream;
 
 public class NullInputStream extends InputStream implements FixedSizeInputStream {
 
-    public static final NullInputStream instance = new NullInputStream();
+    public static final NullInputStream NULL_STREAM = new NullInputStream();
 
     @Override public int read() { return -1; }
     @Override public int read(byte[] b) { return -1; }
