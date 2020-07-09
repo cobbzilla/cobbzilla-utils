@@ -25,7 +25,7 @@ public class Sleep {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
-            throw new IllegalStateException("sleep interrupted (" + reason + ")");
+            throw new SleepInterruptedException("sleep interrupted (" + reason + ")");
         }
     }
 
