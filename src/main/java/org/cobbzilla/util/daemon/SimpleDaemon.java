@@ -144,7 +144,11 @@ public abstract class SimpleDaemon implements Runnable {
             if (isDone) {
                 log.info(getName()+": sleep("+delay+") interrupted but daemon is done");
             } else {
-                log.error(getName()+": sleep("+delay+") interrupted, exiting: "+e);
+                if (canInterruptSleep()) {
+                    log.info(getName() + ": sleep(" + delay + ") interrupted and canInterruptSleep() returned true, continuing...");
+                } else {
+                    log.error(getName() + ": sleep(" + delay + ") interrupted, exiting: " + e);
+                }
             }
             return false;
         }
