@@ -194,7 +194,7 @@ public class Await {
                     log.warn("awaitAll: exception in sleepCallback: "+shortError(e));
                 }
             }
-            sleep(sleepTime);
+            sleep(sleepTime, "awaitAll: awaiting tasks: "+awaiting.size()+"/"+futures.size());
         }
 
         result.timeout(awaiting);
