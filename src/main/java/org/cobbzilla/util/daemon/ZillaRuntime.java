@@ -60,7 +60,7 @@ public class ZillaRuntime {
             sleep(100, "terminate: waiting for thread to exit: "+thread);
         }
         if (thread.isAlive()) {
-            log.warn("terminate: thread did not respond to interrupt, killing: "+thread+" from "+stacktrace());
+            log.warn("terminate: thread did not respond to interrupt, killing: "+thread+" with stack "+stacktrace(thread)+" from "+stacktrace());
             thread.stop();
             return false;
         } else {
@@ -422,6 +422,17 @@ public class ZillaRuntime {
 
     public static String stacktrace() { return getStackTrace(new Exception()); }
     public static String shortStacktrace(int max) { return ellipsis(stacktrace(), max); }
+
+    public static String stacktrace(Thread t) {
+        final StringBuilder b = new StringBuilder();
+        final StackTraceElement[] st = t.getStackTrace();
+        if (st == null) return "no-stack-trace!";
+        for (StackTraceElement e : st) {
+            if (b.length() > 0) b.append("\n");
+            b.append("\t").append(e.toString());
+        }
+        return b.insert(0, "\n").toString();
+    }
 
     private static final AtomicLong selfDestructInitiated = new AtomicLong(-1);
     public static void setSelfDestruct (long t) { setSelfDestruct(t, 0); }
