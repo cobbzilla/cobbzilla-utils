@@ -1,8 +1,10 @@
 package org.cobbzilla.util.system;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 
 import static org.apache.commons.lang3.StringUtils.chop;
+import static org.cobbzilla.util.daemon.ZillaRuntime.big;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.string.StringUtil.removeWhitespace;
 
@@ -14,6 +16,13 @@ public class Bytes {
     public static final long TB = 1024 * GB;
     public static final long PB = 1024 * TB;
     public static final long EB = 1024 * PB;
+
+    public static final BigDecimal BIG_KB = big(KB);
+    public static final BigDecimal BIG_MB = big(MB);
+    public static final BigDecimal BIG_GB = big(GB);
+    public static final BigDecimal BIG_TB = big(TB);
+    public static final BigDecimal BIG_PB = big(PB);
+    public static final BigDecimal BIG_EB = big(EB);
 
     public static final long KiB = 1000;
     public static final long MiB = 1000 * KiB;
