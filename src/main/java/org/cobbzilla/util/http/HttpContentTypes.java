@@ -97,24 +97,25 @@ public class HttpContentTypes {
 
     public static String fileExt (String contentType) {
         switch (contentType) {
-            case TEXT_HTML:        return ".html";
-            case TEXT_PLAIN:       return ".txt";
-            case TEXT_CSV:         return ".csv";
-            case TEXT_CSS:         return ".css";
-            case IMAGE_PNG:        return ".png";
-            case IMAGE_JPEG:       return ".jpeg";
-            case IMAGE_GIF:        return ".gif";
-            case IMAGE_SVG:        return ".svg";
-            case APPLICATION_XML:  return ".xml";
-            case APPLICATION_PDF:  return ".pdf";
-            case APPLICATION_JSON: return ".json";
-            case APPLICATION_JAVASCRIPT: return ".js";
-            case APPLICATION_ZIP:  return ".zip";
-            case APPLICATION_GZIP: return ".tar.gz";
-            case APPLICATION_PEM_FILE: return ".pem";
+            case TEXT_HTML:               return ".html";
+            case TEXT_PLAIN:              return ".txt";
+            case TEXT_CSV:                return ".csv";
+            case TEXT_CSS:                return ".css";
+            case IMAGE_PNG:               return ".png";
+            case IMAGE_JPEG:              return ".jpeg";
+            case IMAGE_GIF:               return ".gif";
+            case IMAGE_SVG:               return ".svg";
+            case APPLICATION_XML:         return ".xml";
+            case APPLICATION_PDF:         return ".pdf";
+            case APPLICATION_JSON:        return ".json";
+            case APPLICATION_JAVASCRIPT:  return ".js";
+            case APPLICATION_ZIP:         return ".zip";
+            case APPLICATION_GZIP:        return ".tar.gz";
+            case APPLICATION_PEM_FILE:    return ".pem";
             case APPLICATION_PKCS12_FILE: return ".p12";
-            case APPLICATION_CER_FILE: return ".cer";
-            case APPLICATION_CRT_FILE: return ".crt";
+            case APPLICATION_CER_FILE:    return ".cer";
+            case APPLICATION_CRT_FILE:    return ".crt";
+            case APPLICATION_JAR:         return ".jar";
             default: return die("fileExt: no file extension could be determined for content-type: "+contentType);
         }
     }
