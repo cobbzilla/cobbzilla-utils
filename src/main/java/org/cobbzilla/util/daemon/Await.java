@@ -170,7 +170,7 @@ public class Await {
         final AwaitResult<T> result = new AwaitResult<>();
         final Collection<Future<?>> awaiting = new ArrayList<>(futures);
 
-        while (clock.now() - start < timeout) {
+        while (true) {
             for (Iterator iter = awaiting.iterator(); iter.hasNext(); ) {
                 final Future f = (Future) iter.next();
                 if (f.isDone()) {
@@ -194,7 +194,8 @@ public class Await {
                     log.warn("awaitAll: exception in sleepCallback: "+shortError(e));
                 }
             }
-            sleep(sleepTime, "awaitAll: awaiting tasks: "+awaiting.size()+"/"+futures.size());
+            if (clock.now() - start < timeout) break;
+            if (sleepTime > 0) sleep(sleepTime, "awaitAll: awaiting tasks: "+awaiting.size()+"/"+futures.size());
         }
 
         result.timeout(awaiting);
