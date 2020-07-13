@@ -139,6 +139,10 @@ public class Await {
         return awaitAll(futures, timeout, ClockProvider.SYSTEM, DEFAULT_AWAIT_ALL_SLEEP, null);
     }
 
+    public static <T> AwaitResult<T> awaitAll(Collection<Future<?>> futures, long timeout, long sleepTime) {
+        return awaitAll(futures, timeout, ClockProvider.SYSTEM, sleepTime, null);
+    }
+
     public static <T> AwaitResult<T> awaitAll(Collection<Future<?>> futures, long timeout, ClockProvider clock) {
         return awaitAll(futures, timeout, clock, DEFAULT_AWAIT_ALL_SLEEP, null);
     }
