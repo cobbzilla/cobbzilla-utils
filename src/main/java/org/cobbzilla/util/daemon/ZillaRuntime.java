@@ -69,6 +69,8 @@ public class ZillaRuntime {
         }
     }
 
+    public static String threadName() { return Thread.currentThread().getName(); }
+
     public static boolean bool(Boolean b) { return b != null && b; }
     public static boolean bool(Boolean b, boolean val) { return b != null ? b : val; }
 
