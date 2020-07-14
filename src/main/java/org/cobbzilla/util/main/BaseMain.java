@@ -79,9 +79,7 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
 
     public void showHelpAndExit(Exception e) {
         parser.printUsage(System.err);
-        if ((e instanceof CmdLineException) && !empty(e.getMessage())) {
-            err(ERR_LINE + " >>> " + e.getMessage() + ERR_LINE);
-        }
+        err(ERR_LINE + " >>> " + e.getMessage() + ERR_LINE);
         System.exit(1);
     }
 
