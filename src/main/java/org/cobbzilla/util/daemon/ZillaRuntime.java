@@ -52,7 +52,15 @@ public class ZillaRuntime {
 
     public static String getJava() { return System.getProperty("java.home") + "/bin/java"; }
 
+    public static boolean terminateQuietly(Thread thread, long timeout) {
+        return terminate(thread, timeout, false);
+    }
+
     public static boolean terminate(Thread thread, long timeout) {
+        return terminate(thread, timeout, true);
+    }
+
+    public static boolean terminate(Thread thread, long timeout, boolean verbose) {
         if (thread == null || !thread.isAlive()) return true;
         thread.interrupt();
         final long start = realNow();
@@ -60,11 +68,11 @@ public class ZillaRuntime {
             sleep(100, "terminate: waiting for thread to exit: "+thread);
         }
         if (thread.isAlive()) {
-            log.warn("terminate: thread did not respond to interrupt, killing: "+thread+" with stack "+stacktrace(thread)+" from "+stacktrace());
+            if (verbose && log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, killing: "+thread+" with stack "+stacktrace(thread)+" from "+stacktrace());
             thread.stop();
             return false;
         } else {
-            log.warn("terminate: thread exited after interrupt: "+thread);
+            if (verbose && log.isWarnEnabled()) log.warn("terminate: thread exited after interrupt: "+thread);
             return true;
         }
     }
