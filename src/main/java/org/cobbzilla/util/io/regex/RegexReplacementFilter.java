@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 @NoArgsConstructor
 public class RegexReplacementFilter implements RegexStreamFilter {
 
-    public static final String DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH = "!";
+    public static final String DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH = "~~~!!!match!!!~~~";
 
     @Getter @Setter private Pattern pattern;
     @Getter @Setter private int group;
