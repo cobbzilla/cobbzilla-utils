@@ -48,10 +48,9 @@ public class RegexReplacementFilter implements RegexStreamFilter {
             // add everything before the group match
             result.append(buffer.subSequence(matcher.start(), matcher.start(group)));
 
-            // if the replacement starts with the special prefixReplacementWithMatch, insert the match before the replacement
-            if (replacement.startsWith(prefixReplacementWithMatch)) {
-                result.append(buffer.subSequence(matcher.start(group), matcher.end(group)));
-                result.append(replacement.substring(prefixReplacementWithMatch.length()));
+            // if the replacement contains prefixReplacementWithMatch, replace with the match
+            if (replacement.contains(prefixReplacementWithMatch)) {
+                result.append(replacement.replace(prefixReplacementWithMatch, buffer.subSequence(matcher.start(group), matcher.end(group))));
             } else {
                 // add the replacement
                 result.append(replacement);

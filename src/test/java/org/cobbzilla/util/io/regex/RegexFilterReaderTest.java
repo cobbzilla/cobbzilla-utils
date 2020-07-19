@@ -50,6 +50,18 @@ public class RegexFilterReaderTest {
         assertEquals("multi reader failed to get expected output", EXPECTED_STRING_INCLUDE_MATCH, result.toString());
     }
 
+    public static final String TEST_STRING_INCLUDE_MATCH_MIDDLE = "<!DOCTYPE html>\n<html dir=\"ltr\" lang=\"en\">\n<meta charset=\"utf-8\">something</html>\n";
+    public static final String EXPECTED_STRING_INCLUDE_MATCH_MIDDLE = "<!DOCTYPE html>\nINSERTED_<html dir=\"ltr\" lang=\"en\">DATA\n<meta charset=\"utf-8\">something</html>\n";
+
+    @Test public void testRegexReaderIncludeMatchInMiddle() throws Exception {
+        final Reader reader = new StringReader(TEST_STRING_INCLUDE_MATCH_MIDDLE);
+        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter("<html\\s+[^>]*>", "INSERTED_!DATA");
+        final RegexFilterReader regexFilterReader = new RegexFilterReader(reader, 1024, regexStreamFilter);
+        final StringWriter result = new StringWriter();
+        IOUtils.copyLarge(regexFilterReader, result);
+        assertEquals("multi reader failed to get expected output", EXPECTED_STRING_INCLUDE_MATCH_MIDDLE, result.toString());
+    }
+
     public static final String MULTI_TEST_STRING_1 = "this is a multi-stream test string\nthat should has a lot of stuff";
     public static final String MULTI_TEST_STRING_2 = "in it but why should that matter?\nit is a bad thing to have multiple streams?";
     public static final String MULTI_TEST_STRING_3 = "maybe some people think so\nbut a good person would never say that";
