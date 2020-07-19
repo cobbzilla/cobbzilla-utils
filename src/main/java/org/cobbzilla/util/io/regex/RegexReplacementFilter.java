@@ -11,9 +11,12 @@ import java.util.regex.Pattern;
 @NoArgsConstructor
 public class RegexReplacementFilter implements RegexStreamFilter {
 
+    public static final String DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH = "!";
+
     @Getter @Setter private Pattern pattern;
     @Getter @Setter private int group;
     @Getter @Setter private String replacement;
+    @Getter @Setter private String prefixReplacementWithMatch = DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH;
 
     public RegexReplacementFilter(String regex, int group, String replacement) {
         this.pattern = Pattern.compile(regex);
@@ -45,8 +48,14 @@ public class RegexReplacementFilter implements RegexStreamFilter {
             // add everything before the group match
             result.append(buffer.subSequence(matcher.start(), matcher.start(group)));
 
-            // add the replacement
-            result.append(replacement);
+            // if the replacement starts with the special prefixReplacementWithMatch, insert the match before the replacement
+            if (replacement.startsWith(prefixReplacementWithMatch)) {
+                result.append(buffer.subSequence(matcher.start(group), matcher.end(group)));
+                result.append(replacement.substring(prefixReplacementWithMatch.length()));
+            } else {
+                // add the replacement
+                result.append(replacement);
+            }
 
             // add everything after the group match
             result.append(buffer.subSequence(matcher.end(group), matcher.end()));
