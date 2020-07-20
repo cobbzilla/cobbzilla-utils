@@ -1,5 +1,6 @@
 package org.cobbzilla.util.collection;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.cobbzilla.util.string.StringUtil;
 
 import java.lang.reflect.Array;
@@ -7,7 +8,6 @@ import java.util.*;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
-import static org.cobbzilla.util.reflect.ReflectionUtil.arrayClass;
 
 public class ArrayUtil {
 
@@ -147,8 +147,17 @@ public class ArrayUtil {
     public static <T> T[] singletonArray (T thing) { return singletonArray(thing, (Class<T>) thing.getClass()); }
 
     public static <T> T[] singletonArray (T thing, Class<T> clazz) {
-        final T[] array = (T[]) Array.newInstance(arrayClass(clazz), 1);
+        final T[] array = (T[]) Array.newInstance(clazz, 1);
         array[0] = thing;
         return array;
     }
+
+    public static <T> T[] copyAndReverse(T[] array, Class<T> clazz) {
+        if (array == null) return null;
+        final T[] reversed = (T[]) Array.newInstance(clazz, array.length);
+        System.arraycopy(array, 0, reversed, 0, array.length);
+        ArrayUtils.reverse(reversed);
+        return reversed;
+    }
+
 }
