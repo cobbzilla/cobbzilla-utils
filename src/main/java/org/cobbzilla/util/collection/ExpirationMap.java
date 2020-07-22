@@ -121,7 +121,7 @@ public class ExpirationMap<K, V> implements Map<K, V> {
     @Override public V put(K key, V value) {
         if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         final ExpirationMapEntry<V> previous = map.put(key, new ExpirationMapEntry<>(value));
-        return previous == null ? null : previous.value;
+        return previous == null ? null : previous.touch().value;
     }
 
     @Override public V remove(Object key) {
@@ -144,36 +144,36 @@ public class ExpirationMap<K, V> implements Map<K, V> {
 
     @Override public Collection<V> values() {
         if (isTimestampInPast(nextCleaningTime)) cleanExpired();
-        return map.values().stream().map(v -> v.value).collect(Collectors.toList());
+        return map.values().stream().map(v -> v.touch().value).collect(Collectors.toList());
     }
 
     @Override public V putIfAbsent(K key, V value) {
         if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         final ExpirationMapEntry<V> val = map.putIfAbsent(key, new ExpirationMapEntry<>(value));
-        return val == null ? null : val.value;
+        return val == null ? null : val.touch().value;
     }
 
     @Override public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
         if (isTimestampInPast(nextCleaningTime)) cleanExpired();
-        return map.computeIfAbsent(key, k -> new ExpirationMapEntry<>(mappingFunction.apply(k))).value;
+        return map.computeIfAbsent(key, k -> new ExpirationMapEntry<>(mappingFunction.apply(k))).touch().value;
     }
 
     @Override public V computeIfPresent(K key, BiFunction<? super K, ? super V, ? extends V> remappingFunction) {
         if (isTimestampInPast(nextCleaningTime)) cleanExpired();
         final ExpirationMapEntry<V> found = map.computeIfPresent(key, (k, vExpirationMapEntry) -> new ExpirationMapEntry<>(remappingFunction.apply(k, vExpirationMapEntry.value)));
-        return found == null ? null : found.value;
+        return found == null ? null : found.touch().value;
     }
 
     @AllArgsConstructor
     private static class EMEntry<K, V> implements Entry<K, V> {
-        @Getter private K key;
-        @Getter private V value;
+        @Getter private final K key;
+        @Getter private final V value;
         @Override public V setValue(V value) { return notSupported("setValue"); }
     }
 
     @Override public Set<Entry<K, V>> entrySet() {
         if (isTimestampInPast(nextCleaningTime)) cleanExpired();
-        return map.entrySet().stream().map(e -> new EMEntry<>(e.getKey(), e.getValue().value)).collect(Collectors.toSet());
+        return map.entrySet().stream().map(e -> new EMEntry<>(e.getKey(), e.getValue().touch().value)).collect(Collectors.toSet());
     }
 
     private synchronized void cleanExpired () {
