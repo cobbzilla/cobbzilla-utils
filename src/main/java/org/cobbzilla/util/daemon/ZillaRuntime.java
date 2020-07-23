@@ -457,4 +457,23 @@ public class ZillaRuntime {
             }
         }
     }
+
+    public interface LazyGet<T> { T init();}
+
+    public static <T> T lazyGet(AtomicReference<T> ref, LazyGet<T> init, LazyGet<T> error) {
+        if (ref.get() == null) {
+            //noinspection SynchronizationOnLocalVariableOrMethodParameter
+            synchronized (ref) {
+                if (ref.get() == null) {
+                    try {
+                        ref.set(init.init());
+                    } catch (Exception e) {
+                        ref.set(error.init());
+                    }
+                }
+            }
+        }
+        return ref.get();
+    }
+
 }
