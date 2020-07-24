@@ -73,13 +73,22 @@ public class HttpUtil {
 
     public static InputStream get (String urlString) throws IOException { return get(urlString, null); }
 
+    public static InputStream get (String urlString, long connectTimeout) throws IOException {
+        return get(urlString, null, null, connectTimeout);
+    }
+
     public static InputStream get (String urlString, Map<String, String> headers) throws IOException {
         return get(urlString, headers, null);
     }
 
     public static InputStream get (String urlString, Map<String, String> headers, Map<String, String> headers2) throws IOException {
+        return get(urlString, headers, headers2, null);
+    }
+
+    public static InputStream get (String urlString, Map<String, String> headers, Map<String, String> headers2, Long connectTimeout) throws IOException {
         final URL url = new URL(urlString);
         final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        if (connectTimeout != null) urlConnection.setConnectTimeout(connectTimeout.intValue());
         if (headers != null) addHeaders(urlConnection, headers);
         if (headers2 != null) addHeaders(urlConnection, headers2);
         return urlConnection.getInputStream();
@@ -193,6 +202,13 @@ public class HttpUtil {
 
     public static String url2string (String url) throws IOException {
         @Cleanup final InputStream in = get(url);
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        IOUtils.copy(in, out);
+        return out.toString();
+    }
+
+    public static String url2string (String url, long connectTimeout) throws IOException {
+        @Cleanup final InputStream in = get(url, connectTimeout);
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         IOUtils.copy(in, out);
         return out.toString();

@@ -4,17 +4,21 @@ import com.sun.jna.Platform;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.cobbzilla.util.collection.ExpirationMap;
+import org.cobbzilla.util.io.FileUtil;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
+import static org.cobbzilla.util.http.HttpSchemes.SCHEME_HTTPS;
+import static org.cobbzilla.util.http.HttpSchemes.isHttpOrHttps;
 import static org.cobbzilla.util.http.HttpUtil.url2string;
+import static org.cobbzilla.util.http.URIUtil.toUri;
 import static org.cobbzilla.util.string.ValidationRegexes.IPv4_PATTERN;
 
 @Slf4j
@@ -211,5 +215,21 @@ public class NetworkUtil {
             log.warn("ipEquals: "+e);
             return false;
         }
+    }
+
+    public static Set<String> toHostSet(File file) throws IOException {
+        return toHostSet(FileUtil.toStringList(file));
+    }
+
+    public static Set<String> toHostSet(Collection<String> vals) {
+        return vals.stream()
+                .map(NetworkUtil::normalizeHost)
+                .collect(Collectors.toSet());
+    }
+
+    public static String normalizeHost(String s) {
+        return isHttpOrHttps(s)
+                ? toUri(s).getHost()
+                : toUri(SCHEME_HTTPS + s).getHost();
     }
 }
