@@ -275,6 +275,13 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
             return new Handlebars.SafeString(src.toString());
         });
 
+        hb.registerHelper("sha256expr", (src, options) -> {
+            if (empty(src)) return "";
+            src = apply(hb, src.toString(), (Map<String, Object>) options.context.model(), '[', ']');
+            src = sha256_hex(src.toString());
+            return new Handlebars.SafeString(src.toString());
+        });
+
         hb.registerHelper("safeSql", (src, options) -> {
             if (empty(src)) return "";
             final String illegalChars = src.toString().replaceAll("[A-Za-z0-9=<>_\\()\\s\\.]+", "");
