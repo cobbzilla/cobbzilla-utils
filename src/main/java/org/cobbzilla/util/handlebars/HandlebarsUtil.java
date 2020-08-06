@@ -547,6 +547,7 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
                     randAddr = randAddr.substring(0, randAddr.lastIndexOf(".")) + ".1";
                 }
             }
+            if (randAddr.startsWith("/")) randAddr = randAddr.substring(1);
             return new Handlebars.SafeString(randAddr);
         });
 
