@@ -43,13 +43,16 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
+import java.net.InetAddress;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.quote;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.cobbzilla.util.collection.ArrayUtil.arrayToString;
 import static org.cobbzilla.util.daemon.DaemonThreadFactory.fixedPool;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
@@ -59,6 +62,8 @@ import static org.cobbzilla.util.io.StreamUtil.loadResourceAsStream;
 import static org.cobbzilla.util.io.StreamUtil.stream2string;
 import static org.cobbzilla.util.json.JsonUtil.getJsonStringEncoder;
 import static org.cobbzilla.util.json.JsonUtil.json;
+import static org.cobbzilla.util.network.NetworkUtil.big2ip4;
+import static org.cobbzilla.util.network.NetworkUtil.big2ip6;
 import static org.cobbzilla.util.security.ShaUtil.sha256_hex;
 import static org.cobbzilla.util.string.Base64.encodeBytes;
 import static org.cobbzilla.util.string.Base64.encodeFromFile;
@@ -508,10 +513,41 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
             final String kind = options.param(0, "alphanumeric");
             final String alphaCase = options.param(1, "lowercase");
             switch (kind) {
-                case "alphanumeric": case "alnum": default: return new Handlebars.SafeString(adjustCase(RandomStringUtils.randomAlphanumeric(len), alphaCase));
+                case "alphanumeric": case "alnum": default: return new Handlebars.SafeString(adjustCase(randomAlphanumeric(len), alphaCase));
                 case "alpha": case "alphabetic": return new Handlebars.SafeString(adjustCase(RandomStringUtils.randomAlphabetic(len), alphaCase));
                 case "num": case "numeric": return new Handlebars.SafeString(RandomStringUtils.randomNumeric(len));
             }
+        });
+
+        hb.registerHelper("rand_ip", (Helper<String>) (cidr, options) -> {
+            final String seed = options.param(0, null);
+            final int slashPos = cidr.indexOf("/");
+            if (slashPos == -1 || slashPos == cidr.length()-1) return die("rand_ip: invalid cidr: "+cidr);
+            final int fixedBits = Integer.parseInt(cidr.substring(slashPos+1));
+            final String network = cidr.substring(0, slashPos);
+            final InetAddress addr = InetAddress.getByName(network);
+            final BigInteger addrInt = new BigInteger(1, addr.getAddress());
+            final boolean v6 = cidr.contains(":");
+            final int randBits = (v6 ? 128 : 32) - fixedBits;
+            final BigInteger offset = seed == null
+                    ? random_bigint(bigint(2).pow(randBits))
+                    : new BigInteger(sha256_hex(parseRandSeed(seed)), 16).and(new BigInteger("1".repeat(randBits), 2));
+            final BigInteger randIpInt = addrInt.add(offset);
+            String randAddr = (v6 ? big2ip6(randIpInt) : big2ip4(randIpInt)).toString();
+            if (v6) {
+                // coerce oddball to :1
+                if (randAddr.endsWith("::")) {
+                    randAddr = randAddr.substring(0, randAddr.lastIndexOf("::")) + ":1";
+                } else if (randAddr.endsWith(":0") || randAddr.endsWith(":0000") || randAddr.endsWith(":ffff")) {
+                    randAddr = randAddr.substring(0, randAddr.lastIndexOf(":")) + ":1";
+                }
+            } else {
+                if (randAddr.endsWith(".0") || randAddr.endsWith(".255")) {
+                    // coerce oddball to .1
+                    randAddr = randAddr.substring(0, randAddr.lastIndexOf(".")) + ".1";
+                }
+            }
+            return new Handlebars.SafeString(randAddr);
         });
 
         hb.registerHelper("truncate", (Helper<Integer>) (max, options) -> {
@@ -597,6 +633,12 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
                 return die("key_file: "+e, e);
             }
         });
+    }
+
+    public static String parseRandSeed(String seed) {
+        if (seed.equals("!host")) return hostname();
+        if (seed.equals("!domain")) return domainname();
+        return seed;
     }
 
     private static String adjustCase(String val, String alphaCase) {

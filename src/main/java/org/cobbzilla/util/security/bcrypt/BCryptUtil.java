@@ -2,12 +2,10 @@ package org.cobbzilla.util.security.bcrypt;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.security.SecureRandom;
+import static org.cobbzilla.util.daemon.ZillaRuntime.RANDOM;
 
 @Slf4j
 public class BCryptUtil {
-
-    private static final SecureRandom random = new SecureRandom();
 
     private static volatile Integer bcryptRounds = null;
 
@@ -23,7 +21,7 @@ public class BCryptUtil {
     public static Integer getBcryptRounds() { return bcryptRounds; }
 
     public static String hash(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt(getBcryptRounds(), random));
+        return BCrypt.hashpw(password, BCrypt.gensalt(getBcryptRounds(), RANDOM));
     }
 
     public static void main (String[] args) {

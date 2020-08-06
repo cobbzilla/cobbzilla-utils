@@ -8,8 +8,8 @@ import org.cobbzilla.util.io.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
+import java.math.BigInteger;
+import java.net.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -215,6 +215,26 @@ public class NetworkUtil {
             log.warn("ipEquals: "+e);
             return false;
         }
+    }
+
+    // adapted from https://stackoverflow.com/a/19238983/1251543
+    public static Inet6Address big2ip6(BigInteger ipNumber) throws UnknownHostException {
+        String ipString = "";
+        final BigInteger a = new BigInteger("FFFF", 16);
+        for (int i=0; i<8; i++) {
+            ipString = ipNumber.and(a).toString(16)+":"+ipString;
+            ipNumber = ipNumber.shiftRight(16);
+        }
+        return (Inet6Address) Inet6Address.getByName(ipString.substring(0, ipString.length()-1));
+    }
+    public static Inet4Address big2ip4(BigInteger ipNumber) throws UnknownHostException {
+        String ipString = "";
+        final BigInteger a = new BigInteger("FF", 16);
+        for (int i=0; i<4; i++) {
+            ipString = ipNumber.and(a).toString(10)+"."+ipString;
+            ipNumber = ipNumber.shiftRight(8);
+        }
+        return (Inet4Address) Inet4Address.getByName(ipString.substring(0, ipString.length()-1));
     }
 
     public static Set<String> toHostSet(File file) throws IOException {

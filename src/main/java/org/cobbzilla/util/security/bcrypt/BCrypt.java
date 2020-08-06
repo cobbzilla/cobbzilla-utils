@@ -18,6 +18,8 @@ import java.io.UnsupportedEncodingException;
 
 import java.security.SecureRandom;
 
+import static org.cobbzilla.util.daemon.ZillaRuntime.RANDOM;
+
 /**
  * BCrypt implements OpenBSD-style Blowfish password hashing using
  * the scheme described in "A Future-Adaptable Password Scheme" by
@@ -726,7 +728,7 @@ public class BCrypt {
 	 * @return	an encoded salt value
 	 */
 	public static String gensalt(int log_rounds) {
-		return gensalt(log_rounds, new SecureRandom());
+		return gensalt(log_rounds, RANDOM);
 	}
 
 	/**

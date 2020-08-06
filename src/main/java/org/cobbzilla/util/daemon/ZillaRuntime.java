@@ -21,6 +21,7 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicLong;
@@ -31,6 +32,7 @@ import static java.lang.Long.toHexString;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.LongStream.range;
 import static org.apache.commons.collections.CollectionUtils.collect;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.cobbzilla.util.error.ExceptionHandler.DEFAULT_EX_RUNNABLE;
 import static org.cobbzilla.util.io.FileUtil.abs;
@@ -291,6 +293,17 @@ public class ZillaRuntime {
     public static BigInteger bigint(int val) { return new BigInteger(String.valueOf(val)); }
     public static BigInteger bigint(byte val) { return new BigInteger(String.valueOf(val)); }
 
+    public static BigInteger random_bigint(BigInteger limit) { return random_bigint(limit, RANDOM); }
+
+    // adapted from https://stackoverflow.com/a/2290089/1251543
+    public static BigInteger random_bigint(BigInteger limit, SecureRandom rand) {
+        BigInteger randomNumber;
+        do {
+            randomNumber = new BigInteger(limit.bitLength(), rand);
+        } while (randomNumber.compareTo(limit) >= 0);
+        return randomNumber;
+    }
+
     public static BigDecimal big(String val) { return new BigDecimal(val); }
     public static BigDecimal big(double val) { return new BigDecimal(String.valueOf(val)); }
     public static BigDecimal big(float val) { return new BigDecimal(String.valueOf(val)); }
@@ -310,7 +323,10 @@ public class ZillaRuntime {
 
     public static String uuid() { return UUID.randomUUID().toString(); }
 
-    private static AtomicLong systemTimeOffset = new AtomicLong(0L);
+    private static final AtomicLong systemTimeOffset = new AtomicLong(0L);
+
+    public static final SecureRandom RANDOM = new SecureRandom((randomAlphanumeric(20)+now()).getBytes());
+
     public static long getSystemTimeOffset () { return systemTimeOffset.get(); }
     public static void setSystemTimeOffset (long t) { systemTimeOffset.set(t); }
     public static long incrementSystemTimeOffset(long t) { return systemTimeOffset.addAndGet(t); }
