@@ -320,6 +320,18 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
             return new Handlebars.SafeString(DateTimeFormat.forPattern(format).withZone(tz).print(Long.valueOf(val.toString().trim())));
         });
 
+        hb.registerHelper("format_price", (val, options) -> {
+            if (options.params.length != 2) return die("format_price: Usage: {{format_price amount currencySymbol decimalSymbol}}");
+            final String currencySymbol = options.param(0);
+            final String decimalSymbol = options.param(1);
+            final long amount = Long.parseLong(val.toString());
+            if (amount % 100 == 0) {
+                return new Handlebars.SafeString(currencySymbol+(amount/100));
+            } else {
+                return new Handlebars.SafeString(currencySymbol+(amount/100)+decimalSymbol+(amount%100 < 10 ? "0"+(amount%100) : amount%100));
+            }
+        });
+
         hb.registerHelper("format_float", (val, options) -> {
             if (empty(val)) return "";
             if (options.params.length > 2) return die("format_float: too many parameters. Usage: {{format_float expr [format] [locale]}}");
