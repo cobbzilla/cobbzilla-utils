@@ -446,4 +446,40 @@ public class HttpUtil {
         return httpChunk;
     }
 
+    // adapted from https://github.com/stuartpb/user-agent-is-browser
+    public static boolean isBrowser (String ua) {
+        final boolean browser = !empty(ua) && !ua.equals("NONE") && (
+                ua.startsWith("Mozilla/")
+                // Older versions of Opera
+                || ua.startsWith("Opera/")
+                // Down the rabbit hole...
+                || ua.startsWith("Lynx/")
+                || ua.startsWith("Links ")
+                || ua.startsWith("Elinks ") || ua.startsWith("ELinks ")
+                || ua.startsWith("ELinks/")
+                || ua.startsWith("Midori/")
+                || ua.startsWith("w3m/")
+                || ua.startsWith("Webkit/")
+                || ua.startsWith("Vimprobable/")
+                || ua.startsWith("Dooble/")
+                || ua.startsWith("Dillo/")
+                || ua.startsWith("Surf/")
+                || ua.startsWith("NetSurf/")
+                || ua.startsWith("Galaxy/")
+                || ua.startsWith("Cyberdog/")
+                || ua.startsWith("iCab/")
+                || ua.startsWith("IBrowse/")
+                || ua.startsWith("IBM WebExplorer /")
+                || ua.startsWith("AmigaVoyager/")
+                || ua.startsWith("HotJava/")
+                || ua.startsWith("retawq/")
+                || ua.startsWith("uzbl ") || ua.startsWith("Uzbl ")
+                || ua.startsWith("NCSA Mosaic/") || ua.startsWith("NCSA_Mosaic/")
+                // And, finally, we test to see if they"re using *the first browser ever*.
+                || ua.equals("WorldWideweb (NEXT)")
+        );
+        if (log.isDebugEnabled()) log.debug("isBrowser("+ua+") returning "+browser);
+        return browser;
+    }
+
 }
