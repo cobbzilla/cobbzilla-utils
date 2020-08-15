@@ -448,7 +448,7 @@ public class HttpUtil {
 
     // adapted from https://github.com/stuartpb/user-agent-is-browser
     public static boolean isBrowser (String ua) {
-        final boolean browser = !empty(ua) && !ua.equals("NONE") && (
+        final boolean browser = !empty(ua) && !ua.equals("NONE") && !ua.equals("UNKNOWN") && (
                 ua.startsWith("Mozilla/")
                 // Older versions of Opera
                 || ua.startsWith("Opera/")
