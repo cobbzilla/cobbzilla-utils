@@ -605,6 +605,7 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
             try {
                 String path = thing.toString();
                 final String[] paths = new String[]{
+                        System.getenv("HOME") + "/" + path,
                         System.getProperty("user.home") + "/" + path,
                         System.getProperty("user.dir") + "/" + path,
                         path
