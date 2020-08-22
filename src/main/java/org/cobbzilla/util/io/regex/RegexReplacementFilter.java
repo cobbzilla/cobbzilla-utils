@@ -19,7 +19,7 @@ public class RegexReplacementFilter implements RegexStreamFilter {
     @Getter @Setter private String prefixReplacementWithMatch = DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH;
 
     public RegexReplacementFilter(String regex, int group, String replacement) {
-        this.pattern = Pattern.compile(regex);
+        this.pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         this.group = group;
         this.replacement = replacement;
     }
