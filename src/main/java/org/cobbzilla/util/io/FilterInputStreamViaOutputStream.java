@@ -4,9 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.cobbzilla.util.system.Bytes;
 
 import java.io.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.reflect.ReflectionUtil.closeQuietly;
 import static org.cobbzilla.util.reflect.ReflectionUtil.instantiate;
@@ -16,9 +16,9 @@ public class FilterInputStreamViaOutputStream extends PipedInputStream implement
 
     private static final int DEFAULT_PIPE_BUFFER_SIZE = (int) (64 * Bytes.KB);
     private static final int DEFAULT_COPY_BUFFER_SIZE = (int) (8 * Bytes.KB);
-    private static final long THREAD_TERMINATE_TIMEOUT = TimeUnit.SECONDS.toMillis(10);
+    private static final long THREAD_TERMINATE_TIMEOUT = SECONDS.toMillis(10);
 
-    private InputStream in;
+    private final InputStream in;
     private PipedOutputStream pipeOut;
     private OutputStream out;
     private Thread thread;
@@ -65,9 +65,11 @@ public class FilterInputStreamViaOutputStream extends PipedInputStream implement
             final byte[] buf = new byte[DEFAULT_COPY_BUFFER_SIZE];
             int bytesRead;
             while ((bytesRead = in.read(buf)) >= 0) {
-                out.write(buf, 0, bytesRead);
+                if (bytesRead > 0) {
+                    out.write(buf, 0, bytesRead);
+                    out.flush();
+                }
             }
-            out.flush();
 
         } catch (IOException e) {
             final String msg = "run: error copying bytes: " + shortError(e);
@@ -92,4 +94,5 @@ public class FilterInputStreamViaOutputStream extends PipedInputStream implement
             background(() -> terminate(this.thread, THREAD_TERMINATE_TIMEOUT));
         }
     }
+
 }

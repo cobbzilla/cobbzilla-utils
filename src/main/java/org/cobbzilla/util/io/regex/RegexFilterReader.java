@@ -21,13 +21,11 @@ public class RegexFilterReader extends BufferedReader {
     public static final int DEFAULT_BUFFER_SIZE = (int) (8 * Bytes.KB);
 
     private final int bufsiz;
-    private RegexStreamFilter filter;
+    private final RegexStreamFilter filter;
     @Getter @Setter private Integer maxMatches;
     @Getter @Setter private String name; // for debugging/identifying which reader
 
-    public RegexFilterReader(Reader in, RegexStreamFilter filter) {
-        this(in, DEFAULT_BUFFER_SIZE, filter);
-    }
+    public RegexFilterReader(Reader in, RegexStreamFilter filter) { this(in, DEFAULT_BUFFER_SIZE, filter); }
 
     public RegexFilterReader(Reader in, int bufsiz, RegexStreamFilter filter) {
         super(in, DEFAULT_BUFFER_SIZE);
@@ -35,9 +33,7 @@ public class RegexFilterReader extends BufferedReader {
         this.filter = filter;
     }
 
-    public RegexFilterReader(InputStream in, RegexStreamFilter filter) {
-        this(in, DEFAULT_BUFFER_SIZE, filter);
-    }
+    public RegexFilterReader(InputStream in, RegexStreamFilter filter) { this(in, DEFAULT_BUFFER_SIZE, filter); }
 
     public RegexFilterReader(InputStream in, int bufsiz, RegexStreamFilter filter) {
         super(new InputStreamReader(in, UTF8cs), bufsiz);
@@ -107,7 +103,7 @@ public class RegexFilterReader extends BufferedReader {
 
         private int readPos = 0;
         private boolean eof = false;
-        private RegexStreamFilter filter;
+        private final RegexStreamFilter filter;
         private int matchCount = 0;
         private Integer maxMatches = null;
 
