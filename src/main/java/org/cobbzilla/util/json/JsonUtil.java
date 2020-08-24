@@ -279,7 +279,7 @@ public class JsonUtil {
     }
 
     public static JsonNode findNode(JsonNode node, String path) throws IOException {
-        if (node == null) return null;
+        if (node == null || path == null) return null;
         final List<JsonNode> nodePath = findNodePath(node, path);
         if (nodePath == null || nodePath.isEmpty()) return null;
         final JsonNode lastNode = nodePath.get(nodePath.size()-1);
