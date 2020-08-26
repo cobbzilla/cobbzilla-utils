@@ -4,6 +4,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.cobbzilla.util.string.StringUtil;
 
 import java.util.*;
@@ -14,6 +15,7 @@ import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 import static org.cobbzilla.util.io.StreamUtil.loadResourceAsStream;
 import static org.cobbzilla.util.string.StringUtil.getPackagePath;
 
+@ToString
 public class UnicodeTimezone implements Comparable<UnicodeTimezone> {
 
     // we exclude these oddball timezones, since they have no good mapping to Linux timezones
