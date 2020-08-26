@@ -107,7 +107,7 @@ public abstract class SimpleDaemon implements Runnable {
             init();
 
             while (!isDone) {
-                log.debug(getName()+": Daemon thread invoking process");
+                if (log.isTraceEnabled()) log.trace(getName()+": Daemon thread invoking process");
                 try {
                     process();
                     lastProcessTime = now();
