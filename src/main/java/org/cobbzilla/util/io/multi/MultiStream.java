@@ -79,7 +79,7 @@ public class MultiStream extends InputStream {
     @Override public int read(byte[] buf, int off, int len) throws IOException {
         if (log.isTraceEnabled()) log.trace("read(byte[]): trying to read "+len+" bytes. this="+this);
         final int count = currentStream.read(buf, off, len);
-        log.error("read: got "+count+" bytes");
+        if (log.isTraceEnabled()) log.trace("read(byte[]): trying to read "+count+" bytes");
         if (count == -1) {
             if (streamIndex == streams.size()-1) {
                 if (log.isTraceEnabled()) log.trace("read(byte[]): end of all streams? this="+this);
