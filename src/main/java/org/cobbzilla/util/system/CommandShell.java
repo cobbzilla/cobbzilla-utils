@@ -6,6 +6,8 @@ import org.apache.commons.exec.*;
 import org.apache.commons.io.output.TeeOutputStream;
 import org.cobbzilla.util.collection.MapBuilder;
 import org.cobbzilla.util.io.FileUtil;
+import oshi.SystemInfo;
+import oshi.hardware.HardwareAbstractionLayer;
 
 import java.io.*;
 import java.util.*;
@@ -27,6 +29,8 @@ public class CommandShell {
     public static final String CHOWN = "chown";
 
     private static final int[] DEFAULT_EXIT_VALUES = {0};
+    public static final SystemInfo SYSTEM_INFO = new SystemInfo();
+    public static final HardwareAbstractionLayer HARDWARE = SYSTEM_INFO.getHardware();
 
     public static Map<String, String> loadShellExports (String path) throws IOException {
         if (!path.startsWith("/")) {
@@ -253,6 +257,8 @@ public class CommandShell {
             throw new CommandShellException(command, e);
         }
     }
+
+    public static final long totalSystemMemory() { return HARDWARE.getMemory().getTotal(); }
 
     public static String hostname () { return toString("hostname"); }
     public static String domainname() { return toString("hostname -d"); }
