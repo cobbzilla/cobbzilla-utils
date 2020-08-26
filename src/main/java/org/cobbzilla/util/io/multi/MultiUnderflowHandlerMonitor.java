@@ -8,6 +8,7 @@ import org.cobbzilla.util.daemon.SimpleDaemon;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.cobbzilla.util.daemon.ZillaRuntime.now;
@@ -20,8 +21,10 @@ public class MultiUnderflowHandlerMonitor extends SimpleDaemon {
 
     private final Map<String, MultiUnderflowHandler> handlers = new ConcurrentHashMap<>();
 
-    @Getter @Setter private static long checkInterval = SECONDS.toMillis(20);
+    @Getter @Setter private long checkInterval = SECONDS.toMillis(20);
     private static final long TERMINATE_TIMEOUT = SECONDS.toMillis(2);
+
+    @Getter @Setter private Function<Thread, Boolean> terminateThreadFunc = null;
 
     @Override protected long getSleepTime() { return checkInterval; }
 
@@ -39,8 +42,12 @@ public class MultiUnderflowHandlerMonitor extends SimpleDaemon {
 
             } else if (now() - underflow.getLastRead() > underflow.getUnderflowTimeout()) {
                 iter.remove();
-                if (log.isErrorEnabled()) log.error("process: underflow timed out, terminating: name="+underflow.getHandlerName()+" thread="+underflow.getThread());
-                terminate(underflow.getThread(), TERMINATE_TIMEOUT);
+                if (terminateThreadFunc == null || terminateThreadFunc.apply(underflow.getThread())) {
+                    if (log.isErrorEnabled()) log.error("process: underflow timed out, terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
+                    terminate(underflow.getThread(), TERMINATE_TIMEOUT);
+                } else {
+                    if (log.isErrorEnabled()) log.error("process: underflow timed out, removing but NOT terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
+                }
             }
         }
     }

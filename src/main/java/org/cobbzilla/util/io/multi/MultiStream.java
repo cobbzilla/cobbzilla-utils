@@ -101,7 +101,8 @@ public class MultiStream extends InputStream {
     }
 
     @Override public void close() throws IOException {
-        if (log.isTraceEnabled()) log.trace("close: closing current stream ("+(currentStream == null ? "null" : currentStream.getClass().getSimpleName())+"). this="+this);
+        if (log.isInfoEnabled()) log.info("close: closing current stream ("+(currentStream == null ? "null" : currentStream.getClass().getSimpleName())+"). name="+underflow.getHandlerName());
+        if (log.isTraceEnabled()) log.trace("close: closing current stream ("+(currentStream == null ? "null" : currentStream.getClass().getSimpleName())+"). name="+underflow.getHandlerName());
         if (currentStream != null) currentStream.close();
         underflow.close();
     }

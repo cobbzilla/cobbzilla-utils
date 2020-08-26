@@ -5,7 +5,6 @@ import org.apache.commons.io.IOUtils;
 import org.cobbzilla.util.io.BlockedInputStream;
 import org.cobbzilla.util.io.multi.MultiReader;
 import org.cobbzilla.util.io.multi.MultiStream;
-import org.cobbzilla.util.io.multi.MultiUnderflowHandlerMonitor;
 import org.junit.Test;
 
 import java.io.*;
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.background;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
+import static org.cobbzilla.util.io.multi.MultiUnderflowHandlerMonitor.DEFAULT_UNDERFLOW_MONITOR;
 import static org.cobbzilla.util.io.regex.RegexReplacementFilter.DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH;
 import static org.cobbzilla.util.system.Sleep.sleep;
 import static org.junit.Assert.*;
@@ -192,7 +192,7 @@ public class RegexFilterReaderTest {
         final InputStream stream2 = new ByteArrayInputStream("some test data2 ".repeat(1000).getBytes());
         final InputStream stream3 = new BlockedInputStream();
 
-        MultiUnderflowHandlerMonitor.setCheckInterval(1000);
+        DEFAULT_UNDERFLOW_MONITOR.setCheckInterval(1000);
         final MultiStream multiStream = new MultiStream(stream1);
         multiStream.getUnderflow()
                 .setMinUnderflowSleep(1000)
