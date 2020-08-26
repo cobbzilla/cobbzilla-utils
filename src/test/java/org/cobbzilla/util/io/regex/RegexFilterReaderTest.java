@@ -5,7 +5,7 @@ import org.apache.commons.io.IOUtils;
 import org.cobbzilla.util.io.BlockedInputStream;
 import org.cobbzilla.util.io.multi.MultiReader;
 import org.cobbzilla.util.io.multi.MultiStream;
-import org.cobbzilla.util.io.multi.MultiUnderflowHandler;
+import org.cobbzilla.util.io.multi.MultiUnderflowHandlerMonitor;
 import org.junit.Test;
 
 import java.io.*;
@@ -192,7 +192,7 @@ public class RegexFilterReaderTest {
         final InputStream stream2 = new ByteArrayInputStream("some test data2 ".repeat(1000).getBytes());
         final InputStream stream3 = new BlockedInputStream();
 
-        MultiUnderflowHandler.setCheckInterval(1000);
+        MultiUnderflowHandlerMonitor.setCheckInterval(1000);
         final MultiStream multiStream = new MultiStream(stream1);
         multiStream.getUnderflow()
                 .setMinUnderflowSleep(1000)

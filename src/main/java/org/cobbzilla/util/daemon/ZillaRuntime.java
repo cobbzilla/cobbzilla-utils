@@ -70,7 +70,7 @@ public class ZillaRuntime {
             sleep(100, "terminate: waiting for thread to exit: "+thread);
         }
         if (thread.isAlive()) {
-            if (verbose && log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, killing: "+thread+" with stack "+stacktrace(thread)+" from "+stacktrace());
+            if (verbose && log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, killing: "+thread+" with stack "+stacktrace(thread)+"\nfrom: "+stacktrace());
             thread.stop();
             return false;
         } else {
