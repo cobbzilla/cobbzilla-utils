@@ -1,5 +1,6 @@
 package org.cobbzilla.util.io.multi;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ public class MultiReader extends Reader {
     private Reader currentReader;
     private int readerIndex = 0;
     private boolean endOfReaders = false;
+    @Getter private final MultiUnderflowHandler underflow = new MultiUnderflowHandler();
 
     public MultiReader (Reader r, boolean last) {
         if (last) {
@@ -53,17 +55,21 @@ public class MultiReader extends Reader {
         int count = currentReader.read(buf, off, len);
         if (count == -1) {
             if (readerIndex == readers.size()-1) {
-                return endOfReaders ? -1 : 0;
+                if (endOfReaders) return -1;
+                underflow.handleUnderflow();
+                return 0;
             }
             currentReader.close();
             readerIndex++;
             currentReader = readers.get(readerIndex);
             return read(buf, off, len);
         }
+        underflow.handleSuccessfulRead();
         return count;
     }
 
     @Override public void close() throws IOException {
         if (currentReader != null) currentReader.close();
+        underflow.close();
     }
 }

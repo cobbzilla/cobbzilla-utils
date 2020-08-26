@@ -1,5 +1,6 @@
 package org.cobbzilla.util.io.multi;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -14,8 +15,12 @@ public class MultiStream extends InputStream {
     private InputStream currentStream;
     private int streamIndex = 0;
     private boolean endOfStreams = false;
+    @Getter private final MultiUnderflowHandler underflow = new MultiUnderflowHandler();
 
-    public MultiStream (InputStream r, boolean last) {
+    public MultiStream (InputStream r, boolean last) { this(r, last, "no-name"); }
+
+    public MultiStream (InputStream r, boolean last, String name) {
+        underflow.setHandlerName(name);
         if (last) {
             addLastStream(r);
         } else {
@@ -24,9 +29,11 @@ public class MultiStream extends InputStream {
         currentStream = r;
     }
 
-    public int pendingStreamCount () { return streams.size() - streamIndex; }
+    public MultiStream (InputStream r, String name) { this(r, false, name); }
 
     public MultiStream (InputStream r) { this(r, false); }
+
+    public int pendingStreamCount () { return streams.size() - streamIndex; }
 
     @Override public String toString () {
         return "MultiStream{"+streams.size()+" streams, index="+streamIndex+", EOS="+endOfStreams+"}";
@@ -52,7 +59,9 @@ public class MultiStream extends InputStream {
         if (val == -1) {
             if (streamIndex == streams.size()-1) {
                 if (log.isTraceEnabled()) log.trace("read(byte): end of all streams? this="+this);
-                return endOfStreams ? -1 : 0;
+                if (endOfStreams) return -1;
+                underflow.handleUnderflow();
+                return 0;
             }
             currentStream.close();
             streamIndex++;
@@ -63,16 +72,20 @@ public class MultiStream extends InputStream {
         } else {
             if (log.isTraceEnabled()) log.trace("read(byte): one byte read. this="+this);
         }
+        underflow.handleSuccessfulRead();
         return val;
     }
 
     @Override public int read(byte[] buf, int off, int len) throws IOException {
         if (log.isTraceEnabled()) log.trace("read(byte[]): trying to read "+len+" bytes. this="+this);
         final int count = currentStream.read(buf, off, len);
+        log.error("read: got "+count+" bytes");
         if (count == -1) {
             if (streamIndex == streams.size()-1) {
                 if (log.isTraceEnabled()) log.trace("read(byte[]): end of all streams? this="+this);
-                return endOfStreams ? -1 : 0;
+                if (endOfStreams) return -1;
+                underflow.handleUnderflow();
+                return 0;
             }
             currentStream.close();
             streamIndex++;
@@ -83,12 +96,14 @@ public class MultiStream extends InputStream {
         } else {
             if (log.isTraceEnabled()) log.trace("read(byte[]): "+count+" bytes read. this="+this);
         }
+        underflow.handleSuccessfulRead();
         return count;
     }
 
     @Override public void close() throws IOException {
         if (log.isTraceEnabled()) log.trace("close: closing current stream ("+(currentStream == null ? "null" : currentStream.getClass().getSimpleName())+"). this="+this);
         if (currentStream != null) currentStream.close();
+        underflow.close();
     }
 
 }

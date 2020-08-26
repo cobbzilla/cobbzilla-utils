@@ -17,7 +17,7 @@ public abstract class SimpleDaemon implements Runnable {
 
     public SimpleDaemon (String name) { this.name = name; }
 
-    @Getter private String name;
+    @Getter private final String name;
     @Getter private long lastProcessTime = 0;
 
     private volatile Thread mainThread = null;

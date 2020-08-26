@@ -1,20 +1,23 @@
 package org.cobbzilla.util.io.regex;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.cobbzilla.util.io.BlockedInputStream;
 import org.cobbzilla.util.io.multi.MultiReader;
+import org.cobbzilla.util.io.multi.MultiStream;
+import org.cobbzilla.util.io.multi.MultiUnderflowHandler;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.background;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
+import static org.cobbzilla.util.io.regex.RegexReplacementFilter.DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH;
 import static org.cobbzilla.util.system.Sleep.sleep;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
+@Slf4j
 public class RegexFilterReaderTest {
 
     public static final String TEST_STRING_1 = "this is a string\nand another string with a lone a near the end\nfoo.";
@@ -43,7 +46,8 @@ public class RegexFilterReaderTest {
 
     @Test public void testRegexReaderIncludeMatch() throws Exception {
         final Reader reader = new StringReader(TEST_STRING_INCLUDE_MATCH);
-        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter("<html\\s+[^>]*>", "!INSERTED_DATA");
+        final RegexStreamFilter regexStreamFilter
+                = new RegexReplacementFilter("<html\\s+[^>]*>", DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH+"INSERTED_DATA");
         final RegexFilterReader regexFilterReader = new RegexFilterReader(reader, 1024, regexStreamFilter);
         final StringWriter result = new StringWriter();
         IOUtils.copyLarge(regexFilterReader, result);
@@ -55,7 +59,8 @@ public class RegexFilterReaderTest {
 
     @Test public void testRegexReaderIncludeMatchInMiddle() throws Exception {
         final Reader reader = new StringReader(TEST_STRING_INCLUDE_MATCH_MIDDLE);
-        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter("<html\\s+[^>]*>", "INSERTED_!DATA");
+        final RegexStreamFilter regexStreamFilter
+                = new RegexReplacementFilter("<html\\s+[^>]*>", "INSERTED_"+DEFAULT_PREFIX_REPLACEMENT_WITH_MATCH+"DATA");
         final RegexFilterReader regexFilterReader = new RegexFilterReader(reader, 1024, regexStreamFilter);
         final StringWriter result = new StringWriter();
         IOUtils.copyLarge(regexFilterReader, result);
@@ -139,4 +144,83 @@ public class RegexFilterReaderTest {
         t.join(1000);
         assertFalse("Expected copy thread to finish", t.isAlive());
         assertEquals("multi reader failed to get expected output", EXPECTED_MULTI_RESULT2, result.toString());
-    }}
+    }
+
+    @Test public void testMultiReaderUnderflow() throws Exception {
+        final StringReader reader1 = new StringReader("some test data1 ".repeat(1000));
+        final StringReader reader2 = new StringReader("some test data2 ".repeat(1000));
+        final StringReader reader3 = new StringReader("some test data3 ".repeat(1000));
+
+        final MultiReader multiReader = new MultiReader(reader1);
+        multiReader.getUnderflow()
+                .setMinUnderflowSleep(1000)
+                .setMaxUnderflowSleep(1000)
+                .setUnderflowTimeout(5000);
+
+        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" test ", " bogus ");
+        final RegexFilterReader regexFilterReader = new RegexFilterReader(multiReader, 8, regexStreamFilter);
+        final StringWriter result = new StringWriter();
+
+        final AtomicReference<Exception> exRef = new AtomicReference<>(null);
+        final Thread t = background(() -> {
+            try {
+                IOUtils.copyLarge(regexFilterReader, result);
+            } catch (IOException e) {
+                exRef.set(e);
+            }
+        });
+
+        sleep(multiReader.getUnderflow().getMaxUnderflowSleep());
+        log.info("adding reader2...");
+        multiReader.addReader(reader2);
+        log.info("added reader2...");
+        sleep(multiReader.getUnderflow().getUnderflowTimeout()*2);
+        log.info("adding reader3...");
+        multiReader.addReader(reader3);
+        log.info("added reader3...");
+
+        t.join(multiReader.getUnderflow().getUnderflowTimeout()+100);
+        assertFalse("Expected copy thread to finish", t.isAlive());
+        assertNotNull("Expected copy thread to have an exception", exRef.get());
+        assertTrue("expected multi reader failed to get data1 output", result.toString().contains(" bogus data1 "));
+        assertTrue("expected multi reader failed to get data2 output", result.toString().contains(" bogus data2 "));
+        assertFalse("expected multi reader failed to NOT get data3 output", result.toString().contains(" bogus data3 "));
+    }
+
+    @Test public void testMultiStreamUnderflow() throws Exception {
+        final InputStream stream1 = new ByteArrayInputStream("some test data1 ".repeat(1000).getBytes());
+        final InputStream stream2 = new ByteArrayInputStream("some test data2 ".repeat(1000).getBytes());
+        final InputStream stream3 = new BlockedInputStream();
+
+        MultiUnderflowHandler.setCheckInterval(1000);
+        final MultiStream multiStream = new MultiStream(stream1);
+        multiStream.getUnderflow()
+                .setMinUnderflowSleep(1000)
+                .setMaxUnderflowSleep(1000)
+                .setUnderflowTimeout(5000);
+        multiStream.addStream(stream2);
+        multiStream.addStream(stream3);
+
+        final RegexStreamFilter regexStreamFilter = new RegexReplacementFilter(" test ", " bogus ");
+        final RegexFilterReader regexFilterReader = new RegexFilterReader(multiStream, 8, regexStreamFilter);
+        final StringWriter result = new StringWriter();
+
+        final AtomicReference<Exception> exRef = new AtomicReference<>(null);
+        final Thread t = background(() -> {
+            try {
+                IOUtils.copyLarge(regexFilterReader, result);
+            } catch (Exception e) {
+                exRef.set(e);
+            }
+        });
+
+        sleep(multiStream.getUnderflow().getUnderflowTimeout()*2);
+
+        t.join(multiStream.getUnderflow().getUnderflowTimeout()+100);
+        assertFalse("Expected copy thread to finish", t.isAlive());
+        assertNotNull("Expected copy thread to have an exception", exRef.get());
+        assertTrue("expected multi stream failed to get data1 output", result.toString().contains(" bogus data1 "));
+        assertTrue("expected multi stream failed to get data2 output", result.toString().contains(" bogus data2 "));
+    }
+
+}
