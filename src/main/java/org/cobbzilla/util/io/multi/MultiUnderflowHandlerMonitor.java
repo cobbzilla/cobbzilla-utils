@@ -29,24 +29,25 @@ public class MultiUnderflowHandlerMonitor extends SimpleDaemon {
     @Override protected long getSleepTime() { return checkInterval; }
 
     @Override protected void process() {
-        if (log.isTraceEnabled()) log.trace("process: examining "+handlers.size()+" underflow handlers");
+        final String prefix = "process("+handlers.size()+" handlers): ";
+        if (log.isTraceEnabled()) log.trace(prefix+"examining underflow handlers");
         for (Iterator<MultiUnderflowHandler> iter = handlers.values().iterator(); iter.hasNext(); ) {
             final MultiUnderflowHandler underflow = iter.next();
             if (underflow.closed()) {
-                if (log.isDebugEnabled()) log.debug("process: removing closed handler: name="+underflow.getHandlerName()+" thread="+underflow.getThread());
+                if (log.isDebugEnabled()) log.debug(prefix+"removing closed handler: name="+underflow.getHandlerName()+" thread="+underflow.getThread());
                 iter.remove();
 
             } else if (underflow.getLastRead() > 0 && !underflow.getThread().isAlive()) {
-                if (log.isDebugEnabled()) log.debug("process: removing dead thread: name="+underflow.getHandlerName()+" thread="+underflow.getThread());
+                if (log.isDebugEnabled()) log.debug(prefix+"removing dead thread: name="+underflow.getHandlerName()+" thread="+underflow.getThread());
                 iter.remove();
 
             } else if (now() - underflow.getLastRead() > underflow.getUnderflowTimeout()) {
                 iter.remove();
                 if (terminateThreadFunc == null || terminateThreadFunc.apply(underflow.getThread())) {
-                    if (log.isErrorEnabled()) log.error("process: underflow timed out, terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
+                    if (log.isErrorEnabled()) log.error(prefix+"underflow timed out, terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
                     terminate(underflow.getThread(), TERMINATE_TIMEOUT);
                 } else {
-                    if (log.isErrorEnabled()) log.error("process: underflow timed out, removing but NOT terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
+                    if (log.isErrorEnabled()) log.error(prefix+"underflow timed out, removing but NOT terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
                 }
             }
         }
