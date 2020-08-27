@@ -143,4 +143,13 @@ public class LocaleUtil {
             default: return empty(defaultLocale) ? null : currencyForLocale(defaultLocale, null);
         }
     }
+
+    public static String getLang(String locale) {
+        if (empty(locale)) return null;
+        final int uPos = locale.indexOf("_");
+        return uPos == -1
+                ? locale.toLowerCase().equals(locale) ? locale : null
+                : locale.substring(0, uPos);
+    }
+
 }
