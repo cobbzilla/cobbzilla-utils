@@ -54,28 +54,49 @@ public class ZillaRuntime {
 
     public static String getJava() { return System.getProperty("java.home") + "/bin/java"; }
 
-    public static boolean terminateQuietly(Thread thread, long timeout) {
+    public static TerminationRequestResult terminateQuietly(Thread thread, long timeout) {
         return terminate(thread, timeout, false);
     }
 
-    public static boolean terminate(Thread thread, long timeout) {
+    public static TerminationRequestResult terminate(Thread thread, long timeout) {
         return terminate(thread, timeout, true);
     }
 
-    public static boolean terminate(Thread thread, long timeout, boolean verbose) {
-        if (thread == null || !thread.isAlive()) return true;
+    public static TerminationRequestResult terminate(Thread thread, long timeout, boolean verbose) {
+        return terminate(thread, timeout, null, verbose);
+    }
+
+    public static TerminationRequestResult terminate(Thread thread, long timeout, Function<Thread, Boolean> onlyIf) {
+        return terminate(thread, timeout, onlyIf, true);
+    }
+
+    public static TerminationRequestResult terminateQuietly(Thread thread, long timeout, Function<Thread, Boolean> onlyIf) {
+        return terminate(thread, timeout, onlyIf, false);
+    }
+
+    public static TerminationRequestResult terminate(Thread thread, long timeout, Function<Thread, Boolean> onlyIf, boolean verbose) {
+        if (thread == null || !thread.isAlive()) return TerminationRequestResult.alive;
+        if (onlyIf != null && !onlyIf.apply(thread)) {
+            if (log.isWarnEnabled()) log.warn("terminate: thread is alive but onlyIf function returned false, not interrupting: " + thread + (verbose ? " with stack " + stacktrace(thread) + "\nfrom: " + stacktrace() : ""));
+            return TerminationRequestResult.alive;
+        }
         thread.interrupt();
         final long start = realNow();
         while (thread.isAlive() && realNow() - start < timeout) {
             sleep(100, "terminate: waiting for thread to exit: "+thread);
         }
         if (thread.isAlive()) {
-            if (verbose && log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, killing: "+thread+" with stack "+stacktrace(thread)+"\nfrom: "+stacktrace());
-            thread.stop();
-            return false;
+            if (onlyIf != null && onlyIf.apply(thread)) {
+                if (log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, killing: " + thread + (verbose ? " with stack " + stacktrace(thread) + "\nfrom: " + stacktrace() : ""));
+                thread.stop();
+                return TerminationRequestResult.terminated;
+            } else {
+                if (log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, but onlyIf function returned false, not killing: " + thread + (verbose ? " with stack " + stacktrace(thread) + "\nfrom: " + stacktrace() : ""));
+                return TerminationRequestResult.interrupted;
+            }
         } else {
-            if (verbose && log.isWarnEnabled()) log.warn("terminate: thread exited after interrupt: "+thread);
-            return true;
+            if (log.isWarnEnabled()) log.warn("terminate: thread exited after interrupt: "+thread);
+            return TerminationRequestResult.interrupted;
         }
     }
 

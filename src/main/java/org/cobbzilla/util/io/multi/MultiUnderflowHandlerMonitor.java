@@ -45,7 +45,7 @@ public class MultiUnderflowHandlerMonitor extends SimpleDaemon {
                 iter.remove();
                 if (terminateThreadFunc == null || terminateThreadFunc.apply(underflow.getThread())) {
                     if (log.isErrorEnabled()) log.error(prefix+"underflow timed out, terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
-                    terminate(underflow.getThread(), TERMINATE_TIMEOUT);
+                    terminate(underflow.getThread(), TERMINATE_TIMEOUT, terminateThreadFunc);
                 } else {
                     if (log.isErrorEnabled()) log.error(prefix+"underflow timed out, removing but NOT terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
                 }
