@@ -36,6 +36,8 @@ public class MultiStream extends InputStream {
 
     public int pendingStreamCount () { return streams.size() - streamIndex; }
 
+    public MultiStream setUnderflowTimeout(long timeout) { getUnderflow().setUnderflowTimeout(timeout); return this; }
+
     @Override public String toString () {
         return "MultiStream{name="+underflow.getHandlerName()+", "+streams.size()+" streams, index="+streamIndex+", EOS="+endOfStreams+"}";
     }
