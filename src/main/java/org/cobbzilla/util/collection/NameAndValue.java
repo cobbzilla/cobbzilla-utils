@@ -23,6 +23,10 @@ public class NameAndValue {
         return list;
     }
 
+    public static NameAndValue[] singleNameAndValueArray(String name, String value) {
+        return new NameAndValue[] { new NameAndValue(name, value) };
+    }
+
     @Getter @Setter private String name;
 
     public static Integer findInt(NameAndValue[] pairs, String name) {
