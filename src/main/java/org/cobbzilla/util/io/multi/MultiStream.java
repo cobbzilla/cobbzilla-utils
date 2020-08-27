@@ -27,6 +27,7 @@ public class MultiStream extends InputStream {
             addStream(r);
         }
         currentStream = r;
+        if (log.isInfoEnabled()) log.info(logPrefix()+"created with initial stream="+r+", last="+last);
     }
 
     public MultiStream (InputStream r, String name) { this(r, false, name); }
@@ -36,29 +37,31 @@ public class MultiStream extends InputStream {
     public int pendingStreamCount () { return streams.size() - streamIndex; }
 
     @Override public String toString () {
-        return "MultiStream{"+streams.size()+" streams, index="+streamIndex+", EOS="+endOfStreams+"}";
+        return "MultiStream{name="+underflow.getHandlerName()+", "+streams.size()+" streams, index="+streamIndex+", EOS="+endOfStreams+"}";
     }
+
+    private String logPrefix () { return this + ": "; }
 
     public void addStream (InputStream in) {
         if (endOfStreams) {
-            log.warn("addStream: endOfStreams is true, not adding InputStream");
+            if (log.isWarnEnabled()) log.warn(logPrefix()+"addStream: endOfStreams is true, not adding InputStream");
         } else {
             streams.add(in);
-            if (log.isTraceEnabled()) log.trace("addStream: added stream ("+in.getClass().getSimpleName()+"). this="+this);
+            if (log.isTraceEnabled()) log.trace(logPrefix()+"addStream: added stream ("+in.getClass().getSimpleName()+")");
         }
     }
 
     public void addLastStream (InputStream in) {
         addStream(in);
         endOfStreams = true;
-        if (log.isTraceEnabled()) log.trace("addLastStream: added last stream ("+in.getClass().getSimpleName()+"). this="+this);
+        if (log.isTraceEnabled()) log.trace(logPrefix()+"addLastStream: added last stream ("+in.getClass().getSimpleName()+")");
     }
 
     @Override public int read() throws IOException {
         final int val = currentStream.read();
         if (val == -1) {
             if (streamIndex == streams.size()-1) {
-                if (log.isTraceEnabled()) log.trace("read(byte): end of all streams? this="+this);
+                if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte): end of all streams? this="+this);
                 if (endOfStreams) return -1;
                 underflow.handleUnderflow();
                 return 0;
@@ -66,23 +69,23 @@ public class MultiStream extends InputStream {
             currentStream.close();
             streamIndex++;
             currentStream = streams.get(streamIndex);
-            if (log.isTraceEnabled()) log.trace("read(byte): end of all stream, advanced to next stream ("+currentStream.getClass().getSimpleName()+"). this="+this);
+            if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte): end of all stream, advanced to next stream ("+currentStream.getClass().getSimpleName()+")");
             return read();
 
         } else {
-            if (log.isTraceEnabled()) log.trace("read(byte): one byte read. this="+this);
+            if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte): one byte read");
         }
         underflow.handleSuccessfulRead();
         return val;
     }
 
     @Override public int read(byte[] buf, int off, int len) throws IOException {
-        if (log.isTraceEnabled()) log.trace("read(byte[]): trying to read "+len+" bytes. this="+this);
+        if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte[]): trying to read "+len+" bytes");
         final int count = currentStream.read(buf, off, len);
-        if (log.isTraceEnabled()) log.trace("read(byte[]): trying to read "+count+" bytes");
+        if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte[]): trying to read "+count+" bytes");
         if (count == -1) {
             if (streamIndex == streams.size()-1) {
-                if (log.isTraceEnabled()) log.trace("read(byte[]): end of all streams? this="+this);
+                if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte[]): end of all streams?");
                 if (endOfStreams) return -1;
                 underflow.handleUnderflow();
                 return 0;
@@ -90,19 +93,19 @@ public class MultiStream extends InputStream {
             currentStream.close();
             streamIndex++;
             currentStream = streams.get(streamIndex);
-            if (log.isTraceEnabled()) log.trace("read(byte[]): end of all stream, advanced to next stream ("+currentStream.getClass().getSimpleName()+"). this="+this);
+            if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte[]): end of all stream, advanced to next stream ("+currentStream.getClass().getSimpleName()+")");
             return read(buf, off, len);
 
         } else {
-            if (log.isTraceEnabled()) log.trace("read(byte[]): "+count+" bytes read. this="+this);
+            if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte[]): "+count+" bytes read");
         }
         underflow.handleSuccessfulRead();
         return count;
     }
 
     @Override public void close() throws IOException {
-        if (log.isInfoEnabled()) log.info("close: closing current stream ("+(currentStream == null ? "null" : currentStream.getClass().getSimpleName())+"). name="+underflow.getHandlerName());
-        if (log.isTraceEnabled()) log.trace("close: closing current stream ("+(currentStream == null ? "null" : currentStream.getClass().getSimpleName())+"). name="+underflow.getHandlerName());
+        if (log.isInfoEnabled()) log.info(logPrefix()+"close: closing current stream ("+(currentStream == null ? "null" : currentStream.getClass().getSimpleName())+"). name="+underflow.getHandlerName());
+        else if (log.isTraceEnabled()) log.trace(logPrefix()+"close: closing current stream ("+(currentStream == null ? "null" : currentStream.getClass().getSimpleName())+"). name="+underflow.getHandlerName());
         if (currentStream != null) currentStream.close();
         underflow.close();
     }

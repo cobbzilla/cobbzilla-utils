@@ -11,8 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.cobbzilla.util.daemon.ZillaRuntime.now;
-import static org.cobbzilla.util.daemon.ZillaRuntime.terminate;
+import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 
 @Slf4j
 public class MultiUnderflowHandlerMonitor extends SimpleDaemon {
@@ -45,7 +44,7 @@ public class MultiUnderflowHandlerMonitor extends SimpleDaemon {
                 iter.remove();
                 if (terminateThreadFunc == null || terminateThreadFunc.apply(underflow.getThread())) {
                     if (log.isErrorEnabled()) log.error(prefix+"underflow timed out, terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
-                    terminate(underflow.getThread(), TERMINATE_TIMEOUT, terminateThreadFunc);
+                    terminateQuietly(underflow.getThread(), TERMINATE_TIMEOUT, terminateThreadFunc);
                 } else {
                     if (log.isErrorEnabled()) log.error(prefix+"underflow timed out, removing but NOT terminating: name=" + underflow.getHandlerName() + " thread=" + underflow.getThread());
                 }
