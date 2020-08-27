@@ -8,6 +8,7 @@ import java.util.Map;
 
 import static org.apache.commons.lang3.StringEscapeUtils.*;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.cobbzilla.util.collection.NameAndValue.singleNameAndValueArray;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 
@@ -49,7 +50,7 @@ public class HttpContentTypes {
             TEXT_HTML, TEXT_CSS, APPLICATION_JAVASCRIPT, IMAGE_PNG, IMAGE_JPEG, IMAGE_GIF, IMAGE_SVG, APPLICATION_PDF
     };
 
-    private static NameAndValue[] nvHttp(String type) { return new NameAndValue[]{new NameAndValue(CONTENT_TYPE, type)}; }
+    private static NameAndValue[] nvHttp(String type) { return singleNameAndValueArray(CONTENT_TYPE, type); }
 
     // useful when constructing HttpRequestBeans that will be used against an API
     public static final NameAndValue[] NV_HTTP_JSON = nvHttp(APPLICATION_JSON);
