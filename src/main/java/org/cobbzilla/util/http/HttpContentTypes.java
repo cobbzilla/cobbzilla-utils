@@ -97,7 +97,8 @@ public class HttpContentTypes {
     }
 
     public static String fileExt (String contentType) {
-        switch (contentType) {
+        final int semi = contentType.indexOf(';');
+        switch (semi == -1 ? contentType : contentType.substring(0, semi)) {
             case TEXT_HTML:               return ".html";
             case TEXT_PLAIN:              return ".txt";
             case TEXT_CSV:                return ".csv";
