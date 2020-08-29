@@ -17,6 +17,7 @@ public enum TerminationRequestResult {
 
     public boolean alive () { return running; }
     public boolean dead () { return !running; }
+    public boolean cleanlyDead () { return !running && this != terminated; }
 
     @JsonCreator public static TerminationRequestResult fromString (String val) { return valueOf(val.toLowerCase()); }
 
