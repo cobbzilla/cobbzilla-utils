@@ -75,7 +75,7 @@ public class ZillaRuntime {
     }
 
     public static TerminationRequestResult terminate(Thread thread, long timeout, Function<Thread, Boolean> onlyIf, boolean verbose) {
-        if (thread == null || !thread.isAlive()) return TerminationRequestResult.alive;
+        if (thread == null || !thread.isAlive()) return TerminationRequestResult.dead;
         if (onlyIf != null && !onlyIf.apply(thread)) {
             if (log.isWarnEnabled()) log.warn("terminate: thread is alive but onlyIf function returned false, not interrupting: " + thread + (verbose ? " with stack " + stacktrace(thread) + "\nfrom: " + stacktrace() : ""));
             return TerminationRequestResult.alive;
