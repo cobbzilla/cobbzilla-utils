@@ -6,6 +6,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.*;
@@ -30,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -43,6 +45,8 @@ import static org.cobbzilla.util.http.HttpMethods.*;
 import static org.cobbzilla.util.http.HttpStatusCodes.NO_CONTENT;
 import static org.cobbzilla.util.http.URIUtil.getFileExt;
 import static org.cobbzilla.util.io.FileUtil.getDefaultTempDir;
+import static org.cobbzilla.util.json.JsonUtil.COMPACT_MAPPER;
+import static org.cobbzilla.util.json.JsonUtil.json;
 import static org.cobbzilla.util.security.CryptStream.BUFFER_SIZE;
 import static org.cobbzilla.util.string.StringUtil.CRLF;
 import static org.cobbzilla.util.system.Sleep.sleep;
@@ -483,4 +487,50 @@ public class HttpUtil {
         return browser;
     }
 
+    public static String chaseRedirects(String url) { return chaseRedirects(url, 5); }
+
+    public static String chaseRedirects(String url, int maxDepth) {
+        try {
+            HttpRequestBean requestBean = new HttpRequestBean(HttpMethods.HEAD, url);
+            HttpResponseBean responseBean = HttpUtil.getResponse(requestBean);
+            log.error("follow("+url+"): HEAD "+url+" returned "+json(responseBean, COMPACT_MAPPER));
+            if (responseBean.isOk()) {
+                // check for Link headers
+                final Collection<String> links = responseBean.getHeaderValues("Link");
+                if (!empty(links)) {
+                    // find the longest link that has rel=shortlink
+                    String longestLink = null;
+                    for (String link : links) {
+                        if (!link.contains("rel=shortlink")) continue;
+                        if (link.indexOf("<") == 0) {
+                            final int close = link.indexOf(">");
+                            if (close == -1) continue;
+                            final String linkUrl = link.substring(1, close);
+                            if (longestLink == null || linkUrl.length() > longestLink.length()) {
+                                longestLink = linkUrl;
+                            }
+                        }
+                    }
+                    if (longestLink != null) return longestLink;
+                }
+                return url;
+            }
+
+            // standard redirect chasing...
+            int depth = 0;
+            String nextUrl;
+            while (depth < maxDepth && responseBean.is3xx() && responseBean.hasHeader(HttpHeaders.LOCATION)) {
+                depth++;
+                nextUrl = responseBean.getFirstHeaderValue(HttpHeaders.LOCATION);
+                log.error("follow("+url+"): found nextUrl="+nextUrl);
+                if (nextUrl == null) break;
+                url = nextUrl;
+                requestBean = new HttpRequestBean(HttpMethods.HEAD, url);
+                responseBean = HttpUtil.getResponse(requestBean);
+            }
+        } catch (Exception e) {
+            log.error("follow("+url+"): error following: "+shortError(e));
+        }
+        return url;
+    }
 }
