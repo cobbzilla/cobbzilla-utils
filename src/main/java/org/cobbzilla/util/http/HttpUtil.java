@@ -491,9 +491,12 @@ public class HttpUtil {
 
     public static String chaseRedirects(String url, int maxDepth) {
         try {
-            HttpRequestBean requestBean = new HttpRequestBean(HttpMethods.HEAD, url);
-            HttpResponseBean responseBean = HttpUtil.getResponse(requestBean);
-            log.error("follow("+url+"): HEAD "+url+" returned "+json(responseBean, COMPACT_MAPPER));
+            HttpRequestBean requestBean = curlHead(url);
+            final HttpClientBuilder clientBuilder = requestBean.initClientBuilder(HttpClients.custom().disableRedirectHandling());
+            @Cleanup final CloseableHttpClient client = clientBuilder.build();
+
+            HttpResponseBean responseBean = HttpUtil.getResponse(requestBean, client);
+            if (log.isDebugEnabled()) log.debug("follow("+url+"): HEAD "+url+" returned "+json(responseBean, COMPACT_MAPPER));
             if (responseBean.isOk()) {
                 // check for Link headers
                 final Collection<String> links = responseBean.getHeaderValues("Link");
@@ -522,15 +525,27 @@ public class HttpUtil {
             while (depth < maxDepth && responseBean.is3xx() && responseBean.hasHeader(HttpHeaders.LOCATION)) {
                 depth++;
                 nextUrl = responseBean.getFirstHeaderValue(HttpHeaders.LOCATION);
-                log.error("follow("+url+"): found nextUrl="+nextUrl);
+                if (log.isDebugEnabled()) log.debug("follow("+url+"): found nextUrl="+nextUrl);
                 if (nextUrl == null) break;
                 url = nextUrl;
-                requestBean = new HttpRequestBean(HttpMethods.HEAD, url);
-                responseBean = HttpUtil.getResponse(requestBean);
+                requestBean = curlHead(url);
+                responseBean = HttpUtil.getResponse(requestBean, client);
             }
         } catch (Exception e) {
-            log.error("follow("+url+"): error following: "+shortError(e));
+            if (log.isErrorEnabled()) log.error("follow("+url+"): error following: "+shortError(e));
         }
         return url;
+    }
+
+    public static HttpRequestBean curlHead(String url) {
+        return new HttpRequestBean(HttpMethods.HEAD, url)
+                .setHeader(ACCEPT, "*/*")
+                .setHeader(USER_AGENT, USER_AGENT_CURL);
+    }
+
+    public static void main (String[] args) {
+        final String url = "https://t.co/4mmxH7Mwlj?amp=1";
+        final String dest = chaseRedirects(url);
+        System.out.println("dest = "+dest);
     }
 }
