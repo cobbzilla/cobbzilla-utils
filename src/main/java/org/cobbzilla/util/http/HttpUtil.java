@@ -52,6 +52,7 @@ import static org.cobbzilla.util.time.TimeUtil.DATE_FORMAT_LAST_MODIFIED;
 public class HttpUtil {
 
     public static final String CHUNKED_ENCODING = "chunked";
+    public static final String USER_AGENT_CURL = "curl/7.64.1";
 
     public static Map<String, String> queryParams(URL url) throws UnsupportedEncodingException {
         return queryParams(url, StringUtil.UTF8);
