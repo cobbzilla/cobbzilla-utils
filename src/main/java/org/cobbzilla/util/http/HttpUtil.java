@@ -32,7 +32,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -504,27 +503,7 @@ public class HttpUtil {
 
             HttpResponseBean responseBean = HttpUtil.getResponse(requestBean, client);
             if (log.isDebugEnabled()) log.debug("follow("+url+"): HEAD "+url+" returned "+json(responseBean, COMPACT_MAPPER));
-            if (responseBean.isOk()) {
-                // check for Link headers
-                final Collection<String> links = responseBean.getHeaderValues("Link");
-                if (!empty(links)) {
-                    // find the longest link that has rel=shortlink
-                    String longestLink = null;
-                    for (String link : links) {
-                        if (!link.contains("rel=shortlink")) continue;
-                        if (link.indexOf("<") == 0) {
-                            final int close = link.indexOf(">");
-                            if (close == -1) continue;
-                            final String linkUrl = link.substring(1, close);
-                            if (longestLink == null || linkUrl.length() > longestLink.length()) {
-                                longestLink = linkUrl;
-                            }
-                        }
-                    }
-                    if (longestLink != null) return cleanParams(longestLink.startsWith("/") ? lastHost + longestLink : longestLink);
-                }
-                return url;
-            }
+            if (responseBean.isOk()) return url;
 
             // standard redirect chasing...
             int depth = 0;
@@ -579,4 +558,8 @@ public class HttpUtil {
                 .setHeader(USER_AGENT, USER_AGENT_CURL);
     }
 
+    public static void main (String[] args) {
+        String dest = chaseRedirects("http://example.com/?", 10);
+        System.out.println("dest = "+dest);
+    }
 }
