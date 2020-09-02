@@ -49,6 +49,7 @@ import static org.cobbzilla.util.json.JsonUtil.COMPACT_MAPPER;
 import static org.cobbzilla.util.json.JsonUtil.json;
 import static org.cobbzilla.util.security.CryptStream.BUFFER_SIZE;
 import static org.cobbzilla.util.string.StringUtil.CRLF;
+import static org.cobbzilla.util.string.StringUtil.urlEncode;
 import static org.cobbzilla.util.system.Sleep.sleep;
 import static org.cobbzilla.util.time.TimeUtil.DATE_FORMAT_LAST_MODIFIED;
 
@@ -490,7 +491,22 @@ public class HttpUtil {
     public static String chaseRedirects(String url) { return chaseRedirects(url, 5); }
 
     public static String chaseRedirects(String url, int maxDepth) {
+        // strip tracking params
+        final int qPos = url.indexOf("?");
+        if (qPos != -1) {
+            final Map<String, String> params = URIUtil.queryParams(url);
+            final StringBuilder b = new StringBuilder();
+            for (Map.Entry<String, String> param : params.entrySet()) {
+                if (!isBlockedParam(param.getKey())) {
+                    if (b.length() > 0) b.append("&");
+                    b.append(param.getKey()).append("=").append(urlEncode(param.getValue()));
+                }
+            }
+            url = url.substring(0, qPos+1) + b.toString();
+        }
+        String lastHost;
         try {
+            lastHost = URIUtil.getScheme(url) + "://" + URIUtil.getHost(url);
             HttpRequestBean requestBean = curlHead(url);
             final HttpClientBuilder clientBuilder = requestBean.initClientBuilder(HttpClients.custom().disableRedirectHandling());
             @Cleanup final CloseableHttpClient client = clientBuilder.build();
@@ -514,7 +530,7 @@ public class HttpUtil {
                             }
                         }
                     }
-                    if (longestLink != null) return longestLink;
+                    if (longestLink != null) return longestLink.startsWith("/") ? lastHost + longestLink : longestLink;
                 }
                 return url;
             }
@@ -527,6 +543,11 @@ public class HttpUtil {
                 nextUrl = responseBean.getFirstHeaderValue(HttpHeaders.LOCATION);
                 if (log.isDebugEnabled()) log.debug("follow("+url+"): found nextUrl="+nextUrl);
                 if (nextUrl == null) break;
+                if (nextUrl.startsWith("/")) {
+                    nextUrl = lastHost + nextUrl;
+                } else {
+                    lastHost = URIUtil.getScheme(nextUrl) + "://" + URIUtil.getHost(nextUrl);
+                }
                 url = nextUrl;
                 requestBean = curlHead(url);
                 responseBean = HttpUtil.getResponse(requestBean, client);
@@ -535,6 +556,10 @@ public class HttpUtil {
             if (log.isErrorEnabled()) log.error("follow("+url+"): error following: "+shortError(e));
         }
         return url;
+    }
+
+    private static boolean isBlockedParam(String key) {
+        return key.startsWith("utm_");
     }
 
     public static HttpRequestBean curlHead(String url) {
