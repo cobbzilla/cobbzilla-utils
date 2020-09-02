@@ -491,18 +491,21 @@ public class HttpUtil {
     public static String chaseRedirects(String url) { return chaseRedirects(url, 5); }
 
     public static String chaseRedirects(String url, int maxDepth) {
+        log.info("chaseRedirects("+url+") starting...");
         // strip tracking params
         final int qPos = url.indexOf("?");
         if (qPos != -1) {
             final Map<String, String> params = URIUtil.queryParams(url);
-            final StringBuilder b = new StringBuilder();
-            for (Map.Entry<String, String> param : params.entrySet()) {
-                if (!isBlockedParam(param.getKey())) {
-                    if (b.length() > 0) b.append("&");
-                    b.append(param.getKey()).append("=").append(urlEncode(param.getValue()));
+            if (!params.isEmpty()) {
+                final StringBuilder b = new StringBuilder();
+                for (Map.Entry<String, String> param : params.entrySet()) {
+                    if (!isBlockedParam(param.getKey())) {
+                        if (b.length() > 0) b.append("&");
+                        b.append(param.getKey()).append("=").append(urlEncode(param.getValue()));
+                    }
                 }
+                url = url.substring(0, qPos+1) + b.toString();
             }
-            url = url.substring(0, qPos+1) + b.toString();
         }
         String lastHost;
         try {
@@ -568,9 +571,4 @@ public class HttpUtil {
                 .setHeader(USER_AGENT, USER_AGENT_CURL);
     }
 
-    public static void main (String[] args) {
-        final String url = "https://t.co/4mmxH7Mwlj?amp=1";
-        final String dest = chaseRedirects(url);
-        System.out.println("dest = "+dest);
-    }
 }

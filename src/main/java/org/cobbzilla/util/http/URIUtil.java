@@ -91,6 +91,7 @@ public class URIUtil {
     public static Map<String, String> queryParams(String query) {
         if (empty(query) || empty(query.trim()) || query.trim().equals("?")) return Collections.emptyMap();
         if (query.contains("?")) query = query.substring(query.indexOf("?")+1);
+        if (empty(query)) return Collections.emptyMap();
         final Map<String, String> query_pairs = new LinkedHashMap<>();
         final String[] pairs = query.split("&");
         for (String pair : pairs) {
