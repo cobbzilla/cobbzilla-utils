@@ -4,6 +4,7 @@ import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -493,20 +494,7 @@ public class HttpUtil {
     public static String chaseRedirects(String url, int maxDepth) {
         log.info("chaseRedirects("+url+") starting...");
         // strip tracking params
-        final int qPos = url.indexOf("?");
-        if (qPos != -1) {
-            final Map<String, String> params = URIUtil.queryParams(url);
-            if (!params.isEmpty()) {
-                final StringBuilder b = new StringBuilder();
-                for (Map.Entry<String, String> param : params.entrySet()) {
-                    if (!isBlockedParam(param.getKey())) {
-                        if (b.length() > 0) b.append("&");
-                        b.append(param.getKey()).append("=").append(urlEncode(param.getValue()));
-                    }
-                }
-                url = url.substring(0, qPos+1) + b.toString();
-            }
-        }
+        url = cleanParams(url);
         String lastHost;
         try {
             lastHost = URIUtil.getScheme(url) + "://" + URIUtil.getHost(url);
@@ -533,7 +521,7 @@ public class HttpUtil {
                             }
                         }
                     }
-                    if (longestLink != null) return longestLink.startsWith("/") ? lastHost + longestLink : longestLink;
+                    if (longestLink != null) return cleanParams(longestLink.startsWith("/") ? lastHost + longestLink : longestLink);
                 }
                 return url;
             }
@@ -543,7 +531,7 @@ public class HttpUtil {
             String nextUrl;
             while (depth < maxDepth && responseBean.is3xx() && responseBean.hasHeader(HttpHeaders.LOCATION)) {
                 depth++;
-                nextUrl = responseBean.getFirstHeaderValue(HttpHeaders.LOCATION);
+                nextUrl = cleanParams(responseBean.getFirstHeaderValue(HttpHeaders.LOCATION));
                 if (log.isDebugEnabled()) log.debug("follow("+url+"): found nextUrl="+nextUrl);
                 if (nextUrl == null) break;
                 if (nextUrl.startsWith("/")) {
@@ -561,8 +549,28 @@ public class HttpUtil {
         return url;
     }
 
+    public static String cleanParams(String url) {
+        final int qPos = url.indexOf("?");
+        if (qPos != -1) {
+            final Map<String, String> params = URIUtil.queryParams(url);
+            if (!params.isEmpty()) {
+                final StringBuilder b = new StringBuilder();
+                for (Map.Entry<String, String> param : params.entrySet()) {
+                    if (!isBlockedParam(param.getKey())) {
+                        if (b.length() > 0) b.append("&");
+                        b.append(param.getKey()).append("=").append(urlEncode(param.getValue()));
+                    }
+                }
+                url = url.substring(0, qPos+1) + b.toString();
+            }
+        }
+        return url;
+    }
+
+    public static final String[] BLOCKED_PARAMS = {"dfaid", "cmp", "cid", "dclid"};
+
     private static boolean isBlockedParam(String key) {
-        return key.startsWith("utm_");
+        return key.startsWith("utm_") || ArrayUtils.contains(BLOCKED_PARAMS, key);
     }
 
     public static HttpRequestBean curlHead(String url) {
