@@ -21,4 +21,15 @@ public class PortPicker {
         }
     }
 
+    // adapted from https://stackoverflow.com/a/434731/1251543
+    public static boolean portIsAvailable (int port) {
+        boolean free;
+        try (ServerSocket ignored = new ServerSocket(port)) {
+            free = true;
+        } catch (IOException e) {
+            free = false;
+        }
+        return free;
+    }
+
 }
