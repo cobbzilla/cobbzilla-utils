@@ -45,7 +45,7 @@ public class FilesystemWalker {
     public FilesystemWalker withVisitor (FilesystemVisitor visitor) { visitors.add(visitor); return this; }
     public FilesystemWalker withTimeoutDuration (String duration) { setTimeout(parseDuration(duration)); return this; }
 
-    @Getter(lazy=true) private final ExecutorService pool = fixedPool(getThreads());
+    @Getter(lazy=true) private final ExecutorService pool = fixedPool(getThreads(), "FilesystemWalker.pool");
     @Getter(lazy=true) private final List<Future<?>> futures = new ArrayList<>(getSize());
 
     public AwaitResult walk() {

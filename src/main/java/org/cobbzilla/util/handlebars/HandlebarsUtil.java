@@ -680,7 +680,7 @@ public class HandlebarsUtil extends AbstractTemplateLoader {
                 : null;
     }
 
-    private static final ExecutorService contextSender = fixedPool(10);
+    private static final ExecutorService contextSender = fixedPool(10, "HandlebarsUtil.contextSender");
 
     public static void sendContext(String recipient, String subject, String message, String contentType) {
         contextSender.submit(() -> {
