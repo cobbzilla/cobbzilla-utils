@@ -109,6 +109,10 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
         return background(new RunWithHandler(this, errorHandler), errorHandler);
     }
 
+    public Thread runInBackground (String name, ExceptionHandler errorHandler) {
+        return background(new RunWithHandler(this, errorHandler), name, errorHandler);
+    }
+
     @AllArgsConstructor
     private static class RunWithHandler implements Runnable {
         private final BaseMain runnable;

@@ -32,7 +32,7 @@ public class BufferedRunDaemon implements Runnable {
     protected long getIdleSyncInterval() { return IDLE_SYNC_INTERVAL; }
     protected long getMinSyncWait     () { return MIN_SYNC_WAIT; }
 
-    public void start () { daemonThread.set(background(this)); }
+    public void start () { daemonThread.set(background(this, "BufferedRunDaemon")); }
 
     protected void interrupt() { if (daemonThread.get() != null) daemonThread.get().interrupt(); }
 

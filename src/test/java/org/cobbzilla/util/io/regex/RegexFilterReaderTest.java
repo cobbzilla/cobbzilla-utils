@@ -92,7 +92,7 @@ public class RegexFilterReaderTest {
             } catch (IOException e) {
                 die("Error copying in background: "+e, e);
             }
-        });
+        }, "RegexFilterReaderTest.testMultiStreamRegexReader");
 
         sleep(500);
         multiReader.addReader(reader2);
@@ -132,7 +132,7 @@ public class RegexFilterReaderTest {
             } catch (IOException e) {
                 die("Error copying in background: "+e, e);
             }
-        });
+        }, "RegexFilterReaderTest.testMultiStreamRegexReaderWithRegexAcrossBoundary");
 
         sleep(500);
         multiReader.addReader(reader2);
@@ -168,7 +168,7 @@ public class RegexFilterReaderTest {
             } catch (IOException e) {
                 exRef.set(e);
             }
-        });
+        }, "RegexFilterReaderTest.testMultiReaderUnderflow");
 
         sleep(multiReader.getUnderflow().getMaxUnderflowSleep());
         log.info("adding reader2...");
@@ -212,7 +212,7 @@ public class RegexFilterReaderTest {
             } catch (Exception e) {
                 exRef.set(e);
             }
-        });
+        }, "RegexFilterReaderTest.testMultiStreamUnderflow");
 
         sleep(multiStream.getUnderflow().getUnderflowTimeout()*2);
 

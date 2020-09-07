@@ -24,6 +24,8 @@ import java.math.RoundingMode;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -105,9 +107,16 @@ public class ZillaRuntime {
     public static boolean bool(Boolean b) { return b != null && b; }
     public static boolean bool(Boolean b, boolean val) { return b != null ? b : val; }
 
+    private static final AtomicInteger backgroundCounter = new AtomicInteger(0);
+    private static final Map<String, AtomicInteger> backgroundNameCounters = new ConcurrentHashMap<>(50);
+
     public static Thread background (Runnable r) { return background(r, DEFAULT_EX_RUNNABLE); }
 
-    public static Thread background (Runnable r, ExceptionHandler ex) {
+    public static Thread background (Runnable r, ExceptionHandler ex) { return background(r, null, ex); }
+
+    public static Thread background (Runnable r, String name) { return background(r, name, DEFAULT_EX_RUNNABLE); }
+
+    public static Thread background (Runnable r, String name, ExceptionHandler ex) {
         final Thread t = new Thread(() -> {
             try {
                 r.run();
@@ -115,6 +124,11 @@ public class ZillaRuntime {
                 ex.handle(e);
             }
         });
+        final AtomicInteger counter = name == null
+                ? backgroundCounter
+                : backgroundNameCounters.computeIfAbsent(name, k -> new AtomicInteger(0));
+        if (name == null) name = "background";
+        t.setName(name+"-"+counter.incrementAndGet());
         t.start();
         return t;
     }

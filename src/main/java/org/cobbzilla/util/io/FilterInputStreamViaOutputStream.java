@@ -91,7 +91,7 @@ public class FilterInputStreamViaOutputStream extends PipedInputStream implement
         closeQuietly(out);
         closeQuietly(pipeOut);
         if (this.thread.isAlive()) {
-            background(() -> terminate(this.thread, THREAD_TERMINATE_TIMEOUT));
+            background(() -> terminate(this.thread, THREAD_TERMINATE_TIMEOUT), "FilterInputStreamViaOutputStream.close");
         }
     }
 
