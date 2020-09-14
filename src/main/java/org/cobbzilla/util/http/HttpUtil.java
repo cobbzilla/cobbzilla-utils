@@ -33,6 +33,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION;
@@ -562,4 +563,18 @@ public class HttpUtil {
         String dest = chaseRedirects("http://example.com/?", 10);
         System.out.println("dest = "+dest);
     }
+
+    public static List<String> applyRegexToUrl(String url, List<NameAndValue> headers, String regex, Integer group) {
+        final HttpRequestBean requestBean = new HttpRequestBean(GET, url).setHeaders(headers);
+        final HttpClientBuilder clientBuilder = requestBean.initClientBuilder(HttpClients.custom().disableRedirectHandling());
+        try {
+            @Cleanup final CloseableHttpClient client = clientBuilder.build();
+            final HttpResponseBean responseBean = HttpUtil.getResponse(requestBean, client);
+            return StringUtil.findAllMatches(responseBean.getEntityString(), regex, group);
+        } catch (Exception e) {
+            log.error("applyRegexToUrl: error: "+shortError(e));
+        }
+        return null;
+    }
+
 }

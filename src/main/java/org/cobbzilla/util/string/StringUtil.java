@@ -558,4 +558,12 @@ public class StringUtil {
 
     public static String sqlEscapeAndQuote(String val) { return "'" + escapeSql(val) + "'"; }
 
+    public static List<String> findAllMatches(String val, String regex, Integer group) {
+        final Pattern pattern = Pattern.compile(regex);
+        final Matcher matcher = pattern.matcher(val);
+        final List<String> matches = new ArrayList<>();
+        while (matcher.find()) matches.add(group == null ? matcher.group() : matcher.group(group));
+        return matches;
+    }
+
 }
