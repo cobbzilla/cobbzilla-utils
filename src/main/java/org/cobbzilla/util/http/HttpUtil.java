@@ -32,6 +32,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,8 +50,7 @@ import static org.cobbzilla.util.io.FileUtil.getDefaultTempDir;
 import static org.cobbzilla.util.json.JsonUtil.COMPACT_MAPPER;
 import static org.cobbzilla.util.json.JsonUtil.json;
 import static org.cobbzilla.util.security.CryptStream.BUFFER_SIZE;
-import static org.cobbzilla.util.string.StringUtil.CRLF;
-import static org.cobbzilla.util.string.StringUtil.urlEncode;
+import static org.cobbzilla.util.string.StringUtil.*;
 import static org.cobbzilla.util.system.Sleep.sleep;
 import static org.cobbzilla.util.time.TimeUtil.DATE_FORMAT_LAST_MODIFIED;
 
@@ -564,13 +564,13 @@ public class HttpUtil {
         System.out.println("dest = "+dest);
     }
 
-    public static List<String> applyRegexToUrl(String url, List<NameAndValue> headers, String regex, Integer group) {
+    public static List<Map<Integer, String>> applyRegexToUrl(String url, List<NameAndValue> headers, String regex, Collection<Integer> groups) {
         final HttpRequestBean requestBean = new HttpRequestBean(GET, url).setHeaders(headers);
         final HttpClientBuilder clientBuilder = requestBean.initClientBuilder(HttpClients.custom().disableRedirectHandling());
         try {
             @Cleanup final CloseableHttpClient client = clientBuilder.build();
             final HttpResponseBean responseBean = HttpUtil.getResponse(requestBean, client);
-            return StringUtil.findAllMatches(responseBean.getEntityString(), regex, group);
+            return findAllMatches(responseBean.getEntityString(), regex, groups);
         } catch (Exception e) {
             log.error("applyRegexToUrl: error: "+shortError(e));
         }

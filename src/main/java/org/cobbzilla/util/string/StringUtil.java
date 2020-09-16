@@ -558,11 +558,21 @@ public class StringUtil {
 
     public static String sqlEscapeAndQuote(String val) { return "'" + escapeSql(val) + "'"; }
 
-    public static List<String> findAllMatches(String val, String regex, Integer group) {
+    public static List<Map<Integer, String>> findAllMatches(String val, String regex, Collection<Integer> groups) {
         final Pattern pattern = Pattern.compile(regex);
         final Matcher matcher = pattern.matcher(val);
-        final List<String> matches = new ArrayList<>();
-        while (matcher.find()) matches.add(group == null ? matcher.group() : matcher.group(group));
+        final List<Map<Integer, String>> matches = new ArrayList<>();
+        while (matcher.find()) {
+            final Map<Integer, String> match = new HashMap<>();
+            if (groups == null) {
+                match.put(0, matcher.group());
+            } else {
+                for (Integer group : groups) {
+                    match.put(group, group == 0 ? matcher.group() : group > matcher.groupCount() ? null : matcher.group(group));
+                }
+            }
+            matches.add(match);
+        }
         return matches;
     }
 
