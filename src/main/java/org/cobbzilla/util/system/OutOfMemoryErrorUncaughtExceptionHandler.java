@@ -3,7 +3,6 @@ package org.cobbzilla.util.system;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.cobbzilla.util.daemon.ZillaRuntime.shortError;
 
 @AllArgsConstructor @Slf4j
@@ -18,11 +17,11 @@ public class OutOfMemoryErrorUncaughtExceptionHandler implements Thread.Uncaught
     @Override public void uncaughtException(Thread t, Throwable e) {
         if (e instanceof OutOfMemoryError) {
             try {
-                log.error("!!!!! OutOfMemoryError: calling System.exit("+status+") from:\n"+getStackTrace(e));
+                log.error("!!!!! OutOfMemoryError: calling System.exit("+status+")", e);
             } catch (Throwable ignored) {}
             System.exit(status);
         } else {
-            log.error("!!!!! Uncaught Exception: " + shortError(e));
+            log.error("!!!!! Uncaught Exception: " + shortError(e), e);
         }
     }
 
