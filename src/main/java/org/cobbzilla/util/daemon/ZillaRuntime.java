@@ -97,7 +97,7 @@ public class ZillaRuntime {
                 return TerminationRequestResult.interrupted_alive;
             }
         } else {
-            if (log.isWarnEnabled()) log.warn("terminate: thread exited after interrupt: "+thread);
+            if (log.isWarnEnabled()) log.warn("terminate: thread exited after interrupt: "+thread+(thread.getName().startsWith("Thread-") ? " with stack: "+stacktrace(thread) : ""));
             return TerminationRequestResult.interrupted_dead;
         }
     }
