@@ -100,4 +100,14 @@ public class NameAndValue {
         return map;
     }
 
+    public static Map<String, String> toMap(Collection<NameAndValue> attrs) {
+        final Map<String, String> map = new HashMap<>();
+        if (!empty(attrs)) {
+            for (NameAndValue attr : attrs) {
+                map.put(attr.getName(), attr.value);
+            }
+        }
+        return map;
+    }
+
 }
