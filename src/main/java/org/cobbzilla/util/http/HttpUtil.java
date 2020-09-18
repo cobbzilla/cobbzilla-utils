@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.http.HttpHeaders.*;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
@@ -59,6 +60,7 @@ public class HttpUtil {
 
     public static final String CHUNKED_ENCODING = "chunked";
     public static final String USER_AGENT_CURL = "curl/7.64.1";
+    public static final Long DEFAULT_CONNECT_TIMEOUT = SECONDS.toMillis(15);
 
     public static Map<String, String> queryParams(URL url) throws UnsupportedEncodingException {
         return queryParams(url, StringUtil.UTF8);
@@ -89,7 +91,7 @@ public class HttpUtil {
     }
 
     public static InputStream get (String urlString, Map<String, String> headers, Map<String, String> headers2) throws IOException {
-        return get(urlString, headers, headers2, null);
+        return get(urlString, headers, headers2, DEFAULT_CONNECT_TIMEOUT);
     }
 
     public static InputStream get (String urlString, Map<String, String> headers, Map<String, String> headers2, Long connectTimeout) throws IOException {
