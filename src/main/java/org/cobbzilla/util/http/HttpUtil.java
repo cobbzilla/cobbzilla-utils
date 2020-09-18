@@ -97,7 +97,8 @@ public class HttpUtil {
     public static InputStream get (String urlString, Map<String, String> headers, Map<String, String> headers2, Long connectTimeout) throws IOException {
         final URL url = new URL(urlString);
         final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        if (connectTimeout != null) urlConnection.setConnectTimeout(connectTimeout.intValue());
+        if (connectTimeout == null) connectTimeout = DEFAULT_CONNECT_TIMEOUT;
+        urlConnection.setConnectTimeout(connectTimeout.intValue());
         if (headers != null) addHeaders(urlConnection, headers);
         if (headers2 != null) addHeaders(urlConnection, headers2);
         return urlConnection.getInputStream();
