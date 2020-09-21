@@ -79,7 +79,7 @@ public class ZillaRuntime {
     public static TerminationRequestResult terminate(Thread thread, long timeout, Function<Thread, Boolean> onlyIf, boolean verbose) {
         if (thread == null || !thread.isAlive()) return TerminationRequestResult.dead;
         if (onlyIf != null && !onlyIf.apply(thread)) {
-            if (log.isWarnEnabled()) log.warn("terminate: thread is alive but onlyIf function returned false, not interrupting: " + thread + (verbose ? " with stack " + stacktrace(thread) + "\nfrom: " + stacktrace() : ""));
+            if (log.isWarnEnabled()) log.warn("terminate: thread is alive but onlyIf function returned false, not interrupting: " + thread + terminateVerbose(thread, verbose));
             return TerminationRequestResult.alive;
         }
         thread.interrupt();
@@ -89,16 +89,24 @@ public class ZillaRuntime {
         }
         if (thread.isAlive()) {
             if (onlyIf != null && onlyIf.apply(thread)) {
-                if (log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, killing: " + thread + (verbose ? " with stack " + stacktrace(thread) + "\nfrom: " + stacktrace() : ""));
+                if (log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, killing: " + thread + terminateVerbose(thread, verbose));
                 thread.stop();
                 return TerminationRequestResult.terminated;
             } else {
-                if (log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, but onlyIf function returned false, not killing: " + thread + (verbose ? " with stack " + stacktrace(thread) + "\nfrom: " + stacktrace() : ""));
+                if (log.isWarnEnabled()) log.warn("terminate: thread did not respond to interrupt, but onlyIf function returned false, not killing: " + thread + terminateVerbose(thread, verbose));
                 return TerminationRequestResult.interrupted_alive;
             }
         } else {
-            if (log.isWarnEnabled()) log.warn("terminate: thread exited after interrupt: "+thread+(thread.getName().startsWith("Thread-") ? " with stack: "+stacktrace(thread) : ""));
+            if (log.isWarnEnabled()) log.warn("terminate: thread exited after interrupt: "+thread + terminateVerbose(thread, verbose));
             return TerminationRequestResult.interrupted_dead;
+        }
+    }
+
+    public static String terminateVerbose(Thread thread, boolean verbose) {
+        try {
+            return verbose || thread.getName().startsWith("Thread-") ? " with stack " + stacktrace(thread) + "\nfrom: " + stacktrace() : "";
+        } catch (NoClassDefFoundError e) {
+            return "(verbose output error: NoClassDefFoundError: "+e.getMessage()+")";
         }
     }
 
