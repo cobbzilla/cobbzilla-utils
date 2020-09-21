@@ -67,6 +67,7 @@ public abstract class SimpleDaemon implements Runnable {
     /**
      * @deprecated USE WITH CAUTION -- calls Thread.stop() !!
      */
+    @Deprecated
     private void kill() {
         if (alreadyStopped()) return;
         isDone = true;
