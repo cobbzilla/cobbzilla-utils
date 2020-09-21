@@ -15,6 +15,10 @@ public class MultiStream extends InputStream {
     private InputStream currentStream;
     private int streamIndex = 0;
     private boolean endOfStreams = false;
+
+    private Integer markedStreamIndex = null;
+    private int markReadLimit = 0;
+
     @Getter private final MultiUnderflowHandler underflow = new MultiUnderflowHandler();
 
     public MultiStream (InputStream r, boolean last) { this(r, last, "no-name"); }
@@ -33,6 +37,26 @@ public class MultiStream extends InputStream {
     public MultiStream (InputStream r, String name) { this(r, false, name); }
 
     public MultiStream (InputStream r) { this(r, false); }
+
+    @Override public boolean markSupported() { return currentStream.markSupported(); }
+
+    @Override public synchronized void mark(int readlimit) {
+        this.markReadLimit = readlimit;
+        currentStream.mark(readlimit);
+        markedStreamIndex = streamIndex;
+    }
+
+    @Override public synchronized void reset() throws IOException {
+        if (markedStreamIndex == null) throw new IOException("cannot reset stream that was never marked");
+        int marked = streamIndex;
+        while (marked >= markedStreamIndex) {
+            streams.get(marked).reset();
+            marked--;
+        }
+        streamIndex = markedStreamIndex;
+        currentStream = streams.get(streamIndex);
+        markedStreamIndex = null;
+    }
 
     public int pendingStreamCount () { return streams.size() - streamIndex; }
 
@@ -68,9 +92,12 @@ public class MultiStream extends InputStream {
                 underflow.handleUnderflow();
                 return 0;
             }
-            currentStream.close();
+            if (markedStreamIndex == null) {
+                currentStream.close();
+            }
             streamIndex++;
             currentStream = streams.get(streamIndex);
+            if (markedStreamIndex != null) currentStream.mark(markReadLimit);
             if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte): end of all stream, advanced to next stream ("+currentStream.getClass().getSimpleName()+")");
             return read();
 
@@ -92,9 +119,12 @@ public class MultiStream extends InputStream {
                 underflow.handleUnderflow();
                 return 0;
             }
-            currentStream.close();
+            if (markedStreamIndex == null) {
+                currentStream.close();
+            }
             streamIndex++;
             currentStream = streams.get(streamIndex);
+            if (markedStreamIndex != null) currentStream.mark(markReadLimit);
             if (log.isTraceEnabled()) log.trace(logPrefix()+"read(byte[]): end of all stream, advanced to next stream ("+currentStream.getClass().getSimpleName()+")");
             return read(buf, off, len);
 

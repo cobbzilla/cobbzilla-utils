@@ -8,6 +8,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.cobbzilla.util.system.Bytes;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.apache.commons.lang3.ArrayUtils.addAll;
@@ -36,7 +37,11 @@ public class RegexFilterReader extends BufferedReader {
     public RegexFilterReader(InputStream in, RegexStreamFilter filter) { this(in, DEFAULT_BUFFER_SIZE, filter); }
 
     public RegexFilterReader(InputStream in, int bufsiz, RegexStreamFilter filter) {
-        super(new InputStreamReader(in, UTF8cs), bufsiz);
+        this(in, UTF8cs, bufsiz, filter);
+    }
+
+    public RegexFilterReader(InputStream in, Charset charset, int bufsiz, RegexStreamFilter filter) {
+        super(new InputStreamReader(in, charset), bufsiz);
         this.bufsiz = bufsiz;
         this.filter = filter;
     }
