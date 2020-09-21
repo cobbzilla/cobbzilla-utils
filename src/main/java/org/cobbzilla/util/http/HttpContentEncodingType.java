@@ -5,6 +5,10 @@ import com.nixxcode.jvmbrotli.common.BrotliLoader;
 import com.nixxcode.jvmbrotli.dec.BrotliInputStream;
 import com.nixxcode.jvmbrotli.enc.BrotliOutputStream;
 import lombok.AllArgsConstructor;
+import org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
+import org.apache.commons.compress.compressors.deflate.DeflateCompressorOutputStream;
+import org.apache.commons.compress.compressors.deflate.DeflateParameters;
+import org.apache.commons.io.IOUtils;
 import org.cobbzilla.util.io.FilterInputStreamViaOutputStream;
 import org.cobbzilla.util.system.Bytes;
 
@@ -20,9 +24,15 @@ public enum HttpContentEncodingType {
 
     gzip (GZIPInputStream::new, GZIPOutputStream::new, GZIPOutputStream.class),
 
-    deflate ((in, bufsiz) -> new InflaterInputStream(in, new Inflater(true), bufsiz),
-             out -> new DeflaterOutputStream(out, new Deflater(7, true)),
-             in -> new FilterInputStreamViaOutputStream(in, out -> new InflaterOutputStream(out, new Inflater(true)))),
+    deflate ((in, bufsiz) -> new DeflateCompressorInputStream(in, Constants.DEFLATE_PARAMETERS),
+             out -> new DeflateCompressorOutputStream(out, Constants.DEFLATE_PARAMETERS),
+             in -> new FilterInputStreamViaOutputStream(in, out -> {
+                 try {
+                     return new DeflateCompressorOutputStream(out, Constants.DEFLATE_PARAMETERS);
+                 } catch (IOException e) {
+                     return die("deflate.FilterInputStreamViaOutputStream: "+e, e);
+                 }
+             })),
 
     br (HttpContentEncodingType::wrapBrotliInput, BrotliOutputStream::new, BrotliOutputStream.class),
     bro (HttpContentEncodingType::wrapBrotliInput, BrotliOutputStream::new, BrotliOutputStream.class);
@@ -31,6 +41,31 @@ public enum HttpContentEncodingType {
 
     static {
         if (!BrotliLoader.isBrotliAvailable()) die("BrotliLoader.isBrotliAvailable() returned false");
+    }
+
+    public byte[] encode(byte[] data) throws IOException {
+        return encode(data, data.length / 2); // take a guess
+    }
+
+    public byte[] encode(byte[] data, int size) throws IOException {
+        final ByteArrayInputStream in = new ByteArrayInputStream(data);
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(size);
+        try (final OutputStream out = wrapOutput(output)) {
+            IOUtils.copyLarge(in, out);
+        }
+        return output.toByteArray();
+    }
+
+    public byte[] decode(byte[] data) throws IOException {
+        return decode(data, data.length * 2); // take a guess
+    }
+
+    public byte[] decode(byte[] data, int size) throws IOException {
+        final ByteArrayOutputStream output = new ByteArrayOutputStream(size);
+        try (final InputStream input = wrapInput(new ByteArrayInputStream(data))) {
+            IOUtils.copyLarge(input, output);
+        }
+        return output.toByteArray();
     }
 
     public interface HttpContentEncodingInputWrapper {
@@ -71,5 +106,12 @@ public enum HttpContentEncodingType {
     public OutputStream wrapOutput(OutputStream out) throws IOException { return outputWrapper.wrap(out); }
 
     public FilterInputStreamViaOutputStream wrapInputAsOutput(InputStream in) throws IOException { return inputAsOutputWrapper.wrap(in); }
+
+    private static class Constants {
+        public static DeflateParameters DEFLATE_PARAMETERS = new DeflateParameters();
+        static {
+            DEFLATE_PARAMETERS.setCompressionLevel(7);
+        }
+    }
 
 }
