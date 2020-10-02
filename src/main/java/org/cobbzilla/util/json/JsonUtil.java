@@ -386,7 +386,7 @@ public class JsonUtil {
 
         final JsonNode parent = found.size() > 1 ? found.get(found.size()-2) : document;
         if (index != null) {
-            final JsonNode origNode = ((ArrayNode) parent).get(index);
+            final JsonNode origNode = parent.get(index);
             ((ArrayNode) parent).set(index, getValueNode(origNode, path, replacement));
         } else {
             // what is the original node type?
