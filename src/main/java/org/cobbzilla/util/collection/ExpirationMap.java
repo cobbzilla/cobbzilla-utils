@@ -81,10 +81,11 @@ public class ExpirationMap<K, V> implements Map<K, V> {
 
         public ExpirationMapEntry<VAL> touch() { atime = now(); return this; }
         public boolean expired() {
+            final long now = now();
             switch (evictionPolicy) {
-                case ctime_or_atime: default: return now() > ctime+maxExpiration || now() > atime+expiration;
-                case atime: return now() > atime+expiration;
-                case ctime: return now() > ctime+expiration;
+                case ctime_or_atime: default: return now > ctime+maxExpiration || now > atime+expiration;
+                case atime: return now > atime+expiration;
+                case ctime: return now > ctime+expiration;
             }
         }
     }
