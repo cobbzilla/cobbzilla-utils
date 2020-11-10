@@ -297,12 +297,6 @@ cobbzilla-utils is available under the Apache License, version 2: http://www.apa
             <version>${args4j.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-
         <!-- web/html screenshots -->
         <dependency>
             <groupId>com.codeborne</groupId>
@@ -377,7 +371,7 @@ cobbzilla-utils is available under the Apache License, version 2: http://www.apa
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>5.2.4</version>
+            <version>5.3.4</version>
         </dependency>
 
     </dependencies>

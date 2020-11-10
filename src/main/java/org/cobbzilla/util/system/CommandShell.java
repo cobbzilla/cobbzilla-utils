@@ -258,7 +258,7 @@ public class CommandShell {
         }
     }
 
-    public static final long totalSystemMemory() { return HARDWARE.getMemory().getTotal(); }
+    public static long totalSystemMemory() { return HARDWARE.getMemory().getTotal(); }
 
     public static String hostname () { return toString("hostname"); }
     public static String domainname() { return toString("hostname -d"); }

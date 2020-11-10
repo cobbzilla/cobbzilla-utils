@@ -17,6 +17,7 @@ import java.security.DigestException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.io.FileUtil.abs;
 import static org.cobbzilla.util.string.StringUtil.UTF8cs;
@@ -69,7 +70,7 @@ public class ShaUtil {
         final CommandResult result;
         try {
             if (file.length() < SHA256_FILE_USE_SHELL_THRESHHOLD) return sha256_file_java(file);
-            result = exec(new CommandLine("sha256sum").addArgument(abs(file), false));
+            result = exec(shaCommand().addArgument(abs(file), false));
             if (result.isZeroExitStatus()) return split(result.getStdout(), " ").get(0);
 
         } catch (Exception e) {
@@ -78,6 +79,14 @@ public class ShaUtil {
             return die("sha256sum_file: Error calculating sha256 on " + abs(file) + ": " + e);
         }
         return die("sha256sum_file: sha256sum "+abs(file)+" exited with status "+result.getExitStatus()+", stderr="+result.getStderr()+", exception="+result.getExceptionString());
+    }
+
+    private static CommandLine shaCommand() {
+        if (IS_OS_MAC) {
+            return new CommandLine("shasum").addArgument("-a").addArgument("256");
+        } else {
+            return new CommandLine("sha256sum");
+        }
     }
 
     public static String sha256_file_java(File file) {

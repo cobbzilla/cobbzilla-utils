@@ -35,6 +35,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.LongStream.range;
 import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.cobbzilla.util.error.ExceptionHandler.DEFAULT_EX_RUNNABLE;
 import static org.cobbzilla.util.io.FileUtil.abs;
@@ -443,8 +444,8 @@ public class ZillaRuntime {
         return collect(range(start.longValue(), end.longValue()).boxed().iterator(), ToStringTransformer.instance);
     }
 
-    public static String zcat() { return SystemUtils.IS_OS_MAC ? "gzcat" : "zcat"; }
-    public static String zcat(File f) { return (SystemUtils.IS_OS_MAC ? "gzcat" : "zcat") + " " + abs(f); }
+    public static String zcat() { return IS_OS_MAC ? "gzcat" : "zcat"; }
+    public static String zcat(File f) { return (IS_OS_MAC ? "gzcat" : "zcat") + " " + abs(f); }
 
     public static final String[] JAVA_DEBUG_OPTIONS = {"-Xdebug", "-agentlib", "-Xrunjdwp"};
 
