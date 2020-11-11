@@ -148,7 +148,9 @@ public class RsaKeyPair {
                         "openssl rand -out secret.key 32 && " +
 
                         // encrypt data with symmetric key
-                        "openssl aes-256-cbc -salt -pbkdf2 -in data -out data.enc -pass file:secret.key && " +
+                        // disable PBKDF2, not supported on mac osx
+//                        "openssl aes-256-cbc -salt -pbkdf2 -in data -out data.enc -pass file:secret.key && " +
+                        "openssl aes-256-cbc -salt -in data -out data.enc -pass file:secret.key && " +
 
                         // encrypt sym key with recipient's public key
                         "openssl rsautl -encrypt -oaep -pubin -certin -keyform PEM -inkey recipient.crt -in secret.key -out secret.key.enc && " +
@@ -184,7 +186,9 @@ public class RsaKeyPair {
                     "openssl rsautl -decrypt -oaep -inkey recipient.key -in secret.key.enc -out secret.key && " +
 
                     // decrypt data with symmetric key
-                    "openssl aes-256-cbc -d -salt -pbkdf2 -in data.enc -out data -pass file:secret.key && " +
+                    // disable PBKDF2, not supported on mac osx
+//                    "openssl aes-256-cbc -d -salt -pbkdf2 -in data.enc -out data -pass file:secret.key && " +
+                    "openssl aes-256-cbc -d -salt -in data.enc -out data -pass file:secret.key && " +
 
                     // verify signature with sender's public key
                     "openssl dgst -sha256 -verify <(openssl x509 -in sender.crt -pubkey -noout) -signature data.sig data");
