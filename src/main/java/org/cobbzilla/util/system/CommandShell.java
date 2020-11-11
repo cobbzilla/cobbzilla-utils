@@ -4,6 +4,7 @@ import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.exec.*;
 import org.apache.commons.io.output.TeeOutputStream;
+import org.apache.commons.lang3.ArrayUtils;
 import org.cobbzilla.util.collection.MapBuilder;
 import org.cobbzilla.util.io.FileUtil;
 import oshi.SystemInfo;
@@ -11,7 +12,10 @@ import oshi.hardware.HardwareAbstractionLayer;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_LINUX;
+import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 import static org.cobbzilla.util.io.FileUtil.abs;
@@ -261,7 +265,14 @@ public class CommandShell {
     public static long totalSystemMemory() { return HARDWARE.getMemory().getTotal(); }
 
     public static String hostname () { return toString("hostname"); }
-    public static String domainname() { return toString("hostname -d"); }
+    public static String domainname() {
+        if (IS_OS_LINUX) {
+            return toString("hostname -d");
+        } else {
+            final String[] parts = toString("hostname").split("\\.");
+            return String.join(".", ArrayUtils.subarray(parts, 1, parts.length));
+        }
+    }
     public static String hostname_short() { return toString("hostname -s"); }
     public static String whoami() { return toString("whoami"); }
     public static boolean isRoot() { return "root".equals(whoami()); }
