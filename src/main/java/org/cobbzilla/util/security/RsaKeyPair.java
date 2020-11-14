@@ -22,6 +22,8 @@ import static org.cobbzilla.util.system.CommandShell.execScript;
 @NoArgsConstructor @Accessors(chain=true) @EqualsAndHashCode(of={"publicKey"}) @Slf4j
 public class RsaKeyPair {
 
+    public static boolean ENABLE_PBKDF2 = true;
+
     public static final int DEFAULT_EXPIRATION_DAYS = 30;
     public static final int MAX_RETRIES = 5;
 
@@ -98,7 +100,7 @@ public class RsaKeyPair {
             + "-days "+PARAM_DAYS+ " -subj \""+PARAM_SUBJECT+"\"";
 
     public static String getDefaultSubject () {
-        return "/C=AQ/ST=Ross Ice Shelf/O=cobbzilla.org/CN=key."+randomAlphanumeric(10)+".cobbzilla.org";
+        return "/C=AQ/ST=Ross Ice Shelf/O=example.org/CN=key."+randomAlphanumeric(10)+".example.org";
     }
 
     private static TempDir newRsaKeyDir(int daysUntilExpiration, String subject, int attempt, int maxKeyTries) {
@@ -148,9 +150,10 @@ public class RsaKeyPair {
                         "openssl rand -out secret.key 32 && " +
 
                         // encrypt data with symmetric key
-                        // disable PBKDF2, not supported on mac osx
-//                        "openssl aes-256-cbc -salt -pbkdf2 -in data -out data.enc -pass file:secret.key && " +
-                        "openssl aes-256-cbc -salt -in data -out data.enc -pass file:secret.key && " +
+                        (ENABLE_PBKDF2
+                                ? "openssl aes-256-cbc -salt -pbkdf2 -in data -out data.enc -pass file:secret.key"
+                                : "openssl aes-256-cbc -salt -in data -out data.enc -pass file:secret.key"
+                        ) + " && " +
 
                         // encrypt sym key with recipient's public key
                         "openssl rsautl -encrypt -oaep -pubin -certin -keyform PEM -inkey recipient.crt -in secret.key -out secret.key.enc && " +
@@ -186,9 +189,10 @@ public class RsaKeyPair {
                     "openssl rsautl -decrypt -oaep -inkey recipient.key -in secret.key.enc -out secret.key && " +
 
                     // decrypt data with symmetric key
-                    // disable PBKDF2, not supported on mac osx
-//                    "openssl aes-256-cbc -d -salt -pbkdf2 -in data.enc -out data -pass file:secret.key && " +
-                    "openssl aes-256-cbc -d -salt -in data.enc -out data -pass file:secret.key && " +
+                    (ENABLE_PBKDF2
+                            ? "openssl aes-256-cbc -d -salt -pbkdf2 -in data.enc -out data -pass file:secret.key"
+                            : "openssl aes-256-cbc -d -salt -in data.enc -out data -pass file:secret.key"
+                    ) + " && " +
 
                     // verify signature with sender's public key
                     "openssl dgst -sha256 -verify <(openssl x509 -in sender.crt -pubkey -noout) -signature data.sig data");
