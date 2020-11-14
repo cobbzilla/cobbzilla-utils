@@ -10,6 +10,7 @@ import org.cobbzilla.util.string.Base64;
 import org.cobbzilla.util.system.CommandResult;
 
 import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
@@ -22,7 +23,7 @@ import static org.cobbzilla.util.system.CommandShell.execScript;
 @NoArgsConstructor @Accessors(chain=true) @EqualsAndHashCode(of={"publicKey"}) @Slf4j
 public class RsaKeyPair {
 
-    public static boolean ENABLE_PBKDF2 = true;
+    public static final AtomicBoolean ENABLE_PBKDF2 = new AtomicBoolean(true);
 
     public static final int DEFAULT_EXPIRATION_DAYS = 30;
     public static final int MAX_RETRIES = 5;
@@ -150,7 +151,7 @@ public class RsaKeyPair {
                         "openssl rand -out secret.key 32 && " +
 
                         // encrypt data with symmetric key
-                        (ENABLE_PBKDF2
+                        (ENABLE_PBKDF2.get()
                                 ? "openssl aes-256-cbc -salt -pbkdf2 -in data -out data.enc -pass file:secret.key"
                                 : "openssl aes-256-cbc -salt -in data -out data.enc -pass file:secret.key"
                         ) + " && " +
@@ -189,7 +190,7 @@ public class RsaKeyPair {
                     "openssl rsautl -decrypt -oaep -inkey recipient.key -in secret.key.enc -out secret.key && " +
 
                     // decrypt data with symmetric key
-                    (ENABLE_PBKDF2
+                    (ENABLE_PBKDF2.get()
                             ? "openssl aes-256-cbc -d -salt -pbkdf2 -in data.enc -out data -pass file:secret.key"
                             : "openssl aes-256-cbc -d -salt -in data.enc -out data -pass file:secret.key"
                     ) + " && " +
