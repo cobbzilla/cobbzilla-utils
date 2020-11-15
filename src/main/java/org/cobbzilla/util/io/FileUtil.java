@@ -608,4 +608,20 @@ public class FileUtil {
                 }).walk();
         return found.get();
     }
+
+    public static File findFile(File dir, String name) {
+        final AtomicReference<File> found = new AtomicReference<>(null);
+        new FilesystemWalker()
+                .withDir(dir)
+                .withVisitor(file -> {
+                    if (found.get() != null) return;
+                    if (file.getName().equals(name)) {
+                        synchronized (found) {
+                            if (found.get() == null) found.set(file);
+                        }
+                    }
+                }).walk();
+        return found.get();
+    }
+
 }
