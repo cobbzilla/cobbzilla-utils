@@ -14,6 +14,7 @@ public class ArrayUtil {
     public static final Object[] SINGLE_NULL_OBJECT = new Object[]{null};
     public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
+    @SafeVarargs
     public static <T> T[] append (T[] array, T... elements) {
         if (array == null || array.length == 0) {
             if (elements.length == 0) return (T[]) new Object[]{}; // punt, it's empty anyway
@@ -28,6 +29,25 @@ public class ArrayUtil {
         }
     }
 
+    @SafeVarargs
+    public static <T> T[] prepend (T[] array, T... elements) {
+        if (array == null || array.length == 0) {
+            if (elements.length == 0) return (T[]) new Object[]{}; // punt, it's empty anyway
+            final T[] newArray = (T[]) Array.newInstance(elements[0].getClass(), elements.length);
+            System.arraycopy(elements, 0, newArray, 0, elements.length);
+            return newArray;
+        } else {
+            if (elements.length == 0) return Arrays.copyOf(array, array.length);
+            final T[] copy = Arrays.copyOf(array, array.length + elements.length);
+            // shift existing data down
+            System.arraycopy(array, 0, copy, elements.length, array.length);
+            // prepend
+            System.arraycopy(elements, 0, copy, 0, elements.length);
+            return copy;
+        }
+    }
+
+    @SafeVarargs
     public static <T> T[] concat (T[]... arrays) {
         int size = 0;
         for (T[] array : arrays) {
@@ -72,6 +92,7 @@ public class ArrayUtil {
         return newArray;
     }
 
+    @SafeVarargs
     public static <T> List<T> merge(Collection<T>... collections) {
         if (empty(collections)) return Collections.emptyList();
         final Set<T> result = new HashSet<>();
