@@ -82,6 +82,8 @@ public class ValidationRegexes {
         return found;
     }
 
-    public static boolean validateRegexMatches(Pattern pattern, String s) { return pattern.matcher(s).matches(); }
+    public static boolean validateRegexMatches(Pattern pattern, String s) {
+        return s != null && pattern.matcher(s).matches();
+    }
 
 }
