@@ -56,6 +56,7 @@ public class ValidationRegexes {
     public static final Pattern FILENAME_PATTERN = pattern("^[_A-Z0-9\\-\\.]+$");
     public static final Pattern INTEGER_PATTERN = pattern("^[0-9]+$");
     public static final Pattern DECIMAL_PATTERN = pattern("^[0-9]+(\\.[0-9]+)?$");
+    public static final Pattern HEXADECIMAL_PATTERN = pattern("^[0-9a-f]+$");
 
     public static final Map<String, Pattern> PHONE_PATTERNS = MapBuilder.build(new Object[][]{
             {"US", pattern("^\\d{10}$")}
