@@ -8,12 +8,13 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
 import org.apache.commons.compress.compressors.deflate.DeflateCompressorOutputStream;
 import org.apache.commons.compress.compressors.deflate.DeflateParameters;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.cobbzilla.util.io.FilterInputStreamViaOutputStream;
 import org.cobbzilla.util.system.Bytes;
 
 import java.io.*;
-import java.util.zip.*;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.die;
 
@@ -22,7 +23,9 @@ public enum HttpContentEncodingType {
 
     identity (BufferedInputStream::new, BufferedOutputStream::new, BufferedOutputStream.class),
 
-    gzip (GZIPInputStream::new, GZIPOutputStream::new, GZIPOutputStream.class),
+    gzip ((in, bufsiz) -> new GzipCompressorInputStream(in),
+            GzipCompressorOutputStream::new,
+            GzipCompressorOutputStream.class),
 
     deflate ((in, bufsiz) -> new DeflateCompressorInputStream(in, Constants.DEFLATE_PARAMETERS),
              out -> new DeflateCompressorOutputStream(out, Constants.DEFLATE_PARAMETERS),
