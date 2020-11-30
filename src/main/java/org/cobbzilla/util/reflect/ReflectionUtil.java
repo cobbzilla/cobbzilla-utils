@@ -557,13 +557,18 @@ public class ReflectionUtil {
                     try {
                         setter = dest.getClass().getMethod(setterName, getter.getReturnType());
                     } catch (Exception e) {
-                        log.debug("copy: setter not found: " + setterName);
+                        log.debug("copy: setter not found: "+dest.getClass().getName()+"."+setterName);
                         continue;
                     }
                 }
 
                 // do not copy null fields (should this be configurable?)
-                final Object srcValue = getter.invoke(src);
+                Object srcValue = null;
+                try {
+                    srcValue = getter.invoke(src);
+                } catch (InvocationTargetException ite) {
+                    log.debug("copy: error invoking getter for "+src.getClass().getName()+"."+fieldName+": "+shortError(ite));
+                }
                 if (srcValue == null) continue;
 
                 // does the dest have a getter? if so grab the current value
@@ -575,7 +580,7 @@ public class ReflectionUtil {
                         destValue = getter.invoke(dest);
                     }
                 } catch (Exception e) {
-                    log.debug("copy: error calling getter on dest: "+e);
+                    log.debug("copy: error calling getter "+dest.getClass().getName()+"."+fieldName+" on dest: "+e);
                 }
 
                 // copy the value from src to dest, if it's different
