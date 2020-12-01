@@ -3,6 +3,7 @@ package org.cobbzilla.util.http;
 public class HttpStatusCodes {
 
     public static final int UNPROCESSABLE_ENTITY = 422;
+    public static final int INVALID = UNPROCESSABLE_ENTITY;
     public static final int OK = 200;
     public static final int CREATED = 201;
     public static final int ACCEPTED = 202;
@@ -20,6 +21,7 @@ public class HttpStatusCodes {
     public static final int GATEWAY_TIMEOUT = 504;
 
     public static final String SC_UNPROCESSABLE_ENTITY = "422";
+    public static final String SC_INVALID = SC_UNPROCESSABLE_ENTITY;
     public static final String SC_OK = "200";
     public static final String SC_CREATED = "201";
     public static final String SC_ACCEPTED = "202";
