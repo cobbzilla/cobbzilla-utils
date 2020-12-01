@@ -20,20 +20,22 @@ public class Topology<T> {
                 .findFirst().orElse(null);
         final Node<T> node = existingNode != null ? existingNode : new Node<>(thing);
 
-        // add refs as edges; skip self-references
-        refs.stream().filter(ref -> !ref.equals(thing)).forEach(ref -> {
-            final Node<T> existingEdgeNode = nodes.stream()
-                    .filter(n -> n.thing.equals(ref))
-                    .findFirst()
-                    .orElse(null);
-            if (existingEdgeNode != null) {
-                node.addEdge(existingEdgeNode);
-            } else {
-                final Node<T> newEdgeNode = new Node<>(ref);
-                nodes.add(newEdgeNode);
-                node.addEdge(newEdgeNode);
-            }
-        });
+        // add refs as edges
+        refs.stream()
+                .filter(ref -> !ref.equals(thing))  // skip self-references
+                .forEach(ref -> {
+                    final Node<T> existingEdgeNode = nodes.stream()
+                            .filter(n -> n.thing.equals(ref))
+                            .findFirst()
+                            .orElse(null);
+                    if (existingEdgeNode != null) {
+                        node.addEdge(existingEdgeNode);
+                    } else {
+                        final Node<T> newEdgeNode = new Node<>(ref);
+                        nodes.add(newEdgeNode);
+                        node.addEdge(newEdgeNode);
+                    }
+                });
         if (existingNode == null) nodes.add(node);
     }
 
