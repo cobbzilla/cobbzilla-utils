@@ -6,22 +6,23 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.cobbzilla.util.reflect.OpenApiSchema;
 import org.cobbzilla.util.string.StringUtil;
 
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.Comparator.comparing;
+import static java.util.concurrent.TimeUnit.HOURS;
 import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 import static org.cobbzilla.util.dns.DnsType.A;
 import static org.cobbzilla.util.dns.DnsType.SOA;
 
-@NoArgsConstructor @Accessors(chain=true) @ToString(callSuper=true)
+@NoArgsConstructor @Accessors(chain=true) @ToString(callSuper=true) @OpenApiSchema
 public class DnsRecord extends DnsRecordBase {
 
-    public static final int DEFAULT_TTL = (int) TimeUnit.HOURS.toSeconds(1);
+    public static final int DEFAULT_TTL = (int) HOURS.toSeconds(1);
 
     public static final String OPT_MX_RANK = "rank";
     public static final String OPT_NS_NAME = "ns";
