@@ -444,7 +444,7 @@ public class ReflectionUtil {
         return fieldsWithAnnotation(forName(className), aClass);
     }
 
-    private static Map<String, List<Field>> _fwaCache = new ExpirationMap<>();
+    private static final Map<String, List<Field>> _fwaCache = new ExpirationMap<>();
     public static <T extends Annotation> List<Field> fieldsMatching(final Class clazz, Function<Field, Boolean> matcher) {
         final String className = clazz.getName();
         return _fwaCache.computeIfAbsent(className+":"+matcher.hashCode(), k -> {
@@ -720,7 +720,7 @@ public class ReflectionUtil {
      */
     public static <T> Class<T> getFirstTypeParam(Class clazz) { return getTypeParam(clazz, 0); }
 
-    private static Map<String, Class> typeParamCache = new ExpirationMap<>(ExpirationEvictionPolicy.atime);
+    private static final Map<String, Class> typeParamCache = new ExpirationMap<>(ExpirationEvictionPolicy.atime);
 
     public static <T> Class<T> getTypeParam(Class clazz, int index) {
         return (Class<T>) typeParamCache.computeIfAbsent(clazz.getName()+":"+index, k -> {
@@ -1046,7 +1046,6 @@ public class ReflectionUtil {
                 return (Class<T>) cls;
             }
         }
-
         return null;
     }
 
