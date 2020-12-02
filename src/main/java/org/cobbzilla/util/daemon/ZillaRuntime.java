@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.cobbzilla.util.collection.ToStringTransformer;
 import org.cobbzilla.util.error.ExceptionHandler;
 import org.cobbzilla.util.error.GeneralErrorHandler;
@@ -293,6 +292,10 @@ public class ZillaRuntime {
             }
         }
         return o.toString().length() == 0;
+    }
+
+    public static boolean annotationStringArrayHasValues(String[] val) {
+        return !empty(val) && (val.length > 1 || val[0].length() > 0);
     }
 
     public static <T> T first (Iterable<T> o) { return (T) ((Iterable) o).iterator().next(); }
