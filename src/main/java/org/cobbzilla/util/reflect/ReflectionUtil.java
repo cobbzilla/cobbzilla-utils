@@ -1164,7 +1164,16 @@ public class ReflectionUtil {
         try {
             return (T) f.get(null);
         } catch (Exception e) {
-            return die("constValue: "+e);
+            return die("constValue("+f+"): "+shortError(e));
+        }
+    }
+
+    public static <T> T safeConstValue(Field f) {
+        try {
+            return constValue(f);
+        } catch (Exception e) {
+            log.warn("safeConstValue("+f+"): error (returning null): "+shortError(e));
+            return null;
         }
     }
 
@@ -1175,9 +1184,18 @@ public class ReflectionUtil {
         } catch (NoSuchFieldException e) {
             return null;
         } catch (Exception e) {
-            return die("constValue: "+e);
+            return die("constValue("+type.getName()+", "+fieldName+"): "+shortError(e));
         }
         return constValue(field);
+    }
+
+    public static <T> T safeConstValue(Class type, String fieldName) {
+        try {
+            return constValue(type, fieldName);
+        } catch (Exception e) {
+            log.warn("safeConstValue("+type.getName()+", "+fieldName+"): error (returning null): "+shortError(e));
+            return null;
+        }
     }
 
 }
