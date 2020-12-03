@@ -1,6 +1,6 @@
 package org.cobbzilla.util.collection;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.cobbzilla.util.string.StringUtil;
 
 import java.lang.reflect.Array;
