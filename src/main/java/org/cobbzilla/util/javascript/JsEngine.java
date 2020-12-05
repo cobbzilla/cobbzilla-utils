@@ -24,8 +24,8 @@ public class JsEngine {
 
     private final List<ScriptEngine> availableScriptEngines;
 
-    private int maxEngines;
-    private String defaultScript;
+    private final int maxEngines;
+    private final String defaultScript;
     public String getDefaultScript () { return empty(defaultScript) ? "" : defaultScript; }
 
     public JsEngine() { this(new JsEngineConfig(1, 1, null)); }
