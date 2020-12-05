@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.MethodUtils;
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Transformer;
 import org.apache.commons.lang3.ArrayUtils;
 import org.cobbzilla.util.collection.ExpirationEvictionPolicy;
 import org.cobbzilla.util.collection.ExpirationMap;
@@ -917,8 +917,8 @@ public class ReflectionUtil {
         return target;
     }
 
-    private static Map<String, Method> setterCache = new ConcurrentHashMap<>(5000);
-    private static Map<Class, Object[]> nullArgCache = new ConcurrentHashMap<>(5000);
+    private static final Map<String, Method> setterCache = new ConcurrentHashMap<>(5000);
+    private static final Map<Class, Object[]> nullArgCache = new ConcurrentHashMap<>(5000);
 
     private static void invoke_set(Object target, String token, Object value) {
         final String cacheKey = target.getClass().getName()+"."+token+"."+(value == null ? "null" : value.getClass().getName());

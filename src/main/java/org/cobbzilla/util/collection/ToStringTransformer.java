@@ -1,6 +1,6 @@
 package org.cobbzilla.util.collection;
 
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Transformer;
 
 public class ToStringTransformer implements Transformer {
 

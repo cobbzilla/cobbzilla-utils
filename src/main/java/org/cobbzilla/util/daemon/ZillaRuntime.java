@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
-import org.cobbzilla.util.collection.ToStringTransformer;
 import org.cobbzilla.util.error.ExceptionHandler;
 import org.cobbzilla.util.error.GeneralErrorHandler;
 import org.cobbzilla.util.io.StreamUtil;
@@ -31,8 +30,6 @@ import java.util.function.Function;
 
 import static java.lang.Long.toHexString;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.stream.LongStream.range;
-import static org.apache.commons.collections.CollectionUtils.collect;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -441,10 +438,6 @@ public class ZillaRuntime {
     // from https://stackoverflow.com/a/8563667/1251543
     public static String hexToBase36(String hex) {
         return new BigInteger(hex, 16).toString(36);
-    }
-
-    public static Collection<String> stringRange(Number start, Number end) {
-        return collect(range(start.longValue(), end.longValue()).boxed().iterator(), ToStringTransformer.instance);
     }
 
     public static String zcat() { return IS_OS_MAC ? "gzcat" : "zcat"; }

@@ -2,8 +2,8 @@ package org.cobbzilla.util.collection;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Transformer;
 import org.cobbzilla.util.reflect.ReflectionUtil;
 
 import java.lang.reflect.Array;

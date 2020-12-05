@@ -2,7 +2,7 @@ package org.cobbzilla.util.collection;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Transformer;
 
 @AllArgsConstructor
 public class StringPrefixTransformer implements Transformer {
