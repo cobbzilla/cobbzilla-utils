@@ -30,18 +30,25 @@ public abstract class SimpleDaemon implements Runnable {
     /** Called right before daemon is about to exit */
     public void onStop () {}
 
-    public void start() {
+    public boolean start() {
         log.info(getName()+": Starting daemon");
         synchronized (lock) {
             if (mainThread != null) {
                 log.info(getName()+": daemon is already running, not starting it again");
-                return;
+                return false;
             }
             mainThread = new Thread(this);
             mainThread.setName(getName());
         }
         mainThread.setDaemon(true);
         mainThread.start();
+        return true;
+    }
+
+    public boolean startOrInterrupt() {
+        if (start()) return true;
+        if (canInterruptSleep()) interrupt();
+        return false;
     }
 
     private boolean alreadyStopped() {
