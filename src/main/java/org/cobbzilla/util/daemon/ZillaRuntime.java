@@ -319,6 +319,13 @@ public class ZillaRuntime {
     }
     public static <T> List toList(T o) {
         if (o == null) return null;
+        if (o instanceof Iterator) {
+            final List list = new ArrayList();
+            while (((Iterator<?>) o).hasNext()) {
+                list.add(((Iterator<?>) o).next());
+            }
+            return list;
+        }
         if (o instanceof Collection) return new ArrayList((Collection) o);
         if (o instanceof Object[]) return Arrays.asList((Object[]) o);
         return die("sortedList: cannot sort a "+o.getClass().getSimpleName()+", can only sort arrays and Collections");
