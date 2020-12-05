@@ -1,8 +1,6 @@
 package org.cobbzilla.util.string;
 
 import com.google.common.base.CaseFormat;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Transformer;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
@@ -25,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,15 +43,9 @@ public class StringUtil {
     public static final char[] EMPTY_CHAR_ARRAY = {};
     public static final String CRLF = "\r\n";
 
-    public static final Transformer XFORM_TO_STRING = o -> String.valueOf(o);
-
     public static final String[] VOWELS = {"e", "a", "o", "i", "u"};
 
     public static boolean isVowel(String symbol) { return ArrayUtils.indexOf(VOWELS, symbol) != -1; }
-
-    public static List<String> toStringCollection (Collection c) {
-        return new ArrayList<>(CollectionUtils.collect(c, XFORM_TO_STRING));
-    }
 
     public static String prefix(String s, int count) {
         return s == null ? null : s.length() > count ? s.substring(0, count) : s;
@@ -228,21 +219,13 @@ public class StringUtil {
     public static String toString (Collection c) { return toString(c, ","); }
 
     public static String toString (Collection c, String sep) {
-        return toString(c, sep, null);
-    }
-
-    public static String toString (Collection c, String sep, Function<Object, String> transformer) {
         StringBuilder builder = new StringBuilder();
         for (Object o : c) {
             if (builder.length() > 0) builder.append(sep);
-            builder.append(transformer != null ? transformer.apply(o) : o);
+            builder.append(o);
         }
         return builder.toString();
     }
-
-    public static String sqlIn (Collection c) { return toString(c, ",", ESCAPE_SQL); }
-
-    public static final Function<Object, String> ESCAPE_SQL = o -> "'"+o.toString().replace("\'", "\'\'")+"'";
 
     public static String toString(Map map) {
         if (map == null) return "null";
