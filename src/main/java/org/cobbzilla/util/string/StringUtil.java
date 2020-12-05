@@ -1,6 +1,7 @@
 package org.cobbzilla.util.string;
 
 import com.google.common.base.CaseFormat;
+import lombok.Getter;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.LocaleUtils;
@@ -507,14 +508,14 @@ public class StringUtil {
     private static final String DIFF_JS
             = loadResourceAsStringOrDie(getPackagePath(StringUtil.class)+"/diff_match_patch.js") + "\n"
             + loadResourceAsStringOrDie(getPackagePath(StringUtil.class)+"/calc_diff.js") + "\n";
-    public static JsEngine DIFF_JS_ENGINE = new JsEngine(new JsEngineConfig(5, 20, null));
+    @Getter(lazy=true) private static final JsEngine diffJsEngine = new JsEngine(new JsEngineConfig(5, 20, null));
     public static String diff (String text1, String text2, Map<String, String> opts) {
         if (opts == null) opts = new HashMap<>();
         final Map<String, Object> ctx = new HashMap<>();
         ctx.put("text1", text1);
         ctx.put("text2", text2);
         ctx.put("opts", opts);
-        return DIFF_JS_ENGINE.evaluate(DIFF_JS, ctx);
+        return getDiffJsEngine().evaluate(DIFF_JS, ctx);
     }
 
     public static String replaceWithRandom(String s, String find, int randLength) {
