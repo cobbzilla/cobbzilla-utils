@@ -85,20 +85,20 @@ cobbzilla-utils is available under the Apache License, version 2: http://www.apa
         <dependency>
             <groupId>org.graalvm.js</groupId>
             <artifactId>js</artifactId>
-            <version>19.2.0</version>
+            <version>${graalvm.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.graalvm.js/js-scriptengine -->
         <dependency>
             <groupId>org.graalvm.js</groupId>
             <artifactId>js-scriptengine</artifactId>
-            <version>19.2.0</version>
+            <version>${graalvm.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.graalvm.truffle/truffle-api -->
         <dependency>
             <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-api</artifactId>
-            <version>19.2.0</version>
+            <version>${graalvm.version}</version>
         </dependency>
 
         <dependency>
