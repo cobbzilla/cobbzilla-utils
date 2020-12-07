@@ -10,12 +10,12 @@ cobbzilla-utils is available under the Apache License, version 2: http://www.apa
     <parent>
         <groupId>org.cobbzilla</groupId>
         <artifactId>cobbzilla-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>2.0.1</version>
     </parent>
 
     <artifactId>cobbzilla-utils</artifactId>
     <name>cobbzilla-utils</name>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>2.0.1</version>
     <packaging>jar</packaging>
 
     <repositories>
