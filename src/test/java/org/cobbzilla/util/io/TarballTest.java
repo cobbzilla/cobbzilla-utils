@@ -2,7 +2,6 @@ package org.cobbzilla.util.io;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
-import org.cobbzilla.util.security.ShaUtil;
 import org.cobbzilla.util.string.StringUtil;
 import org.junit.After;
 import org.junit.Before;
@@ -12,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.cobbzilla.util.io.FileUtil.getDefaultTempDir;
+import static org.cobbzilla.util.security.ShaUtil.sha256;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -62,7 +62,7 @@ public class TarballTest {
 
         assertEquals("file1.txt", files[fileIndex].getName());
         assertEquals(4160, files[fileIndex].length());
-        shasum = StringUtil.tohex(ShaUtil.sha256(FileUtil.toString(files[fileIndex])));
+        shasum = StringUtil.tohex(sha256(FileUtil.toString(files[fileIndex])));
         assertEquals("62b74f00961184e2b448adfcf38ee6186d94b15ea6a364917d72645d8705a30c", shasum);
 
         assertEquals("subdir", files[subdirIndex].getName());
@@ -72,7 +72,7 @@ public class TarballTest {
         assertEquals(1, subdirFiles.length);
         assertEquals("subfile.txt", subdirFiles[0].getName());
         assertEquals(65072, subdirFiles[0].length());
-        shasum = StringUtil.tohex(ShaUtil.sha256(FileUtil.toString(subdirFiles[0])));
+        shasum = StringUtil.tohex(sha256(FileUtil.toString(subdirFiles[0])));
         assertEquals("4ded9b8ff2cb3b94ff0bb15b8e17aff795c7f64bd088d5d70acb38ad286e2d12", shasum);
     }
 
