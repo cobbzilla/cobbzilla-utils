@@ -3,6 +3,7 @@ package org.cobbzilla.util.network;
 import com.sun.jna.Platform;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.cobbzilla.util.collection.ExpirationMap;
 import org.cobbzilla.util.io.FileUtil;
 
@@ -251,5 +252,21 @@ public class NetworkUtil {
         return isHttpOrHttps(s)
                 ? toUri(s).getHost()
                 : toUri(SCHEME_HTTPS + s).getHost();
+    }
+
+    public static String randomLocalIp4() {
+        final StringBuilder addr = new StringBuilder("127");
+        for (int i=0; i<3; i++) {
+            addr.append(".").append(RandomUtils.nextInt(1, 255));
+        }
+        return addr.toString();
+    }
+
+    public static String randomLocalIp6() {
+        final StringBuilder addr = new StringBuilder("fd00");
+        for (int i=0; i<7; i++) {
+            addr.append("::").append(Integer.toHexString(RandomUtils.nextInt(1, 65536)));
+        }
+        return addr.toString();
     }
 }
