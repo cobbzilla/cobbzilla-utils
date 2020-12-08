@@ -518,12 +518,13 @@ public class ReflectionUtil {
      * Same as copy(dest, src) but only named fields are copied
      * @param dest destination object, or a Map<String, Object>
      * @param src source object
+     * @param prefix prefix map keys with this String
      * @param fields only fields with these names will be considered for copying
      * @param exclude fields with these names will NOT be considered for copying
      * @param <T> objects must share a type
      * @return count of fields copied
      */
-    public static <T> int copy (T dest, T src, String[] fields, String[] exclude) {
+    public static <T> int copy (T dest, T src, String prefix, String[] fields, String[] exclude) {
         int copyCount = 0;
         final boolean isMap = dest instanceof Map;
         try {
@@ -596,6 +597,13 @@ public class ReflectionUtil {
             throw new IllegalArgumentException("Error copying "+dest.getClass().getSimpleName()+" from src="+src+": "+e, e);
         }
         return copyCount;
+    }
+
+    /**
+     * Same as the other copy, but with no key prefix
+     */
+    public static <T> int copy (T dest, T src, String[] fields, String[] exclude) {
+        return copy(dest, src, "", fields, exclude);
     }
 
     private static <T> boolean isIgnored(T o, String fieldName, Method getter) {
@@ -702,11 +710,22 @@ public class ReflectionUtil {
      * @param thing The thing to copy
      * @return A copy of the object, created using the thing's copy constructor
      */
-    public static Map<String, Object> toMap(Object thing) { return toMap(thing, null, TO_MAP_STANDARD_EXCLUDES); }
+    public static Map<String, Object> toMap(Object thing) { return toMap(thing, "", null, TO_MAP_STANDARD_EXCLUDES); }
 
-    public static Map<String, Object> toMap(Object thing, String[] fields) { return toMap(thing, fields, TO_MAP_STANDARD_EXCLUDES); }
+    // prefix keys
+    public static Map<String, Object> toMap(Object thing, String prefix) { return toMap(thing, prefix, null, TO_MAP_STANDARD_EXCLUDES); }
+
+    public static Map<String, Object> toMap(Object thing, String[] fields) { return toMap(thing, "", fields, TO_MAP_STANDARD_EXCLUDES); }
+
+    public static Map<String, Object> toMap(Object thing, String prefix, String[] fields) {
+        return toMap(thing, prefix, fields, TO_MAP_STANDARD_EXCLUDES);
+    }
 
     public static Map<String, Object> toMap(Object thing, String[] fields, String[] exclude) {
+        return toMap(thing, "", fields, exclude);
+    }
+
+    public static Map<String, Object> toMap(Object thing, String prefix, String[] fields, String[] exclude) {
         final Map<String, Object> map = new HashMap<>();
         copy(map, thing, fields, exclude);
         return map;
