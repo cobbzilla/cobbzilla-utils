@@ -518,7 +518,7 @@ public class ReflectionUtil {
      * Same as copy(dest, src) but only named fields are copied
      * @param dest destination object, or a Map<String, Object>
      * @param src source object
-     * @param prefix prefix map keys with this String
+     * @param prefix prefix map keys with this String. This only works if `dest` is a Map
      * @param fields only fields with these names will be considered for copying
      * @param exclude fields with these names will NOT be considered for copying
      * @param <T> objects must share a type
@@ -586,7 +586,7 @@ public class ReflectionUtil {
                 // copy the value from src to dest, if it's different
                 if (!srcValue.equals(destValue)) {
                     if (isMap) {
-                        ((Map) dest).put(fieldName, srcValue);
+                        ((Map) dest).put((empty(prefix)?"":prefix) + fieldName, srcValue);
                     } else {
                         setter.invoke(dest, srcValue);
                     }
@@ -727,7 +727,7 @@ public class ReflectionUtil {
 
     public static Map<String, Object> toMap(Object thing, String prefix, String[] fields, String[] exclude) {
         final Map<String, Object> map = new HashMap<>();
-        copy(map, thing, fields, exclude);
+        copy(map, thing, prefix, fields, exclude);
         return map;
     }
 
