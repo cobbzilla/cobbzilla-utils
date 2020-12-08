@@ -265,7 +265,7 @@ public class NetworkUtil {
     public static String randomLocalIp6() {
         final StringBuilder addr = new StringBuilder("fd00");
         for (int i=0; i<7; i++) {
-            addr.append("::").append(Integer.toHexString(RandomUtils.nextInt(1, 65536)));
+            addr.append(":").append(Integer.toHexString(RandomUtils.nextInt(1, 65536)));
         }
         return addr.toString();
     }
