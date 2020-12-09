@@ -27,6 +27,7 @@ public class NetworkUtil {
 
     public static final String IPv4_ALL_ADDRS = "0.0.0.0";
     public static final String IPv4_LOCALHOST = "127.0.0.1";
+    public static final String IPv6_LOCALHOST = "fd00::1";
 
     public static boolean isLocalIpv4(String addr) {
         if (empty(addr)) return false;
