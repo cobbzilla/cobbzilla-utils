@@ -57,7 +57,8 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
                 ZillaRuntime.die("Unexpected error: " + e);
             } else {
                 final String msg = e.getClass().getSimpleName() + (e.getMessage() != null ? ": " + e.getMessage() : "");
-                log.error(msg);
+                log.error(msg, e);
+                e.printStackTrace();
             }
             returnValue = -1;
         } finally {
