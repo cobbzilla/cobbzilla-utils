@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.cobbzilla.util.error.ExceptionHandler;
 import org.cobbzilla.util.daemon.ZillaRuntime;
+import org.cobbzilla.util.error.ExceptionHandler;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -57,8 +57,7 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
                 ZillaRuntime.die("Unexpected error: " + e);
             } else {
                 final String msg = e.getClass().getSimpleName() + (e.getMessage() != null ? ": " + e.getMessage() : "");
-                log.error(msg, e);
-                e.printStackTrace();
+                log.error(msg);
             }
             returnValue = -1;
         } finally {
