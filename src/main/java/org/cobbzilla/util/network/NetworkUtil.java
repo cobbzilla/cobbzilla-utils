@@ -12,28 +12,38 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.*;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.cobbzilla.util.daemon.ZillaRuntime.die;
-import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
+import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.http.HttpSchemes.SCHEME_HTTPS;
 import static org.cobbzilla.util.http.HttpSchemes.isHttpOrHttps;
 import static org.cobbzilla.util.http.HttpUtil.url2string;
 import static org.cobbzilla.util.http.URIUtil.toUri;
 import static org.cobbzilla.util.string.ValidationRegexes.IPv4_PATTERN;
+import static org.cobbzilla.util.string.ValidationRegexes.IPv6_PATTERN;
 
 @Slf4j
 public class NetworkUtil {
 
     public static final String IPv4_ALL_ADDRS = "0.0.0.0";
     public static final String IPv4_LOCALHOST = "127.0.0.1";
-    public static final String IPv6_LOCALHOST = "fd00::1";
+    public static final String IPv6_LOCALHOST = "::1";
+    public static final String IPv6_LOCALHOST_CIDR = "::1/128";
 
     public static boolean isLocalIpv4(String addr) {
         if (empty(addr)) return false;
         if (addr.startsWith("/")) addr = addr.substring(1);
         if (!IPv4_PATTERN.matcher(addr).matches()) return false;
         if (addr.startsWith("127.")) return true;
+        return false;
+    }
+
+    public static boolean isLocalIpv6(String addr) {
+        if (empty(addr)) return false;
+        if (addr.startsWith("/")) addr = addr.substring(1);
+        if (!IPv6_PATTERN.matcher(addr).matches()) return false;
+        if (addr.equals(IPv6_LOCALHOST) || addr.equals(IPv6_LOCALHOST_CIDR)) return true;
         return false;
     }
 
@@ -70,6 +80,20 @@ public class NetworkUtil {
         }
     }
 
+    public static boolean isPublicIpv6(String addr) {
+        if (empty(addr)) return false;
+        if (addr.startsWith("/")) addr = addr.substring(1);
+        if (!IPv6_PATTERN.matcher(addr).matches()) return false;
+        try {
+            final InetAddress address = InetAddress.getByName(addr);
+            if (address.isSiteLocalAddress() || address.isLoopbackAddress() || address.isLinkLocalAddress()) return false;
+            return !isLocalIpv6(addr) && !isPrivateIp6(addr);
+        } catch (Exception e) {
+            log.warn("isPublicIpv4: "+e);
+            return false;
+        }
+    }
+
     public static boolean isPrivateIp4(String addr) {
         if (addr.startsWith("10.")) return true;
         if (addr.startsWith("192.168.")) return true;
@@ -82,6 +106,8 @@ public class NetworkUtil {
         }
         return false;
     }
+
+    public static boolean isPrivateIp6(String addr) { return addr.startsWith("fd"); }
 
     public static String getEthernetIpv4(NetworkInterface iface) {
         if (iface == null) return null;
@@ -120,11 +146,12 @@ public class NetworkUtil {
                     }
                 }
             }
-            return die("getLocalhostIpv4: no local 127.x.x.x address found");
+            log.warn("getLocalhostIpv4: no local 127.x.x.x address found (returning 127.0.0.1)");
 
         } catch (Exception e) {
-            return die("getLocalhostIpv4: "+e, e);
+            log.warn("getLocalhostIpv4 (returning 127.0.0.1): "+shortError(e));
         }
+        return IPv4_LOCALHOST;
     }
 
     public static Set<String> configuredIps() {
@@ -164,6 +191,14 @@ public class NetworkUtil {
     }
 
     public static String getFirstPublicIpv4() {
+        return getFirstAddrMatch(NetworkUtil::isPublicIpv4);
+    }
+
+    public static String getFirstPublicIpv6() {
+        return getFirstAddrMatch(NetworkUtil::isPublicIpv4);
+    }
+
+    private static String getFirstAddrMatch(Predicate<String> predicate) {
         try {
             final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             while (interfaces.hasMoreElements()) {
@@ -171,16 +206,16 @@ public class NetworkUtil {
                 final Enumeration<InetAddress> addrs = i.getInetAddresses();
                 while (addrs.hasMoreElements()) {
                     final String addr = addrs.nextElement().toString();
-                    if (isPublicIpv4(addr)) {
+                    if (predicate.test(addr)) {
                         return addr.substring(1);
                     }
                 }
             }
-            log.debug("getFirstPublicIpv4: no public IPv4 address found");
+            log.debug("getFirstAddrMatch: no matching address found");
             return null;
 
         } catch (Exception e) {
-            return die("getFirstPublicIpv4: "+e, e);
+            return die("getFirstAddrMatch: "+e, e);
         }
     }
 
