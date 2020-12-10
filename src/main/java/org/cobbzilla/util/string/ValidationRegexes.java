@@ -87,4 +87,6 @@ public class ValidationRegexes {
         return s != null && pattern.matcher(s).matches();
     }
 
+    public static boolean isHostname (String s) { return validateRegexMatches(HOST_PATTERN, s); }
+
 }
