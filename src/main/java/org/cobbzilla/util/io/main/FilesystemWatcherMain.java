@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.cobbzilla.util.daemon.ZillaRuntime.errorString;
 import static org.cobbzilla.util.daemon.ZillaRuntime.now;
+import static org.cobbzilla.util.string.StringUtil.safeShellArg;
 
 @Slf4j
 public class FilesystemWatcherMain extends BaseMain<FilesystemWatcherMainOptions> {
@@ -30,7 +31,7 @@ public class FilesystemWatcherMain extends BaseMain<FilesystemWatcherMainOptions
             @Override public void uber_fire(List<WatchEvent<?>> events) {
                 try {
                     if (options.hasCommand()) {
-                        CommandShell.exec(new CommandLine(options.getCommand()));
+                        CommandShell.exec(new CommandLine(safeShellArg(options.getCommand())));
                     } else {
                         final String msg = status() + " uber_fire ("+events.size()+" events) at " + DFORMAT.print(now());
                         log.info(msg);

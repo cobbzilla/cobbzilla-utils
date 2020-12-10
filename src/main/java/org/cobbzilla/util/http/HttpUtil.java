@@ -52,6 +52,7 @@ import static org.cobbzilla.util.json.JsonUtil.COMPACT_MAPPER;
 import static org.cobbzilla.util.json.JsonUtil.json;
 import static org.cobbzilla.util.security.CryptStream.BUFFER_SIZE;
 import static org.cobbzilla.util.string.StringUtil.*;
+import static org.cobbzilla.util.string.ValidationRegexes.isHostname;
 import static org.cobbzilla.util.system.Sleep.sleep;
 import static org.cobbzilla.util.time.TimeUtil.DATE_FORMAT_LAST_MODIFIED;
 
@@ -397,6 +398,10 @@ public class HttpUtil {
     public static boolean isOk(String url) { return isOk(url, URIUtil.getHost(url)); }
 
     public static boolean isOk(String url, String host) {
+        if (!isHostname(host)) {
+            log.warn("isOK: invalid hostname, returning false: "+host);
+            return false;
+        }
         final CommandLine command = new CommandLine("curl")
                 .addArgument("--insecure") // since we are requested via the IP address, the cert will not match
                 .addArgument("--header").addArgument("Host: " + host) // pass FQDN via Host header

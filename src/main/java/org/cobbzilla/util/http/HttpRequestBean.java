@@ -26,6 +26,7 @@ import static org.cobbzilla.util.daemon.ZillaRuntime.empty;
 import static org.cobbzilla.util.http.HttpContentTypes.NV_HTTP_JSON;
 import static org.cobbzilla.util.http.HttpMethods.*;
 import static org.cobbzilla.util.reflect.ReflectionUtil.copy;
+import static org.cobbzilla.util.string.StringUtil.safeShellUrlArg;
 import static org.cobbzilla.util.system.CommandShell.execScript;
 
 /**
@@ -153,7 +154,7 @@ public class HttpRequestBean {
     public static HttpRequestBean postJson(String path, String json) { return new HttpRequestBean(POST, path, json, NV_HTTP_JSON); }
 
     public String cURL () {
-        final StringBuilder b = new StringBuilder("curl '"+getUri()).append("'");
+        final StringBuilder b = new StringBuilder("curl '"+safeShellUrlArg(getUri())).append("'");
         for (NameAndValue header : getHeaders()) {
             final String name = header.getName();
             b.append(" -H '").append(name).append(": ").append(header.getValue()).append("'");
