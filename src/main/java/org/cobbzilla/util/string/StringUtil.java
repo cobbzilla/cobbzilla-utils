@@ -106,7 +106,7 @@ public class StringUtil {
     public static String safeFunctionName (String s) { return s.replaceAll("\\W", ""); }
     public static String safeSnakeName (String s) { return s.replaceAll("\\W", "_"); }
 
-    public static String safeShellUrlArg (String s) { return s.replaceAll("[^-\\.&?@+_%/=\\w]+", ""); }
+    public static String safeShellUrlArg (String s) { return s.replaceAll("[^-\\.&?:@+_%/=\\w]+", ""); }
 
     public static String onlyDigits (String s) { return s.replaceAll("\\D+", ""); }
 
