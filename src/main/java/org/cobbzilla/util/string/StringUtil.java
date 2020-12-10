@@ -101,7 +101,7 @@ public class StringUtil {
 
     public static String lastPathElement(String url) { return url.substring(url.lastIndexOf("/")+1); }
 
-    public static String safeShellArg (String s) { return s.replaceAll("[^-\\._ \t/=\\w]+", ""); }
+    public static String safeShellArg (String s) { return s.replaceAll("[^-\\.@_ \t/=\\w]+", ""); }
     public static boolean checkSafeShellArg (String s) { return safeShellArg(s).equals(s); }
     public static String safeFunctionName (String s) { return s.replaceAll("\\W", ""); }
     public static String safeSnakeName (String s) { return s.replaceAll("\\W", "_"); }
