@@ -624,4 +624,9 @@ public class FileUtil {
         return found.get();
     }
 
+    public static String replaceExt(String path, String ext) {
+        final int pos = path.lastIndexOf('.');
+        return pos == -1 ? path + "." + ext : path.substring(0, pos) + ext;
+    }
+
 }
