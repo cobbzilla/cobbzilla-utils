@@ -485,6 +485,11 @@ public class FileUtil {
         return f.getName().substring(0, f.getName().length() - ext.length());
     }
 
+    public static String appendToFileNameBeforeExt(String path, String part) {
+        final int dotPos = path.lastIndexOf('.');
+        return dotPos == -1 ? path + part : path.substring(0, dotPos) + part + path.substring(dotPos);
+    }
+
     /**
      * @param dir The directory to search
      * @return The most recently modified file, or null if the dir does not exist, is not a directory, or does not contain any files
