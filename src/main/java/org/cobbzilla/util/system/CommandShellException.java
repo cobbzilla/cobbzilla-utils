@@ -11,6 +11,8 @@ public class CommandShellException extends RuntimeException {
     @Getter @Setter private CommandResult result;
     @Getter @Setter private Exception exception;
 
+    @Override public String getMessage() { return toString(); }
+
     public CommandShellException (CommandResult result) { this.result = result; }
 
     public CommandShellException (Exception e) { this.exception = e; }
