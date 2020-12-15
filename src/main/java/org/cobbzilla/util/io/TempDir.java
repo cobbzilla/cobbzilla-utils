@@ -1,16 +1,20 @@
 package org.cobbzilla.util.io;
 
-import com.google.common.io.Files;
 import lombok.AllArgsConstructor;
-import lombok.Delegate;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
@@ -97,14 +101,23 @@ public class TempDir extends File implements Closeable {
     private interface TempDirOverrides { boolean delete(); }
 
     @Delegate(excludes=TempDirOverrides.class)
-    private File file;
+    private final File file;
 
     public TempDir () { this("700"); }
 
     public TempDir (String chmod) {
-        super(abs(Files.createTempDir()));
+        super(abs(_tempdir()));
         file = new File(super.getPath());
         chmod(file, chmod);
+    }
+
+    private static Path _tempdir() {
+        try {
+            final Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwx------");
+            return Files.createTempDirectory("tempDir", PosixFilePermissions.asFileAttribute(perms));
+        } catch (IOException e) {
+            return die("_tempdir: "+shortError(e), e);
+        }
     }
 
     public void killAfter (long t) {
