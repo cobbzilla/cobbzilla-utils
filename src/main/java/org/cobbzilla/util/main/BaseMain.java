@@ -40,6 +40,8 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
     protected void preRun() {}
     protected void postRun() {}
 
+    protected boolean exit() { return true; }
+
     public static void main(Class<? extends BaseMain> clazz, String[] args) {
         BaseMain m = null;
         int returnValue = 0;
@@ -63,7 +65,7 @@ public abstract class BaseMain<OPT extends BaseMainOptions> {
         } finally {
             if (m != null) m.cleanup();
         }
-        System.exit(returnValue);
+        if (m == null || m.exit()) System.exit(returnValue);
     }
 
     public void cleanup () {}
