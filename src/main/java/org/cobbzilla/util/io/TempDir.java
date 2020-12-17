@@ -23,6 +23,7 @@ import static org.cobbzilla.util.daemon.ZillaRuntime.*;
 import static org.cobbzilla.util.io.FileUtil.abs;
 import static org.cobbzilla.util.io.FileUtil.getDefaultTempDir;
 import static org.cobbzilla.util.system.CommandShell.chmod;
+import static org.cobbzilla.util.system.OsType.isWindows;
 import static org.cobbzilla.util.system.Sleep.sleep;
 
 /**
@@ -105,21 +106,27 @@ public class TempDir extends File implements Closeable {
 
     public TempDir () { this("700"); }
 
-    public TempDir (File dir) { this(dir, "700"); }
+    public TempDir (File dir) { this(dir, "700", !isWindows()); }
+    public TempDir (File dir, boolean doChmod) { this(dir, "700", doChmod); }
 
-    public TempDir (String chmod) { this(null, chmod); }
+    public TempDir (String chmod) { this(null, chmod, !isWindows()); }
 
-    public TempDir (File dir, String chmod) {
+    public TempDir (File dir, String chmod) { this(dir, chmod, !isWindows()); }
+
+    public TempDir (File dir, String chmod, boolean doChmod) {
         super(abs(_tempdir(dir)));
         file = new File(super.getPath());
-        chmod(file, chmod);
+        if (doChmod) {
+            if (isWindows()) die("TempDir: chmod not supported on Windows");
+            chmod(file, chmod);
+        }
     }
 
     private static Path _tempdir(File dir) {
         try {
             final Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwx------");
             return dir == null
-                    ? Files.createTempDirectory("tempDir", PosixFilePermissions.asFileAttribute(perms))
+                    ? Files.createTempDirectory( "tempDir", PosixFilePermissions.asFileAttribute(perms))
                     : Files.createTempDirectory(dir.toPath(), "tempDir", PosixFilePermissions.asFileAttribute(perms));
         } catch (IOException e) {
             return die("_tempdir: "+shortError(e), e);

@@ -13,6 +13,10 @@ public enum OsType {
 
     public static final OsType CURRENT_OS = initCurrentOs();
 
+    public static boolean isWindows () { return CURRENT_OS == windows; }
+    public static boolean isMac () { return CURRENT_OS == macosx; }
+    public static boolean isLinux () { return CURRENT_OS == linux; }
+
     private static OsType initCurrentOs() {
         if (Platform.isWindows()) return windows;
         if (Platform.isMac()) return macosx;
