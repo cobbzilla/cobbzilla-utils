@@ -174,3 +174,8 @@ function pct_diff (x, y) {
 function is_close_enough (x, y, max_pct) {
     return 100 - pct_diff(x, y) <= ((typeof max_pct == "undefined") ? 1.0 : max_pct);
 }
+
+// return true if x is "within" max_delta of y
+function is_within (x, y, max_delta) {
+    return Math.abs(x - y) < max_delta;
+}
