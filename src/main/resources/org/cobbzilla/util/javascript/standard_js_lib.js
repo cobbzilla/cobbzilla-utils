@@ -171,7 +171,7 @@ function pct_diff (x, y) {
 }
 
 // return true if x is "close enough" to y, in terms of max_pct (default is 1%)
-function is_close_enough (x, y, max_pct) {
+function is_within_pct (x, y, max_pct) {
     return 100 - pct_diff(x, y) <= ((typeof max_pct == "undefined") ? 1.0 : max_pct);
 }
 
