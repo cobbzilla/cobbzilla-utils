@@ -1,14 +1,18 @@
 package org.cobbzilla.util.time;
 
-import org.cobbzilla.util.string.StringUtil;
+import org.cobbzilla.util.collection.MapBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.DurationFieldType;
 import org.joda.time.format.*;
 
+import java.util.Map;
+import java.util.StringTokenizer;
+
 import static java.util.concurrent.TimeUnit.*;
 import static org.apache.commons.lang3.LocaleUtils.toLocale;
 import static org.cobbzilla.util.daemon.ZillaRuntime.*;
+import static org.joda.time.DurationFieldType.*;
 
 public class TimeUtil {
 
@@ -138,16 +142,39 @@ public class TimeUtil {
         return prefix+String.format("%1$02d:%2$02d:%3$02d.%4$04d", hours, mins, secs, millis);
     }
 
+    public static final Map<Character, DurationFieldType> DURATION_TYPES = MapBuilder.build(new Object[][]{
+            {'M', months()},
+            {'d', days()},
+            {'h', hours()},
+            {'m', minutes()},
+            {'s', seconds()}
+    });
+
     public static long parseDuration(String duration) {
         if (empty(duration)) return 0;
-        final long val = Long.parseLong(duration.length() > 1 ? StringUtil.chopSuffix(duration) : duration);
-        switch (duration.charAt(duration.length()-1)) {
-            case 's': return SECONDS.toMillis(val);
-            case 'm': return MINUTES.toMillis(val);
-            case 'h': return HOURS.toMillis(val);
-            case 'd': return DAYS.toMillis(val);
-            default: return val;
+        final StringTokenizer st = new StringTokenizer(duration, "+-Mdhms", true);
+        int sign = 1;
+        final long now = now();
+        DateTime result = new DateTime(now);
+        Integer amount = null;
+        while (st.hasMoreTokens()) {
+            final String token = st.nextToken();
+            final char firstChar = token.charAt(0);
+            switch (firstChar) {
+                case '+': sign = 1; break;
+                case '-': sign = -1; break;
+                case 'M': case 'd': case 'h': case 'm': case 's':
+                    if (amount == null) return die("parseDuration: amount missing: "+duration);
+                    result = result.withFieldAdded(DURATION_TYPES.get(firstChar), amount);
+                    sign = 1;
+                    amount = null;
+                    break;
+                default:
+                    // must be a number
+                    amount = big(token).multiply(big(sign)).intValue();
+            }
         }
+        return result.getMillis() - now;
     }
 
     public static long addYear (long time) {
