@@ -1,5 +1,6 @@
 package org.cobbzilla.util.string;
 
+import lombok.extern.slf4j.Slf4j;
 import org.cobbzilla.util.collection.MapBuilder;
 
 import java.util.ArrayList;
@@ -8,8 +9,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static org.cobbzilla.util.daemon.ZillaRuntime.shortError;
 import static org.cobbzilla.util.string.StringUtil.chop;
 
+@Slf4j
 public class ValidationRegexes {
 
     public static final Pattern LOGIN_PATTERN = pattern("^[\\w\\-]+$");
@@ -69,7 +73,10 @@ public class ValidationRegexes {
     public static final String ZIPCODE_REGEX = "^\\d{5}(-\\d{4})?$";
     public static final Pattern ZIPCODE_PATTERN = pattern(ZIPCODE_REGEX);
 
-    public static Pattern pattern(String regex) { return Pattern.compile(regex, Pattern.CASE_INSENSITIVE); }
+    public static final String NEVER_MATCH_REGEX = "(?!)";
+    public static final Pattern NEVER_MATCH_PATTERN = pattern(NEVER_MATCH_REGEX);
+
+    public static Pattern pattern(String regex) { return Pattern.compile(regex, CASE_INSENSITIVE); }
 
     public static List<String> findAllRegexMatches(String text, String regex) {
         if (regex.startsWith("^")) regex = regex.substring(1);
@@ -88,5 +95,14 @@ public class ValidationRegexes {
     }
 
     public static boolean isHostname (String s) { return validateRegexMatches(HOST_PATTERN, s); }
+
+    public static Pattern safePattern(String regex) {
+        try {
+            return pattern(regex);
+        } catch (Exception e) {
+            log.error("safePattern: invalid regex: "+regex+": "+shortError(e));
+            return NEVER_MATCH_PATTERN;
+        }
+    }
 
 }
