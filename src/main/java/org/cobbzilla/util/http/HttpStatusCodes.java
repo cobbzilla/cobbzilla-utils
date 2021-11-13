@@ -1,7 +1,5 @@
 package org.cobbzilla.util.http;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class HttpStatusCodes {
 
     public static final int UNPROCESSABLE_ENTITY = 422;
