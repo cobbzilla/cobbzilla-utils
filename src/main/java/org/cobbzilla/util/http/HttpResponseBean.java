@@ -33,12 +33,12 @@ public class HttpResponseBean {
     @Getter @Setter private long contentLength;
     @Getter @Setter private String contentType;
 
-    @JsonIgnore public boolean isOk() { return is2xx(); }
-    @JsonIgnore public boolean is1xx() { return (status / 100) == 1; }
-    @JsonIgnore public boolean is2xx() { return (status / 100) == 2; }
-    @JsonIgnore public boolean is3xx() { return (status / 100) == 3; }
-    @JsonIgnore public boolean is4xx() { return (status / 100) == 4; }
-    @JsonIgnore public boolean is5xx() { return (status / 100) == 5; }
+    @JsonIgnore public boolean isOk() { return HttpStatusCodes.isOk(status); }
+    @JsonIgnore public boolean is1xx() { return HttpStatusCodes.is1xx(status); }
+    @JsonIgnore public boolean is2xx() { return HttpStatusCodes.is2xx(status); }
+    @JsonIgnore public boolean is3xx() { return HttpStatusCodes.is3xx(status); }
+    @JsonIgnore public boolean is4xx() { return HttpStatusCodes.is4xx(status); }
+    @JsonIgnore public boolean is5xx() { return HttpStatusCodes.is5xx(status); }
 
     public Map<String, Object> toMap () {
         final Map<String, Object> map = new LinkedHashMap<>();

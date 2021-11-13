@@ -1,5 +1,7 @@
 package org.cobbzilla.util.http;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class HttpStatusCodes {
 
     public static final int UNPROCESSABLE_ENTITY = 422;
@@ -37,5 +39,12 @@ public class HttpStatusCodes {
     public static final String SC_SERVER_ERROR = "500";
     public static final String SC_SERVER_UNAVAILABLE = "503";
     public static final String SC_GATEWAY_TIMEOUT = "504";
+
+    public static boolean isOk(int status) { return is2xx(status); }
+    public static boolean is1xx(int status) { return (status / 100) == 1; }
+    public static boolean is2xx(int status) { return (status / 100) == 2; }
+    public static boolean is3xx(int status) { return (status / 100) == 3; }
+    public static boolean is4xx(int status) { return (status / 100) == 4; }
+    public static boolean is5xx(int status) { return (status / 100) == 5; }
 
 }
